@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace App.Runtime.Debug
+namespace App.Runtime.Tools
 {
     [System.Serializable]
     public struct PoseSample

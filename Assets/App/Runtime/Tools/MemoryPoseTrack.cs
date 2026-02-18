@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace App.Runtime.Debug
+namespace App.Runtime.Tools
 {
     public class MemoryPoseTrack
     {

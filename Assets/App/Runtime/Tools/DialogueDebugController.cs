@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using App.Runtime.Input;
 
-namespace App.Runtime.Debug
+namespace App.Runtime.Tools
+
 {
     public class DialogueDebugController : MonoBehaviour
     {
