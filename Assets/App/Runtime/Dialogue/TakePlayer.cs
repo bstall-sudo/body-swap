@@ -15,6 +15,8 @@ namespace App.Runtime.Dialogue
         private double _dspStart;
         private bool _playing;
 
+        private float _fallbackStartTime;
+
         public bool IsPlaying => _playing;
 
         public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, AudioSource audio)
@@ -26,7 +28,8 @@ namespace App.Runtime.Dialogue
 
         public void Begin(TakeData take)
         {
-            
+            _fallbackStartTime = Time.time;
+
             _take = take;
             _i = 0;
             _playing = take != null && take.Frames.Count > 0;
@@ -52,7 +55,15 @@ namespace App.Runtime.Dialogue
             if (_audio == null || _audio.clip == null || !_audio.isPlaying)
                 return;
 
-            float t = (float)_audio.timeSamples / _audio.clip.frequency;
+            float t;
+            if (_audio != null && _audio.clip != null && _audio.isPlaying)
+            {
+                t = (float)_audio.timeSamples / _audio.clip.frequency;
+            }
+            else
+            {
+                t = Time.time - _fallbackStartTime;
+            }
 
             var frames = _take.Frames;
             if (frames.Count == 0) { _playing = false; return; }

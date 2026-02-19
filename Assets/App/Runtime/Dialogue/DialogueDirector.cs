@@ -3,6 +3,10 @@ using UnityEngine.InputSystem;
 using App.Runtime.Input;
 using System.Collections;
 using System.Diagnostics;
+using System;
+using System.IO;
+
+using App.Runtime.Dialogue.Persistence;
 
 namespace App.Runtime.Dialogue
 {
@@ -47,6 +51,10 @@ namespace App.Runtime.Dialogue
 
         private readonly SmoothAlign _align = new();
 
+        private SessionStore _store;
+        private SessionModel _session;
+        private int _takeCounter = 0;
+
         void Start()
         {
             if (TakeRoot == null) TakeRoot = transform;
@@ -73,6 +81,20 @@ namespace App.Runtime.Dialogue
 
             _playA = new TakePlayer(ActorA, A_Head, A_Left, A_Right, AudioA);
             _playB = new TakePlayer(ActorB, B_Head, B_Left, B_Right, AudioB);
+
+            _store = new SessionStore("YourApp"); // Ordnername frei
+            string sessionFolder = _store.CreateNewSessionFolder(out string sessionId);
+
+            _session = new SessionModel
+            {
+                SessionId = sessionId,
+                CreatedUtc = DateTime.UtcNow.ToString("o")
+            };
+
+            _store.SaveSessionModel(_session);
+
+            UnityEngine.Debug.Log("Session folder: " + sessionFolder);
+
         }
 
         void Update()
@@ -234,11 +256,13 @@ namespace App.Runtime.Dialogue
             {
                 _lastTakeA = _recA.Current;
                 _lastTakeA.AudioClip = trimmed;
+                PersistTake("A", _lastTakeA);
             }
             else
             {
                 _lastTakeB = _recB.Current;
                 _lastTakeB.AudioClip = trimmed;
+                PersistTake("B", _lastTakeB);
             }
         }
 
@@ -256,5 +280,40 @@ namespace App.Runtime.Dialogue
             // Anchor neu setzen
             _xrProvider?.SetAnchorFromTakeRoot(TakeRoot);
         }
+
+        private void PersistTake(string speaker, TakeData take)
+        {
+            _takeCounter++;
+            string takeId = $"take_{_takeCounter:0000}";
+
+            string folder = _store.GetSessionFolder(_session.SessionId);
+            string framesName = _store.FramesFileName(takeId, speaker);
+            string audioName = _store.AudioFileName(takeId, speaker);
+
+            string framesPath = Path.Combine(folder, framesName);
+            string audioPath = Path.Combine(folder, audioName);
+
+            // 1) Frames
+            JsonlFrames.WriteAll(framesPath, take.Frames);
+
+            // 2) Audio
+            if (take.AudioClip != null)
+                WavUtility.SaveWav(audioPath, take.AudioClip);
+
+            // 3) Meta
+            _session.Takes.Add(new TakeMeta
+            {
+                TakeId = takeId,
+                Speaker = speaker,
+                DurationSec = take.DurationSec,
+                FramesFile = framesName,
+                AudioFile = audioName
+            });
+
+            _store.SaveSessionModel(_session);
+
+            UnityEngine.Debug.Log($"Saved take {takeId} speaker={speaker} frames={framesName} audio={audioName}");
+        }
+
     }
 }
