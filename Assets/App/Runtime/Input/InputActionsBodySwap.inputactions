@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "name": "InputActionsBodySwap",
+    "maps": [
+        {
+            "name": "BodySwap",
+            "id": "61275bb0-d49b-41d5-9578-68f9aba8fa65",
+            "actions": [
+                {
+                    "name": "RecordToggle",
+                    "type": "Button",
+                    "id": "97a8005b-ef05-4eff-9772-3747f86a6b6f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchRole",
+                    "type": "Button",
+                    "id": "dc103a62-2e90-4964-a0e3-9feaffd638e7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ResetStage",
+                    "type": "Button",
+                    "id": "dee7a6a8-3e35-440e-9a15-2eaa1baf704c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "048e6ca0-938d-4af7-b60b-a11deab9bd5c",
+                    "path": "<XRController>{LeftHand}/gripButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RecordToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb8cfe19-4368-44bd-bf8b-996e5ebb13fa",
+                    "path": "<XRController>{RightHand}/gripPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchRole",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "29abab09-261e-4b8e-acb3-09ba5a8e76a4",
+                    "path": "<XRController>{LeftHand}/triggerPressed",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ResetStage",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

@@ -12,6 +12,10 @@ namespace App.Runtime.Dialogue
 {
     public class DialogueDirector : MonoBehaviour
     {
+        [Header("XR Origin (XR Rig)")]
+        public Transform XrOrigin;
+
+
         [Header("Stage Root")]
         public Transform TakeRoot; // this transform
 
@@ -38,6 +42,11 @@ namespace App.Runtime.Dialogue
         public bool UseXR = true;
         public float SmoothAlignSeconds = 0.6f;
 
+        //Verbindung zu DialogueInputBridge
+        public void ToggleRecordPublic() => ToggleRecord();
+        public void SwitchRolesPublic() => SwitchRolesSmooth();
+        public void ResetStagePublic() => ResetTakeRootToHead();
+
         private InputRouter _router;
         private XRInputProvider _xrProvider;
 
@@ -54,6 +63,24 @@ namespace App.Runtime.Dialogue
         private SessionStore _store;
         private SessionModel _session;
         private int _takeCounter = 0;
+
+        //für die Rebase Berechnung (neuer Take startet da, wo letzter Take geendet hat)
+        private bool _hasLastEndA = false;
+        private Vector3 _lastEndPosA;
+        private float _lastEndYawA;
+        //für die Rebase Berechnung (neuer Take startet da, wo letzter Take geendet hat)
+        private bool _hasLastEndB = false;
+        private Vector3 _lastEndPosB;
+        private float _lastEndYawB;
+
+        //damit man beim RoleSwitch an die Stelle der anderen Figur teleportiert wird
+        private bool _playerAlignActive;
+        private Vector3 _playerAlignFromPos, _playerAlignToPos;
+        private float _playerAlignFromYaw, _playerAlignToYaw;
+        private float _playerAlignT, _playerAlignDur;
+        //Helper, damit man beim RoleSwitch an die Stelle der anderen Figur teleportiert wird
+        private static float YawOf(Quaternion q) => q.eulerAngles.y;
+        private static Quaternion YawRot(float yawDeg) => Quaternion.Euler(0f, yawDeg, 0f);
 
         void Start()
         {
@@ -112,10 +139,11 @@ namespace App.Runtime.Dialogue
                 SwitchRolesSmooth();
 
             // Align tick
-            if (_align.Active) _align.Tick(Time.deltaTime);
+            //if (_align.Active) _align.Tick(Time.deltaTime);
 
+            TickPlayerAlign();
             // Live Update (mit Align)
-            UpdateLiveRigWithAlign();
+            UpdateLiveRig();
 
             // Recording tick
             if (_recording)
@@ -129,6 +157,111 @@ namespace App.Runtime.Dialogue
             _playB.Tick();
         }
 
+        // damit man sozusagen an den Ort des neuen Actors teleportiert wird.
+        private void AlignPlayerToActor(Transform actor)
+        {
+            if (XrOrigin == null || XrHead == null || actor == null) return;
+
+            // current head on floor (world)
+            Vector3 headFloor = XrHead.position;
+            headFloor.y = actor.position.y; // usually floor
+
+            // desired body position (world) = actor.position
+            Vector3 delta = actor.position - headFloor;
+
+            // move XR Origin so the head ends up at actor
+            XrOrigin.position += delta;
+
+            // optional: yaw align to actor forward
+            float targetYaw = actor.eulerAngles.y;
+            float currentYaw = XrHead.eulerAngles.y;
+            float deltaYaw = Mathf.DeltaAngle(currentYaw, targetYaw);
+            XrOrigin.rotation = Quaternion.Euler(0f, deltaYaw, 0f) * XrOrigin.rotation;
+        }
+
+        //Das wird in Update gerufen
+        private void TickPlayerAlign()
+        {
+            if (!_playerAlignActive) return;
+
+            _playerAlignT += Time.deltaTime;
+            float a = Mathf.Clamp01(_playerAlignT / _playerAlignDur);
+            a = a * a * (3f - 2f * a); // smoothstep
+
+            Vector3 pos = Vector3.Lerp(_playerAlignFromPos, _playerAlignToPos, a);
+            float yaw = Mathf.LerpAngle(_playerAlignFromYaw, _playerAlignToYaw, a);
+
+            XrOrigin.position = pos;
+
+            // keep only yaw rotation on origin (safe)
+            XrOrigin.rotation = Quaternion.Euler(0f, yaw, 0f);
+
+            if (a >= 1f) _playerAlignActive = false;
+        }
+
+        //das wird bei RoleSwitch gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
+        private void StartPlayerAlignToActor(Transform actor, float duration)
+        {
+            if (XrOrigin == null || XrHead == null || actor == null) return;
+
+            // From
+            _playerAlignFromPos = XrOrigin.position;
+            _playerAlignFromYaw = YawOf(XrOrigin.rotation);
+
+            // Head floor (world)
+            Vector3 headFloor = XrHead.position;
+            headFloor.y = actor.position.y;
+
+            // We want: headFloor -> actor.position
+            Vector3 delta = actor.position - headFloor;
+            _playerAlignToPos = XrOrigin.position + delta;
+
+            // Yaw: align head yaw to actor yaw (only yaw)
+            float headYaw = YawOf(XrHead.rotation);
+            float actorYaw = YawOf(actor.rotation);
+            float deltaYaw = Mathf.DeltaAngle(headYaw, actorYaw);
+
+            _playerAlignToYaw = _playerAlignFromYaw + deltaYaw;
+
+            _playerAlignDur = Mathf.Max(0.05f, duration);
+            _playerAlignT = 0f;
+            _playerAlignActive = true;
+        }
+
+        //das wird bei RoleSwitch gerufen, damit man das Gefühlt hat im Avatar zu sein. das XR-Rig wird vor der Aufnahme an die Position gefahren, wo die Figur am Ende des letzten Takes stand.
+        private void StartPlayerAlignToStagePose(Vector3 stagePos, float stageYawDeg, float duration)
+        {
+            if (XrOrigin == null || XrHead == null || TakeRoot == null) return;
+
+            // target world position of actor on floor
+            Vector3 targetWorldPos = TakeRoot.TransformPoint(stagePos);
+
+            // target world yaw
+            float takeRootYaw = TakeRoot.eulerAngles.y;
+            float targetWorldYaw = takeRootYaw + stageYawDeg;
+
+            // From origin pose
+            _playerAlignFromPos = XrOrigin.position;
+            _playerAlignFromYaw = XrOrigin.eulerAngles.y;
+
+            // current head on floor (world)
+            Vector3 headFloor = XrHead.position;
+            headFloor.y = targetWorldPos.y;
+
+            // Move origin so head lands at target
+            Vector3 delta = targetWorldPos - headFloor;
+            _playerAlignToPos = XrOrigin.position + delta;
+
+            // Rotate origin so head yaw matches target yaw
+            float headYaw = XrHead.eulerAngles.y;
+            float deltaYaw = Mathf.DeltaAngle(headYaw, targetWorldYaw);
+            _playerAlignToYaw = _playerAlignFromYaw + deltaYaw;
+
+            _playerAlignDur = Mathf.Max(0.05f, duration);
+            _playerAlignT = 0f;
+            _playerAlignActive = true;
+        }
+
         private void ToggleRecord()
         {
             if (!_recording)
@@ -138,8 +271,27 @@ namespace App.Runtime.Dialogue
                 // Beim Start: Anchor auf Bühne setzen (damit tracking->stage stabil ist)
                 _xrProvider?.SetAnchorFromTakeRoot(TakeRoot);
 
-                if (_aIsLive) _recA.Begin();
-                else _recB.Begin();
+
+
+                // Wenn es eine desiredStartPose gibt: zuerst alignen, dann Begin
+                if (UseXR)
+                {
+                    if (_aIsLive && _hasLastEndA)
+                    {
+                        StartPlayerAlignToStagePose(_lastEndPosA, _lastEndYawA, SmoothAlignSeconds);
+                        StartCoroutine(BeginRecordingAfterAlign(true, SmoothAlignSeconds));
+                        return;
+                    }
+                    if (!_aIsLive && _hasLastEndB)
+                    {
+                        StartPlayerAlignToStagePose(_lastEndPosB, _lastEndYawB, SmoothAlignSeconds);
+                        StartCoroutine(BeginRecordingAfterAlign(false, SmoothAlignSeconds));
+                        return;
+                    }
+                }
+
+                // erster Take: sofort beginnen
+                BeginRecordingNow();
 
                 // Playback stoppen
                 if (_aIsLive) _playB.Stop(); else _playA.Stop();
@@ -150,22 +302,68 @@ namespace App.Runtime.Dialogue
 
                 if (_aIsLive)
                 {
-                    UnityEngine.Debug.Log($"Recording stopped.");
                     var info = _recA.EndAndGetTrimInfo();
+
+                    // Frames sind sofort verfügbar:
+                    var take = _recA.Current;
+                    _lastTakeA = take; // schon mal setzen (Audio wird ggf. später ersetzt)
+
+                    if (take != null && take.Frames.Count > 0)
+                    {
+                        var lastFrame = take.Frames[take.Frames.Count - 1];
+                        _lastEndPosA = lastFrame.Body.Pos;
+                        _lastEndYawA = lastFrame.Body.YawDeg;
+                        _hasLastEndA = true;
+                    }
+
                     if (info.HasValue)
                         StartCoroutine(FinalizeTrimNextFrame(true, info.Value));
-                    else
-                        _lastTakeA = _recA.Current; // fallback
                 }
                 else
                 {
                     var info = _recB.EndAndGetTrimInfo();
+
+                    var take = _recB.Current;
+                    _lastTakeB = take;
+
+                    if (take != null && take.Frames.Count > 0)
+                    {
+                        var lastFrame = take.Frames[take.Frames.Count - 1];
+                        _lastEndPosB = lastFrame.Body.Pos;
+                        _lastEndYawB = lastFrame.Body.YawDeg;
+                        _hasLastEndB = true;
+                    }
+
                     if (info.HasValue)
                         StartCoroutine(FinalizeTrimNextFrame(false, info.Value));
-                    else
-                        _lastTakeB = _recB.Current; // fallback
                 }
 
+            }
+        }
+
+        private IEnumerator BeginRecordingAfterAlign(bool forA, float waitSec)
+        {
+            // warte bis Align fertig (oder waitSec)
+            float t0 = Time.time;
+            while (_playerAlignActive && Time.time - t0 < waitSec + 0.2f)
+                yield return null;
+
+            BeginRecordingNow();
+        }
+
+        private void BeginRecordingNow()
+        {
+            if (_aIsLive)
+            {
+                if (_hasLastEndA) _recA.SetDesiredStartPose(_lastEndPosA, _lastEndYawA);
+                _recA.Begin();
+                _playB.Stop();
+            }
+            else
+            {
+                if (_hasLastEndB) _recB.SetDesiredStartPose(_lastEndPosB, _lastEndYawB);
+                _recB.Begin();
+                _playA.Stop();
             }
         }
 
@@ -198,11 +396,15 @@ namespace App.Runtime.Dialogue
                 Vector3 fromPos = headStage; fromPos.y = 0f;
                 float fromYaw = headRotStage.eulerAngles.y;
 
-                _align.StartAlign(fromPos, fromYaw, targetPos, targetYaw, SmoothAlignSeconds);
+                StartPlayerAlignToActor(_aIsLive ? ActorA : ActorB, SmoothAlignSeconds);
+
+
             }
+            
         }
 
-        private void UpdateLiveRigWithAlign()
+    
+        private void UpdateLiveRig()
         {
             var p = _router.Provider;
             if (p == null) return;
@@ -214,11 +416,6 @@ namespace App.Runtime.Dialogue
             // Wenn Align aktiv: ersetze BodyPose (pos+yaw) durch interpolierte, aber behalte relative Head/Hands
             Vector3 bodyPos = headStage; bodyPos.y = 0f;
             float yaw = headRotStage.eulerAngles.y;
-
-            if (_align.Active)
-            {
-                _align.GetCurrent(out bodyPos, out yaw);
-            }
 
             Transform actor = _aIsLive ? ActorA : ActorB;
             Transform h = _aIsLive ? A_Head : B_Head;
@@ -243,6 +440,7 @@ namespace App.Runtime.Dialogue
             if (l) { l.localPosition = ToLocalPos(leftStage); l.localRotation = ToLocalRot(leftRotStage); }
             if (r) { r.localPosition = ToLocalPos(rightStage); r.localRotation = ToLocalRot(rightRotStage); }
         }
+     
 
         private IEnumerator FinalizeTrimNextFrame(bool wasALive, (AudioClip clip, int startSample, int sampleCount, int channels, int sampleRate) info)
         {
@@ -254,13 +452,13 @@ namespace App.Runtime.Dialogue
 
             if (wasALive)
             {
-                _lastTakeA = _recA.Current;
+                //_lastTakeA = _recA.Current;   //damit das nicht mit dem Rebase in die Quere kommt
                 _lastTakeA.AudioClip = trimmed;
                 PersistTake("A", _lastTakeA);
             }
             else
             {
-                _lastTakeB = _recB.Current;
+                //_lastTakeB = _recB.Current;   //damit das nicht mit dem Rebase in die Quere kommt
                 _lastTakeB.AudioClip = trimmed;
                 PersistTake("B", _lastTakeB);
             }

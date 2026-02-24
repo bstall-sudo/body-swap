@@ -124,6 +124,65 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1670256625, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
   m_PrefabInstance: {fileID: 441087506}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &118879409
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 118879411}
+  - component: {fileID: 118879410}
+  - component: {fileID: 118879412}
+  m_Layer: 0
+  m_Name: AppRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &118879410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118879409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88078a46f659b5147bcaebaa417215db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::App.Runtime.Input.XRControllerInput
+  Actions: {fileID: -944628639613478452, guid: 691d69d2e26102f4e903b312c8736ca9, type: 3}
+--- !u!4 &118879411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118879409}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &118879412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118879409}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ea2423002322cb4cb010b6343d20fd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InputTest
+  input: {fileID: 118879410}
 --- !u!1 &299639867
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,6 +524,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!4 &667199360 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+  m_PrefabInstance: {fileID: 441087506}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &683587000
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,7 +716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d63c42f8942b434c820bc92342568e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::App.Runtime.Dialogue.FullDialoguePlayer
-  SessionId: 746d7230701c4c16a46bbc36c8622301
+  SessionId: 9132d104f4ba4cb28ddc9c8e25fc012a
   AutoPlayOnStart: 1
   AppFolderName: YourApp
   ActorA: {fileID: 1621907961}
@@ -691,8 +755,8 @@ GameObject:
   m_Component:
   - component: {fileID: 891649870}
   - component: {fileID: 891649869}
-  - component: {fileID: 891649871}
   - component: {fileID: 891649872}
+  - component: {fileID: 891649873}
   m_Layer: 0
   m_Name: TakeRoot
   m_TagString: Untagged
@@ -736,7 +800,7 @@ Transform:
   - {fileID: 1979610533}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &891649871
+--- !u!114 &891649872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -745,34 +809,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 891649868}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b6432648032a5e45bdbef81998c695e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::App.Runtime.Debug.DialogueDebugController
-  RoleAIsLive: 1
-  RoleA:
-    Head: {fileID: 1577832725}
-    LeftHand: {fileID: 2004650654}
-    RightHand: {fileID: 1093998125}
-  RoleB:
-    Head: {fileID: 1727611863}
-    LeftHand: {fileID: 683587001}
-    RightHand: {fileID: 2055584089}
-  UseXR: 1
-  XrHead: {fileID: 2028347679}
-  XrLeftHand: {fileID: 1922292853}
-  XrRightHand: {fileID: 34679635}
---- !u!114 &891649872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891649868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac9f2af3f905017499fd9c18c2a4e588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::App.Runtime.Dialogue.DialogueDirector
+  XrOrigin: {fileID: 667199360}
   TakeRoot: {fileID: 891649870}
   ActorA: {fileID: 1621907961}
   ActorB: {fileID: 1979610533}
@@ -789,6 +829,20 @@ MonoBehaviour:
   XrRight: {fileID: 34679635}
   UseXR: 1
   SmoothAlignSeconds: 0.6
+--- !u!114 &891649873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891649868}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4113a05818efe8147ad4ec5d785ce1fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::App.Runtime.Dialogue.DialogueInputBridge
+  Input: {fileID: 118879410}
+  Director: {fileID: 891649872}
 --- !u!1 &1093998124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1185,7 +1239,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1693406912}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.05, z: 0}
   m_LocalScale: {x: 10.454, y: 0.1, z: 10.454}
   m_ConstrainProportionsScale: 0
@@ -1796,7 +1850,8 @@ SceneRoots:
   - {fileID: 441087506}
   - {fileID: 756192408}
   - {fileID: 2092139010}
+  - {fileID: 1693406916}
   - {fileID: 891649870}
   - {fileID: 1340740285}
-  - {fileID: 1693406916}
   - {fileID: 886290955}
+  - {fileID: 118879411}

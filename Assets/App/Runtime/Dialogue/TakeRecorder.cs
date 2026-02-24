@@ -18,14 +18,30 @@ namespace App.Runtime.Dialogue
         private string _device;
         private int _micStartSamplePos;
 
+        // für das Rebase, damit die neue Aufnahme so aufgenommen wird, dass es keinen "Sprung" gibt vom Ende der letzten Aufnahme
+        private bool _hasDesiredStart = false;
+        private Vector3 _desiredStartPos;
+        private float _desiredStartYaw;
 
-
+        //für die Rebase-Berechnung
+        private bool _hasRebase = false;
+        private Vector3 _rebasePos;
+        private float _rebaseYawDeg;
 
 
         private double _dspStart;
         private bool _recording;
 
         public TakeData Current { get; private set; }
+
+        // für das Rebase, damit die neue Aufnahme so aufgenommen wird, dass es keinen "Sprung" gibt vom Ende der letzten Aufnahme
+        public void SetDesiredStartPose(Vector3 pos, float yawDeg)
+        {
+            _desiredStartPos = pos;
+            _desiredStartYaw = yawDeg;   //rotation, wo die Figur am Ende der letzten Aufnahme stand.
+            _hasDesiredStart = true;
+        }
+
 
         public TakeRecorder(Transform stageRoot, Transform actorRoot, IInputProvider input,
                             int micDeviceIndex = 0, int sampleRate = 48000)
@@ -73,6 +89,8 @@ namespace App.Runtime.Dialogue
 
 
         {
+            //verstehe ich nicht...
+            _hasRebase = false;
 
             UnityEngine.Debug.Log("Mic devices: " + string.Join(" | ", Microphone.devices));
 
@@ -131,14 +149,52 @@ namespace App.Runtime.Dialogue
 
             float t = (float)sampleCount / _sampleRate;
 
-            // Live Posen vom Input (die kommen bei XR bei uns schon Anchor-local = stage-local)
+            // Live Posen vom Input (die kommen bei XR bei uns schon Anchor-local = stage-local) "out var" heisst, die out-Variablen werden direkt dort deklariert. 
+            // if (!Methode()) return; -> wenn methode fehlschlägt, zurückkehren, sonst weiter
             if (!_input.TryGetHeadPose(out var headP_stageLocal, out var headR_stageLocal)) return;
             _input.TryGetLeftHandPose(out var leftP_stageLocal, out var leftR_stageLocal);
             _input.TryGetRightHandPose(out var rightP_stageLocal, out var rightR_stageLocal);
 
+            //für das Rebase yawDeg => _desiredStartYaw (rotation)
+            static Quaternion YawRot(float yawDeg) => Quaternion.Euler(0f, yawDeg, 0f);
+
             // BodyPose aus Head ableiten: Bodenposition + yaw
             Vector3 bodyPos = headP_stageLocal; bodyPos.y = 0f;
             float yaw = headR_stageLocal.eulerAngles.y;
+
+            // Rebase einmalig berechnen: measuredStart -> desiredStart
+            if (_hasDesiredStart && !_hasRebase)
+            {
+                float deltaYaw = Mathf.DeltaAngle(yaw, _desiredStartYaw); // desired - measured (als shortest angle)
+                Quaternion qDelta = YawRot(deltaYaw);
+
+                // rebasePos so, dass: desired = rebasePos + qDelta * measured
+                _rebasePos = _desiredStartPos - (qDelta * bodyPos);
+                _rebaseYawDeg = deltaYaw;
+                _hasRebase = true;
+            }
+
+            if (_hasRebase)
+            {
+                Quaternion qDelta = Quaternion.Euler(0f, _rebaseYawDeg, 0f);
+
+                // Body
+                bodyPos = _rebasePos + (qDelta * bodyPos);
+                yaw = Mathf.Repeat(yaw + _rebaseYawDeg, 360f);
+
+                // Head / Hands POS
+                headP_stageLocal = _rebasePos + (qDelta * headP_stageLocal);
+                leftP_stageLocal = _rebasePos + (qDelta * leftP_stageLocal);
+                rightP_stageLocal = _rebasePos + (qDelta * rightP_stageLocal);
+
+                // Head / Hands ROT
+                headR_stageLocal = qDelta * headR_stageLocal;
+                leftR_stageLocal = qDelta * leftR_stageLocal;
+                rightR_stageLocal = qDelta * rightR_stageLocal;
+            }
+
+            //optional normalisieren, falls yaw über 360 Grad
+            yaw = Mathf.Repeat(yaw, 360f);
 
             // ActorRoot entsprechend setzen (stage-local)
             _actorRoot.localPosition = bodyPos;
