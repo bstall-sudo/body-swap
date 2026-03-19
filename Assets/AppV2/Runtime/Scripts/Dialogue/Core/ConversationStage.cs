@@ -301,7 +301,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
    
         }
-
+/*
         //das wird bei RoleSwitch gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         private void StartPlayerAlignToActor(Transform actor, float duration)
         {
@@ -329,7 +329,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _playerAlignDur = Mathf.Max(0.05f, duration);
             _playerAlignT = 0f;
             _playerAlignActive = true;
-        }
+        }*/
     }
 
 }
