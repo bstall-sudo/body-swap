@@ -18,6 +18,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         private float _fallbackStartTime;
 
+        private float _roleScale = 1f;
+
         public bool IsPlaying => _playing;
 
         public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, AudioSource audio)
@@ -25,6 +27,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             _actorRoot = actorRoot;
             _headT = head; _leftT = left; _rightT = right;
             _audio = audio;
+        }
+
+        // das ist wichtig um die Figur in der skalierten Grösse abzuspielen, wenn das nicht gerufen wird, wird 1:1 abgespielt.
+        public void SetRoleScale(float roleScale)
+        {
+            
+            _roleScale = Mathf.Max(0.0001f, roleScale);
+            //UnityEngine.Debug.Log($"roleScale is: {roleScale}");
         }
 
         public void Begin(TakeData take)
@@ -50,9 +60,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 _dspStart = AudioSettings.dspTime;
             }
 
+            /*
             UnityEngine.Debug.Log(
                 $"TakePlayer.Begin called. Frames: {take?.Frames?.Count}, AudioClip: {take?.AudioClip != null}"
             );
+            */
         }
 
         public void Tick()
@@ -113,23 +125,51 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             if (_headT)
             {
-                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u);
+                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u) * _roleScale; 
                 _headT.localRotation = Quaternion.Slerp(a.Head.Rot, b.Head.Rot, u);
             }
 
             if (_leftT)
             {
-                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u);
+                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u) * _roleScale; 
                 _leftT.localRotation = Quaternion.Slerp(a.Left.Rot, b.Left.Rot, u);
             }
 
             if (_rightT)
             {
-                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u);
+                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u) * _roleScale; 
                 _rightT.localRotation = Quaternion.Slerp(a.Right.Rot, b.Right.Rot, u);
             }
         }
 
+
+        //hier ist jetzt auch roleScale dabei, um die positionsdaten entsprechend anpassen zu können.
+        private void ApplyFrame(Frame f)
+        {
+            _actorRoot.localPosition = f.Body.Pos;
+            _actorRoot.localRotation = Quaternion.Euler(0f, f.Body.YawDeg, 0f);
+
+            if (_headT)
+            {
+                _headT.localPosition = f.Head.Pos * _roleScale;
+                _headT.localRotation = f.Head.Rot;
+            }
+
+            if (_leftT)
+            {
+                _leftT.localPosition = f.Left.Pos * _roleScale;
+                _leftT.localRotation = f.Left.Rot;
+            }
+
+            if (_rightT)
+            {
+                _rightT.localPosition = f.Right.Pos * _roleScale;
+                _rightT.localRotation = f.Right.Rot;
+            }
+        }
+
+
+        /*
         private void ApplyFrame(Frame f)
         {
             _actorRoot.localPosition = f.Body.Pos;
@@ -139,6 +179,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             if (_leftT) { _leftT.localPosition = f.Left.Pos; _leftT.localRotation = f.Left.Rot; }
             if (_rightT) { _rightT.localPosition = f.Right.Pos; _rightT.localRotation = f.Right.Rot; }
         }
+        */
 
         //Stoppen und RAM leeren.
         public void Stop()

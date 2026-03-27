@@ -24,11 +24,11 @@ namespace AppV2.Runtime.Scripts.DataStructures
         {
             string key = BuildTakeKey(roleIndex, sceneCount);
 
-            UnityEngine.Debug.Log($"TryGetTakeForScene: looking for key={key}");
+            //UnityEngine.Debug.Log($"TryGetTakeForScene: looking for key={key}");
 
             bool found = _takeMetaBySceneAndRole.TryGetValue(key, out takeMeta);
 
-            UnityEngine.Debug.Log($"TryGetTakeForScene: found={found}");
+            //UnityEngine.Debug.Log($"TryGetTakeForScene: found={found}");
 
             return found;
         }
@@ -38,6 +38,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             if (meta == null)
                 return;
             string key = BuildTakeKey(meta.RoleIndex, meta.SceneCount);
+            /*
             UnityEngine.Debug.Log(
                 $"StoreTakeMeta: key={key}, " +
                 $"sceneCount={meta.SceneCount}, " +
@@ -45,6 +46,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
                 $"takeId={meta.TakeId}, " +
                 $"roleId={meta.RoleId}"
             );
+            */
 
             
             _takeMetaBySceneAndRole[key] = meta;
@@ -73,12 +75,12 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
             foreach (var meta in session.Takes)
             {
-                UnityEngine.Debug.Log($"RebuildFromSession: {meta.SessionId}, {meta.TakeId}, {meta.RoleId}");
+                //UnityEngine.Debug.Log($"RebuildFromSession: {meta.SessionId}, {meta.TakeId}, {meta.RoleId}");
 
                 StoreTakeMeta(meta);
             }
 
-            UnityEngine.Debug.Log($"SessionTakeIndex rebuilt. Take count: {session.Takes.Count}");
+            //UnityEngine.Debug.Log($"SessionTakeIndex rebuilt. Take count: {session.Takes.Count}");
         }
     }
 }

@@ -21,11 +21,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         public bool allStoppedPlaying;
 
         private SessionTakeIndex _takeIndex;
+        private float _playerHeightCm;
 
-        public void Initialize(List<RoleRig> roles, SessionStore sessionStore , SessionTakeIndex takeIndex){
+        private float _roleScale;
 
-            
-            
+        public void Initialize(List<RoleRig> roles, float playerHeigthCm, SessionStore sessionStore , SessionTakeIndex takeIndex){
+            _playerHeightCm = playerHeigthCm;
             _store = sessionStore;
             _takeIndex = takeIndex;
             InitializePlayers(roles);
@@ -52,7 +53,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             for (int i = 0; i < roleCount; i++)
             {
-                player = new TakePlayer(
+                var player = new TakePlayer(
                     roles[i].root,
                     roles[i].head,
                     roles[i].leftHand,
@@ -60,18 +61,33 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     roles[i].audioSource
                 );
 
+               
+
+
+                UnityEngine.Debug.Log(
+                    $"InitializePlayers: roleIndex={i}, roleId={roles[i].roleId}, " +
+                    $"heightOfRoleCm={roles[i].heightOfRoleCm}, playerHeightCm={_playerHeightCm}"
+                );
+
                 players.Add(player);
             }
         }
 
-        public void PlaybackForIndexListBegin(List<int> roleIndices,  int sceneCount, string sessionId){
+        public void PlaybackForIndexListBegin(List<int> roleIndices, float playerHeightCM, int sceneCount, string sessionId){
 
             foreach (var roleIndex in roleIndices){
 
                 if(_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta)){
 
                     TakeData take = _store.LoadTakeData(takeMeta);
-
+                    if (playerHeightCM > 0.01f)
+                    {
+                        _roleScale = (float)roles[roleIndex].heightOfRoleCm /playerHeightCM;
+                    }
+                    else{
+                        _roleScale = 1f;
+                    }
+                    players[roleIndex].SetRoleScale(_roleScale);
                     players[roleIndex].Begin(take);
                     /*
                     UnityEngine.Debug.Log(

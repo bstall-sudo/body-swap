@@ -27,6 +27,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         private Vector3 _desiredStartPos;
         private float _desiredStartYaw;
 
+
         //f�r die Rebase-Berechnung
         private bool _hasRebase = false;
         private Vector3 _rebasePos;
@@ -36,14 +37,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         private double _dspStart;
         private bool _recording;
 
+        //das ist wichtig damit die Aufnahmen wieder auf 1,1,1 skaliert werden vor dem Abspeichern, auch wenn man eine kleinere Rolle spielt.
+        private float _roleScale = 1f;
+
         public TakeData Current { get; private set; }
 
-        // f�r das Rebase, damit die neue Aufnahme so aufgenommen wird, dass es keinen "Sprung" gibt vom Ende der letzten Aufnahme
+        // für das Rebase, damit die neue Aufnahme so aufgenommen wird, dass es keinen "Sprung" gibt vom Ende der letzten Aufnahme
         public void SetDesiredStartPose(Vector3 pos, float yawDeg)
         {
             _desiredStartPos = pos;
             _desiredStartYaw = yawDeg;   //rotation, wo die Figur am Ende der letzten Aufnahme stand.
             _hasDesiredStart = true;
+        }
+
+        public void SetRoleScale(float roleScale)
+        {
+            _roleScale = Mathf.Max(0.0001f, roleScale);
         }
 
 
@@ -98,7 +107,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             //verstehe ich nicht...
             _hasRebase = false;
 
-            UnityEngine.Debug.Log("Mic devices: " + string.Join(" | ", Microphone.devices));
+            //UnityEngine.Debug.Log("Mic devices: " + string.Join(" | ", Microphone.devices));
 
             Current = new TakeData();
             _recording = true;
@@ -114,8 +123,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             _sampleRate = PickSupportedSampleRate(_device, 48000);
 
-            UnityEngine.Debug.Log($"Using mic: '{_device}' @ {_sampleRate} Hz");
-            UnityEngine.Debug.Log("Mic devices: " + string.Join(" | ", Microphone.devices));
+            //UnityEngine.Debug.Log($"Using mic: '{_device}' @ {_sampleRate} Hz");
+            //UnityEngine.Debug.Log("Mic devices: " + string.Join(" | ", Microphone.devices));
 
             Current.AudioClip = Microphone.Start(_device, false, 300, _sampleRate);
             _waitingForMic = true;
@@ -132,7 +141,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 int pos = Microphone.GetPosition(_device);
                 if (pos > 0)
                 {
-                    UnityEngine.Debug.Log("Mic started, first pos: " + pos);
+                    //UnityEngine.Debug.Log("Mic started, first pos: " + pos);
                     // Ab jetzt ist Aufnahme wirklich gestartet
                     _micStartSamplePos = pos;
                     _dspStart = AudioSettings.dspTime;
@@ -211,6 +220,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             var actorRot = _roleRoot.localRotation;
             var invActorRot = Quaternion.Inverse(actorRot);
 
+            /*
             PoseSample ToActorLocal(Vector3 pStage, Quaternion rStage)
             {
                 Vector3 delta = pStage - bodyPos;
@@ -218,14 +228,29 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 var rLocal = invActorRot * rStage;
                 return new PoseSample { Pos = pLocal, Rot = rLocal };
             }
+            */
+
+
+            PoseSample ToActorLocalNeutral(Vector3 pStage, Quaternion rStage)
+            {
+                Vector3 delta = pStage - bodyPos;
+                Vector3 pLocalEmbodied = invActorRot * delta;
+
+                // WICHTIG:
+                // Für die gespeicherten Daten wieder neutralisieren
+                Vector3 pLocalNeutral = pLocalEmbodied / _roleScale;
+
+                Quaternion rLocal = invActorRot * rStage;
+                return new PoseSample { Pos = pLocalNeutral, Rot = rLocal };
+            }
 
             var f = new Frame
             {
                 T = t,
                 Body = new BodyPose { Pos = bodyPos, YawDeg = yaw },
-                Head = ToActorLocal(headP_stageLocal, headR_stageLocal),
-                Left = ToActorLocal(leftP_stageLocal, leftR_stageLocal),
-                Right = ToActorLocal(rightP_stageLocal, rightR_stageLocal),
+                Head = ToActorLocalNeutral(headP_stageLocal, headR_stageLocal),
+                Left = ToActorLocalNeutral(leftP_stageLocal, leftR_stageLocal),
+                Right = ToActorLocalNeutral(rightP_stageLocal, rightR_stageLocal),
             };
 
             Current.Frames.Add(f);
@@ -255,7 +280,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             if (sampleCount <= 0 || sampleCount > totalSamples) return null;
 
-            UnityEngine.Debug.Log("Chosen Mic device is: " + _device);
+            //UnityEngine.Debug.Log("Chosen Mic device is: " + _device);
 
             // Wichtig: hier KEIN GetData, nur Info zur�ckgeben
             return (Current.AudioClip, _micStartSamplePos, sampleCount, channels, _sampleRate);

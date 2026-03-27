@@ -8,3 +8,15 @@
 f783a5a2a4df4d19b9500c6e6e100c8e
 6512b7d7b062417191e6872104d0e90d
 6c33be37fb28443e869975114a59c809
+23534a8ac0e14f09b070b4e3b8d95ad5
+9132d104f4ba4cb28ddc9c8e25fc012a
+72b4a6ee6474461688e78a3201c24bd5  (gar nicht bewegt beim zuhören)
+
+e9861982d476443c835e0fb99d084f59
+98e4c1eb1cad4884acf359897ee60201
+fcf166881d974a5c83baed58652053c1
+
+(State1: Player in RoleA speaking is redorded, RoleB idle) ->(State1Switch: Player switches Role from RoleA to RoleB) (State2: Player in RoleB is listening and is recorded, RoleA is in Playback mode) ->(State3: Player in Role B speaks and is recorded, RoleB idle) -> (State3Switch: Player switches Role from RoleB to RoleA) -> (State4: Player in RoleA is listening and is recorded, RoleB is in Playback mode)
+
+grosser grüner Junge:
+2026-03-27-UTC-14-05-06_81

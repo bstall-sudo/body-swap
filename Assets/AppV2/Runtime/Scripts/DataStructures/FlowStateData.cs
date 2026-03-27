@@ -11,6 +11,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public int SelectedNext;
         public List<int> Playbacks;
         public List<int> ReactiveIdles;
+        public bool GoToSpeakerState;
      
         public void Initialize(int roleCount)
         {
@@ -20,6 +21,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             SceneCount = -1;
             Playbacks = new List<int>();
             ReactiveIdles = new List<int>();
+            GoToSpeakerState = false;
         }
     }
 }

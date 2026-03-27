@@ -8,6 +8,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         ChooseSpeaker,
         RecordSpeaker,
         RecordListeners,
+        PlayerAlignState,
         FinalizeConversation,
         PlaybackFullConversation,
         Idle,

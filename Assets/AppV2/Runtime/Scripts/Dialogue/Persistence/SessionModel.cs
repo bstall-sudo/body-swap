@@ -9,6 +9,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string SessionId;
         public string CreatedUtc;
 
+        public List<ConversationRoleMeta> Roles = new List<ConversationRoleMeta>();
         // Reihenfolge der Takes im Dialog (A1, B1, A2, ...)
         public List<TakeMeta> Takes = new();
     }
