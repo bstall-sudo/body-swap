@@ -125,19 +125,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             if (_headT)
             {
-                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u) * _roleScale; 
+                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u);// * _roleScale; könnte sein, dass das dann doppelt ist 29.04.2026
                 _headT.localRotation = Quaternion.Slerp(a.Head.Rot, b.Head.Rot, u);
             }
 
             if (_leftT)
             {
-                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u) * _roleScale; 
+                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u);// * _roleScale; 
                 _leftT.localRotation = Quaternion.Slerp(a.Left.Rot, b.Left.Rot, u);
             }
 
             if (_rightT)
             {
-                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u) * _roleScale; 
+                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u);// * _roleScale; 
                 _rightT.localRotation = Quaternion.Slerp(a.Right.Rot, b.Right.Rot, u);
             }
         }
@@ -151,19 +151,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             if (_headT)
             {
-                _headT.localPosition = f.Head.Pos * _roleScale;
+                _headT.localPosition = f.Head.Pos; // * _roleScale;  //als Test, weil RoleX_ScaleRoot ist ja auch schon skaliert. Daher ist das hier vielleicht nicht nötig.
                 _headT.localRotation = f.Head.Rot;
             }
 
             if (_leftT)
             {
-                _leftT.localPosition = f.Left.Pos * _roleScale;
+                _leftT.localPosition = f.Left.Pos; // * _roleScale;
                 _leftT.localRotation = f.Left.Rot;
             }
 
             if (_rightT)
             {
-                _rightT.localPosition = f.Right.Pos * _roleScale;
+                _rightT.localPosition = f.Right.Pos; // * _roleScale;
                 _rightT.localRotation = f.Right.Rot;
             }
         }

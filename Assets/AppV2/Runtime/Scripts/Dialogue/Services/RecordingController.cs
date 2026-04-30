@@ -133,10 +133,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         }
 
-        public void TickRecording( int roleIndex, string roleId, int sceneCount)
+        // float embodimentDeltaY damti die Augenhöhenanpassung, berücksichtigt werden kann beim Speichern
+        public void TickRecording( int roleIndex, string roleId, int sceneCount, float embodimentDeltaY)
         {
             if (_isRecording && _takeRecorder != null){
-                _takeRecorder.Tick();
+                //embodimentDeltaY damti die Augenhöhenanpassung, berücksichtigt werden kann beim Speichern
+                _takeRecorder.Tick(embodimentDeltaY);
             }
 
             // 2) Wenn Trim/Persist noch aussteht: runterzählen

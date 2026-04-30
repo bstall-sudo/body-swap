@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AppV2.Runtime.Scripts.Dialogue.Rig
+namespace AppV2.Runtime.Scripts.Rig
 {
     public class VisualRigFollower : MonoBehaviour
     {
@@ -97,7 +97,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Rig
             Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
         }
 
-        private void LateUpdate()
+        public void ApplyFollow()
         {
             if (technicalRoot != null && visualRoot != null)
             {

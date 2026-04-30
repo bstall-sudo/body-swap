@@ -48,12 +48,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Objekt mit ConversationStatusUI-Script Komponente")]
         private ConversationStatusUI statusUI;
         public ConversationStatusUI StatusUI => statusUI;
+        public bool _xrMode;
 
         private void Awake()
         {
             _data = new FlowStateData();
             _data.Initialize(Stage.roleCount);
             _startInPlaybackFullConversationMode = Stage.StartInPlaybackFullConversationMode;
+            _xrMode = Stage.UseXR;
         }
 
         private void OnDestroy()
@@ -67,13 +69,16 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if(_startInPlaybackFullConversationMode){
                 SetState(new PlaybackFullConversationState(this));
             }else{
-                if(selectableNext)
-                {
-                    SetState(new ChooseSpeakerState(this));
-                }else{
-                    SetState(new RecordSpeakerState(this));
+                if(_xrMode){
+                    SetState(new CalibrationState(this));
+                }else {
+                    if(selectableNext)
+                    {
+                        SetState(new ChooseSpeakerState(this));
+                    }else{
+                        SetState(new RecordSpeakerState(this));
+                    }
                 }
-
             }
 
            

@@ -71,7 +71,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             playbacks = _flow._data.Playbacks;
 
             _flow.Stage.PlaybackStart(playbacks, sceneCount);
-            //_flow.Stage.StartReactiveIdle(reactiveIdles);
+            _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
             UnityEngine.Debug.Log($"[RecordListenersState] Enter || Playback by Index: {playbacks[0]} || toBeRecorded Index: {toBeRecorded} || Scene: {sceneCount} || ReactiveIdleCount: {reactiveIdles.Count}");
@@ -81,13 +81,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Tick(float dt)
         {
-
+            _flow.Stage.ReactiveIdleTick(reactiveIdles, toBeRecorded);
             // Solange noch nicht beendet wird: normales Verhalten
             if (!_waitingForRecordingSave)
             {
                 _flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 _flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 _flow.Stage.PlaybackTick(playbacks);
+                
             }
 
             if (!_waitingForRecordingSave && _flow.Stage.PlaybacksAreAllStopped() )
@@ -107,7 +108,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 
                 if (_flow.Stage.RecordingSaveCompleted())
                 {
-                    UnityEngine.Debug.Log("[RecordListenersState] Recording was fully saved, switching to next state.");
+                    //UnityEngine.Debug.Log("[RecordListenersState] Recording was fully saved, switching to next state.");
 
                     // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
                     if(!_startWaitingToSwitchToFullPlayback){
@@ -182,6 +183,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
+            _flow.Stage.ReactiveIdleEnd(reactiveIdles);
             _flow.ListenerStateExit();
             
             /*

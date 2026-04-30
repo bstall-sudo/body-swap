@@ -107,6 +107,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
 
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
+            _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;
 
             UnityEngine.Debug.Log($"[RecordSpeakerState] Enter || toBeRecorded Index: {toBeRecorded} || Scene: {sceneCount} || ReactiveIdleCount: {reactiveIdles.Count}");
@@ -117,6 +118,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
 
         {
+            _flow.Stage.ReactiveIdleTick(reactiveIdles, toBeRecorded);
             if(_isRecording && !_waitingForRecordingSave){
                 _flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 _flow.Stage.RecordingTick(toBeRecorded,sceneCount);
@@ -185,6 +187,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
+            _flow.Stage.ReactiveIdleEnd(reactiveIdles);
             _flow.SpeakerStateExit();
             UnityEngine.Debug.Log($"[RecordSpeakerState] To Be Recorded: {_flow._data.ToBeRecorded}");
             

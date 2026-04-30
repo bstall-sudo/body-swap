@@ -8,6 +8,7 @@ using AppV2.Runtime.Scripts.Input;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
 using AppV2.Runtime.Scripts.Dialogue.Services;
+using AppV2.Runtime.Scripts.Rig;
 
 namespace AppV2.Runtime.Scripts.Dialogue
 {
@@ -28,13 +29,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Roles")]
         [Min(1)]
         public int roleCount = 2;
+        // This is used, so that CalibrationState can call Methods from AvatarRigFollower and AvatarRigDefinition 
+        // e.g. set avatars visible invisible, set rot/pos of RolesVisual Targets (Cubes) to IkChainTargets.  
+        [SerializeField] private AvatarCalibrationController avatarCalibration;
+        public AvatarCalibrationController AvatarCalibration => avatarCalibration;
+
+        // to set visibility of the (Debug-) Cubes of the RolesVisuals, => is a getter, I can access rolesVisualsVisibilityHandler somewhere else, but I 
+        // can not write to it
+        [SerializeField] private RolesVisualsVisibilityHandler rolesVisualsVisibilityHandler;
+        public RolesVisualsVisibilityHandler RolesVisualsVisibilityHandler  => rolesVisualsVisibilityHandler;
 
         [Header("Grösse des Spielers")]
         public float heightOfPlayerCm = 180f;
+        public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
 
         private RecordingController _recordingController;
         private PlaybackController _playbackController;
+        private ReactiveIdleController _reactiveIdleController;
         private SessionTakeIndex _takeIndex;
 
         public SessionStore _store;
@@ -95,6 +107,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Settings")]
         public bool UseXR = false;
         public float SmoothAlignSeconds = 0.6f;
+        public bool FullBodyTrackers = false;
 
         [Header("Start im Playback Mode. Grundeinstellung: letzte Aufnahme, sonst SessionId")]
         public bool StartInPlaybackFullConversationMode = false;
@@ -129,6 +142,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             // das Playback-Objekt wird mit einer RoleRig-Liste und dem Ordnernamen initiiert
             _playbackController = new PlaybackController();
+            _reactiveIdleController = new ReactiveIdleController();
 
             if(StartInPlaybackFullConversationMode){
 
@@ -147,14 +161,23 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
 
             }else{
-                //Im FullPlaybackMode muss diese Funktion dann durch eine Entsprechende erfüllt werden, welche die Daten aus SessionModell: public List<ConversationRoleMeta> Roles berücksichtigt.
+                
                 
                 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
                 _recordingController = new RecordingController(roleCount, _store, _takeIndex);
+
+                
             }
+            _reactiveIdleController.Initialize(roles);
+
             InitializeRoleHeightsFromPlayerIfNeeded();
+
+            // used in CalibrationState
+            avatarCalibration.Initialize(roles);
+            // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
+            rolesVisualsVisibilityHandler.Initialize(roles);
             
         }
             
@@ -204,7 +227,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void RecordingTick(int roleIndex, int sceneCount)
         {
             RoleRig role = roles[roleIndex];
-            _recordingController.TickRecording( roleIndex, role.roleId, sceneCount);
+
+            //// damit das embodimentOffset im Recording auch berücksichtigt wird:
+            float embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
+            _recordingController.TickRecording(roleIndex, role.roleId, sceneCount, embodimentDeltaY);
+            //_recordingController.TickRecording( roleIndex, role.roleId, sceneCount);
             
         }
 
@@ -251,6 +278,35 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool PlaybackHasAnyTakeForScene(int sceneCount)
         {
             return _playbackController.HasAnyTakeForScene(sceneCount);
+        }
+
+        public void ReactiveIdleStart(List<int> reactiveIdles, int speakerRoleIndex)
+        {
+            if (reactiveIdles == null) return;
+
+            for (int i = 0; i < reactiveIdles.Count; i++)
+            {
+                int roleIndex = reactiveIdles[i];
+                _reactiveIdleController.SetRoleToIdleLookingAt(roleIndex, speakerRoleIndex);
+            }
+        }
+
+        public void ReactiveIdleTick(List<int> reactiveIdles, int speakerRoleIndex)
+        {
+            if (reactiveIdles == null) return;
+
+            _reactiveIdleController.UpdateIdleLookTargets(reactiveIdles, speakerRoleIndex);
+        }
+
+        public void ReactiveIdleEnd(List<int> reactiveIdles)
+        {
+            if (reactiveIdles == null) return;
+
+            for (int i = 0; i < reactiveIdles.Count; i++)
+            {
+                int roleIndex = reactiveIdles[i];
+                _reactiveIdleController.SetRoleToRecordPlayback(roleIndex);
+            }
         }
 
         //wenn der Folder Session Id String leer is, dann soll die letzte Aufnahme geladen werden.
@@ -320,7 +376,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 leftStage.y -= embodimentDeltaY;
                 rightStage.y -= embodimentDeltaY;
 
-                // Rollengröße semantisch berechnen, nicht über avatarRoot.localScale
+                // Rollengröße semantisch berechnen, nicht über visualRigRoot.localScale
                 float roleScale = 1f;
                 if (heightOfPlayerCm > 0.01f)
                 {
@@ -488,11 +544,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return;
             }
 
-            if (roles[roleIndex].avatarRoot == null)
+            if (roles[roleIndex].visualRigRoot == null)
             {
-                UnityEngine.Debug.LogWarning($"avatarRoot is null for roleIndex {roleIndex}");
+                UnityEngine.Debug.LogWarning($"visualRigRoot is null for roleIndex {roleIndex}");
                 return;
             }
+
+            if (roles[roleIndex].avatarRoot == null)
+            {
+                UnityEngine.Debug.LogWarning($"AvatarRoot is null for roleIndex {roleIndex}");
+                return;
+            }
+  
 
             // 1) Body-Rotation im Stage-Lokalraum
             Quaternion bodyRotStageLocal = Quaternion.Euler(0f, targetBodyYaw, 0f);
@@ -544,6 +607,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _playerAlignT = 0f;
             _playerAlignActive = true;
 
+            /*
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH ROOT SCALE role {roleIndex}: {roles[roleIndex].root.lossyScale}");
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH HEAD SCALE role {roleIndex}: {roles[roleIndex].head.lossyScale}");
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} STAGE ROOT SCALE: {_stageRoot.lossyScale}");
@@ -560,7 +624,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex}  XR ORIGIN Y-Position: {XrOrigin.position.y}");
 
-            /*
+            
             UnityEngine.Debug.Log(
                 $"StartPlayerAlignToActor: roleIndex={roleIndex}, " +
                 $"targetBodyPosLocal={targetBodyPosLocal}, targetBodyYaw={targetBodyYaw}, " +
@@ -700,9 +764,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
         */
         public bool PlayerAlignFinished(){
-            
+            //UnityEngine.Debug.Log("TickPlayerAlign: finished");
             return !_playerAlignActive;
-            UnityEngine.Debug.Log("TickPlayerAlign: finished");
+            
         }
 
         //Grösse des Spielers, entweder aufgrund von XR Headset zu Boden Distanz, oder die definierte Variable
@@ -735,24 +799,31 @@ namespace AppV2.Runtime.Scripts.Dialogue
         // hier werden dann die Avatare skaliert, den Einträgen aus dem RoleRig für jede Rolle entsprechend.
         public void ApplyRoleVisualScale(RoleRig role, float playerHeightCm)
         {
-            if (role == null || role.avatarRoot == null)
+            if (role == null || role.visualRigRoot == null || role.avatarRoot == null)
                 return;
 
             if (playerHeightCm <= 0.01f)
                 return;
 
-            float scale = (float)role.heightOfRoleCm / playerHeightCm;
+            //float scale = (float)role.heightOfRoleCm / playerHeightCm;
+
+            float visualScale = role.heightOfRoleCm / playerHeightCm;
+            float avatarScale = role.heightOfRoleCm / avatarBaseHeightCm;
+            
 
             
-            role.avatarRoot.localScale = Vector3.one * scale;
+            role.visualRigRoot.localScale = Vector3.one * visualScale;
 
-            Vector3 p = role.avatarRoot.localPosition;
+            // Das muss ev. angepasst werden, da die Figuren zurzeit standardmässig 2 m gross sind.
+            role.avatarRoot.localScale = Vector3.one * avatarScale;// * avatarScale;
+
+            Vector3 p = role.visualRigRoot.localPosition;
             p.y = role.visualGroundOffsetY;
-            role.avatarRoot.localPosition = p;
+            role.visualRigRoot.localPosition = p;
 
             UnityEngine.Debug.Log(
                 $"ApplyRoleVisualScale: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
-                $"playerHeight={playerHeightCm}, scale={scale}, groundOffsetY={role.visualGroundOffsetY}"
+                $"playerHeight={playerHeightCm}, avatarScale={avatarScale}, visualScale={visualScale} groundOffsetY={role.visualGroundOffsetY}"
             );
         }
 
@@ -771,7 +842,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void ApplyVisualScaleToConversationStage(int roleIndex)
         {
             RoleRig role = roles[roleIndex];
-            if (role == null || role.avatarRoot == null)
+            if (role == null || role.visualRigRoot == null)
                 return;
 
             if (heightOfPlayerCm <= 0.01f)
@@ -781,11 +852,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             
             _stageRoot.localScale = Vector3.one / scale;
-            role.avatarRoot.localScale = Vector3.one * scale;
+            role.visualRigRoot.localScale = Vector3.one * scale;
 
-            Vector3 p = role.avatarRoot.localPosition;
+            Vector3 p = role.visualRigRoot.localPosition;
             p.y = role.visualGroundOffsetY;
-            role.avatarRoot.localPosition = p;
+            role.visualRigRoot.localPosition = p;
 
             UnityEngine.Debug.Log(
                 $"ApplyVisualScaleToConversationStage: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
@@ -797,7 +868,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void ResetVisualScaleOfConversationStage(int roleIndex)
         {
             RoleRig role = roles[roleIndex];
-            if (role == null || role.avatarRoot == null)
+            if (role == null || role.visualRigRoot == null)
                 return;
 
             if (heightOfPlayerCm <= 0.01f)
@@ -807,11 +878,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             
             _stageRoot.localScale = Vector3.one;
-            role.avatarRoot.localScale = Vector3.one * scale;
+            role.visualRigRoot.localScale = Vector3.one * scale;
 
-            Vector3 p = role.avatarRoot.localPosition;
+            Vector3 p = role.visualRigRoot.localPosition;
             p.y = role.visualGroundOffsetY;
-            role.avatarRoot.localPosition = p;
+            role.visualRigRoot.localPosition = p;
 
             UnityEngine.Debug.Log(
                 $"ApplyVisualScaleToConversationStage: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
@@ -838,7 +909,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             float deltaM = (roleEyeHeightCm - playerEyeHeightCm) / 100f;
 
             Vector3 p = embodimentOffsetRoot.localPosition;
-            UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight]: EmbodimentOffsetRoot is: {embodimentOffsetRoot.localPosition}");
+            UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight]: EmbodimentOffsetRoot of Role={roles[roleIndex].roleId} is: {embodimentOffsetRoot.localPosition}");
             p.y = _baseCameraOffsetY + deltaM;
             embodimentOffsetRoot.localPosition = p;
 

@@ -133,7 +133,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         }
 
 
-        public void Tick()
+        public void Tick(float embodimentDeltaY)
 
         {
             if (_waitingForMic && !string.IsNullOrEmpty(_device))
@@ -220,17 +220,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             var actorRot = _roleRoot.localRotation;
             var invActorRot = Quaternion.Inverse(actorRot);
 
-            /*
+            
             PoseSample ToActorLocal(Vector3 pStage, Quaternion rStage)
             {
                 Vector3 delta = pStage - bodyPos;
                 var pLocal = invActorRot * delta;
+                pLocal.y -= embodimentDeltaY;
                 var rLocal = invActorRot * rStage;
                 return new PoseSample { Pos = pLocal, Rot = rLocal };
             }
-            */
+            
 
-
+            /*
             PoseSample ToActorLocalNeutral(Vector3 pStage, Quaternion rStage)
             {
                 Vector3 delta = pStage - bodyPos;
@@ -243,14 +244,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 Quaternion rLocal = invActorRot * rStage;
                 return new PoseSample { Pos = pLocalNeutral, Rot = rLocal };
             }
+            */
 
             var f = new Frame
             {
                 T = t,
                 Body = new BodyPose { Pos = bodyPos, YawDeg = yaw },
-                Head = ToActorLocalNeutral(headP_stageLocal, headR_stageLocal),
-                Left = ToActorLocalNeutral(leftP_stageLocal, leftR_stageLocal),
-                Right = ToActorLocalNeutral(rightP_stageLocal, rightR_stageLocal),
+                Head = ToActorLocal(headP_stageLocal, headR_stageLocal),
+                Left = ToActorLocal(leftP_stageLocal, leftR_stageLocal),
+                Right = ToActorLocal(rightP_stageLocal, rightR_stageLocal),
             };
 
             Current.Frames.Add(f);

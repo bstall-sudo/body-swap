@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using AppV2.Runtime.Scripts.Rig;
 
 namespace AppV2.Runtime.Scripts.DataStructures
 {
@@ -16,9 +17,17 @@ public class RoleRig
     public AudioSource audioSource;
     [Header("Role size")]
     public int heightOfRoleCm = 180;
+ 
 
-    [Header("Visual rig")]
+    [Header("Visual Debug Rig")]
+    public Transform visualRigRoot;
+    public RolesVisualsSetVisibility visualRolesVisibility;
+
+    [Header("Avatar Rig")]
+    public bool sittingIdle = false;
     public Transform avatarRoot;
+    public AvatarRigDefinition avatar;
+    public AvatarRigFollower rigFollower;
 
     public float visualGroundOffsetY = 0f;
 
