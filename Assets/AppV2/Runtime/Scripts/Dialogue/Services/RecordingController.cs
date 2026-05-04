@@ -23,6 +23,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private string sessionFolder;
         // hier wird abgespeichert, welche Role in welcher Szene schon einen Take hat. -> Wichtig für PlaybackController
         private SessionTakeIndex _takeIndex;
+
+        public List<RoleRig> _roles;
       
 
         // Pending finalize state
@@ -56,8 +58,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private int _currentSceneCount = -1;
 
 
-        public RecordingController(int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex)
+        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex)
         {
+            _roles = roles;
             _hasDesiredStartList = new List<bool>(new bool[roleCount]);
             _hasLastFrameList    = new List<bool>(new bool[roleCount]);
 
@@ -88,9 +91,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             //UnityEngine.Debug.Log("Session folder: " + sessionFolder);
         }
 
-
-        public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
+        //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
+        // Transform roleRoot, string roleId
+        public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
         {
+            //Anpassung weil jetzt RoleRig role als Argument übergeben wird. 
+            Transform roleRoot = _roles[roleIndex].root;
+            string roleId = _roles[roleIndex].roleId;
             
 
             if (stageRoot == null)
@@ -116,6 +123,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 UnityEngine.Debug.LogError($"BeginRecording: invalid roleIndex {roleIndex}.");
                 return;
             }
+
+
+       
             
             _currentSceneCount = sceneCount;
             _takeRecorder = new TakeRecorder(stageRoot, roleRoot, roleId, roleIndex, input);
@@ -125,12 +135,40 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             _takeRecorder.SetRoleScale(roleScale);
 
 
-            if (_hasLastFrameList[roleIndex]) _takeRecorder.SetDesiredStartPose(_lastEndPosList[roleIndex], _lastEndYawList[roleIndex]);
+            ApplyDesiredStartPoseForRole(roleIndex);
             _takeRecorder.Begin();
             _isRecording = true;
             //UnityEngine.Debug.Log($"BeginRecording: roleId={roleId}, roleIndex={roleIndex}");
       
 
+        }
+
+        //hier wird entweder auf die Pos/Rot Daten aus _lastEndPosList/_lastEndYawList zurückgegriffen, oder InitialStartPose verwendet. 
+        private void ApplyDesiredStartPoseForRole(int roleIndex)
+        {
+            _takeRecorder.ClearDesiredStartPose();
+
+            
+
+            if (_hasLastFrameList[roleIndex])
+            {
+                _takeRecorder.SetDesiredStartPose(
+                    _lastEndPosList[roleIndex],
+                    _lastEndYawList[roleIndex]
+                );
+
+                return;
+            }
+
+            if (_roles[roleIndex].hasInitialStartPose)
+            {
+                _takeRecorder.SetDesiredStartPose(
+                    _roles[roleIndex].initialStartPos,
+                    _roles[roleIndex].initialStartYawDeg
+                );
+
+                return;
+            }
         }
 
         // float embodimentDeltaY damti die Augenhöhenanpassung, berücksichtigt werden kann beim Speichern
@@ -340,14 +378,24 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
             return false;
 
-        if (!_hasLastFrameList[roleIndex])
-            return false;
 
-        pos = _lastEndPosList[roleIndex];
-        yaw = _lastEndYawList[roleIndex];
+        if (_hasLastFrameList[roleIndex])
+        {
+            pos = _lastEndPosList[roleIndex];
+            yaw = _lastEndYawList[roleIndex];
+            return true;
+        }
 
+        RoleRig role = _roles[roleIndex];
 
-        return true;
+        if (role.hasInitialStartPose)
+        {
+            pos = role.initialStartPos;
+            yaw = role.initialStartYawDeg;
+            return true;
+        }
+
+        return false;
     }
 
     // das wird im ConversationStage gebraucht, damit man an die richtige Stelle Lerpen kann. Insbesondere, damit man direkt in den Kopf alignen kann.
@@ -360,18 +408,33 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
             return false;
 
-        if (!_hasLastFrameList[roleIndex])
+        // 1. Wenn es schon eine letzte Head-EndPose gibt:
+        //    Diese ist die beste StartPose.
+        if (_hasLastFrameList[roleIndex])
+        {
+            
+            pos = _lastHeadEndPosList[roleIndex];
+            yaw = _lastHeadEndYawList[roleIndex];
+            UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos}  und Rotation: {yaw}");
+            return true;
+        }
+
+        // 2. Sonst: InitialPlacement aus RoleRig benutzen.
+        if (roleIndex < 0 || roleIndex >= _roles.Count)
             return false;
 
-        pos = _lastHeadEndPosList[roleIndex];
-        yaw = _lastHeadEndYawList[roleIndex];
+        RoleRig role = _roles[roleIndex];
 
-        /*
-        UnityEngine.Debug.Log(
-                $"---------------------------------- LastHeadEnd roleIndex={roleIndex} pos={_lastHeadEndPosList[roleIndex].y} ---------------------------------------"
-            );
+        if (role == null || !role.hasInitialStartPose)
+            return false;
 
-        */
+        float estimatedHeadHeightMeters = role.heightOfRoleCm * 0.01f * 0.9f;
+        
+
+        pos = Vector3.up * estimatedHeadHeightMeters;
+        yaw = 0f;
+        UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos} und estimatedHeight: {estimatedHeadHeightMeters} und Rotation: {yaw}");
+
         return true;
     }
 

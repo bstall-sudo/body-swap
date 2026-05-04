@@ -108,6 +108,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool UseXR = false;
         public float SmoothAlignSeconds = 0.6f;
         public bool FullBodyTrackers = false;
+        public bool AvatarPlacementAtStart = true;
 
         [Header("Start im Playback Mode. Grundeinstellung: letzte Aufnahme, sonst SessionId")]
         public bool StartInPlaybackFullConversationMode = false;
@@ -166,7 +167,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
-                _recordingController = new RecordingController(roleCount, _store, _takeIndex);
+                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex);
 
                 
             }
@@ -221,7 +222,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
             UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR ORIGIN WORLD POS before recording: {XrOrigin.position}");
             RoleRig role = roles[roleIndex];
             float roleScale = (float)roles[roleIndex].heightOfRoleCm / heightOfPlayerCm;
-            _recordingController.BeginRecording(_stageRoot, role.root, role.roleId, roleScale, roleIndex, sceneCount, _input);
+
+            //public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
+            _recordingController.BeginRecording(_stageRoot, roleScale, roleIndex, sceneCount, _input);
         }
 
         public void RecordingTick(int roleIndex, int sceneCount)

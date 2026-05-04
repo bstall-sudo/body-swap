@@ -17,6 +17,11 @@ public class RoleRig
     public AudioSource audioSource;
     [Header("Role size")]
     public int heightOfRoleCm = 180;
+
+    [Header("Initial placement")]
+    public bool hasInitialStartPose = false;
+    public Vector3 initialStartPos;
+    public float initialStartYawDeg;
  
 
     [Header("Visual Debug Rig")]

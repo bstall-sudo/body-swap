@@ -259,6 +259,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             Current.DurationSec = t;
         }
 
+        //Damit nicht die Pos/Rot Daten einer anderen Rolle versehentlich übernommen werden.
+        public void ClearDesiredStartPose()
+        {
+            _hasDesiredStart = false;
+            _desiredStartPos = Vector3.zero;
+            _desiredStartYaw = 0f;
+        }
+
         public (AudioClip clip, int startSample, int sampleCount, int channels, int sampleRate)? EndAndGetTrimInfo()
         {
             if (!_recording) return null;

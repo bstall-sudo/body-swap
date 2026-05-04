@@ -7,6 +7,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private readonly FlowController _flow;
         private int _currentRoleIndexForCalibration;
         private bool selectableNext;
+        private bool _avatarPlacementAtStart;
 
         public DialogueMode Mode => DialogueMode.Calibration;
 
@@ -23,6 +24,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             selectableNext = _flow.Stage.selectableNext;
 
             _currentRoleIndexForCalibration = 0;
+            _avatarPlacementAtStart = _flow.Stage.AvatarPlacementAtStart;
             
             _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
             // Set XR-Cam to Role height
@@ -83,14 +85,21 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
-            if (selectableNext)
-            {
-                _flow.SetState(new ChooseSpeakerState(_flow));
+            if(_avatarPlacementAtStart){
+                _flow.SetState(new AvatarPlacementState(_flow));
+
+            }else{
+                if (selectableNext)
+                {
+                    _flow.SetState(new ChooseSpeakerState(_flow));
+                }
+                else
+                {
+                    _flow.SetState(new RecordSpeakerState(_flow));
+                }
             }
-            else
-            {
-                _flow.SetState(new RecordSpeakerState(_flow));
-            }
+
+
         }
     }
 }
