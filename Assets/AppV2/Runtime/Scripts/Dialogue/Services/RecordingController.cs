@@ -91,6 +91,23 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             //UnityEngine.Debug.Log("Session folder: " + sessionFolder);
         }
 
+        //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
+        // Das passiert im FinishCalibration() von CalibrationState _flow.Stage.SaveTargetTransformsAfterCalibration();
+        public void SaveTargetTransformsToSessionModel(List<ConversationRoleMeta> roleMetas)
+        {
+            if (_session == null)
+            {
+                UnityEngine.Debug.LogError("[RecordingController] Cannot save role calibration. SessionModel is null.");
+                return;
+            }
+
+            _session.Roles = roleMetas ?? new List<ConversationRoleMeta>();
+
+            _store.SaveSessionModel(_session);
+
+            UnityEngine.Debug.Log($"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model.");
+        }
+
         //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
         // Transform roleRoot, string roleId
         public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)

@@ -67,6 +67,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.RolesVisualsVisibilityHandler.SetAllVisible(false);
             // reset XR-Cam position to level 0 again
             _flow.Stage.ResetEmbodimentHeight();
+            
         }
 
         private void ShowCurrentRoleOrFinish()
@@ -84,6 +85,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private void FinishCalibration()
         {
             _flow.Stage.AvatarCalibration.ShowAllRoles();
+
+            _flow.Stage.MirrorSetVisibility.ActivateMirror(false);
+
+            _flow.Stage.SaveTargetTransformsAfterCalibration();
 
             if(_avatarPlacementAtStart){
                 _flow.SetState(new AvatarPlacementState(_flow));

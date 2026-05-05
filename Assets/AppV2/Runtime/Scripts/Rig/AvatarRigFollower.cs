@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -27,7 +28,7 @@ namespace AppV2.Runtime.Scripts.Rig
         [SerializeField] private bool copyLocalScale = false;
 
         [Header("Names to match")]
-        [SerializeField] private List<string> ikTargetNames = new()
+        [SerializeField] public List<string> ikTargetNames = new()
         {
             "headTarget",
             "leftHandTarget",
@@ -174,7 +175,7 @@ namespace AppV2.Runtime.Scripts.Rig
             }
         }
 
-        private Transform FindDeepChildByName(Transform root, string targetName)
+        public Transform FindDeepChildByName(Transform root, string targetName)
         {
             if (root == null)
                 return null;
@@ -190,6 +191,23 @@ namespace AppV2.Runtime.Scripts.Rig
             }
 
             return null;
+        }
+        
+        //das wird gebraucht, wenn die Rigs im StartPlaybackFullConversation Mode gestartet werden.
+        public void BuildMapAndEnableFollow()
+        {
+            BuildMap();
+            isCalibrated = true;
+        }
+
+        //das wird gebraucht, um die Avatar Rigs im StartPlaybackFullConversation Mode zu Kalibrieren.
+        private void ApplyLocalTransform(Transform target, TransformData data)
+        {
+            if (target == null || data == null) return;
+
+            target.localPosition = data.LocalPosition;
+            target.localRotation = data.LocalRotation;
+            //target.localScale = data.LocalScale;
         }
     }
 }

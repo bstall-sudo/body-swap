@@ -39,6 +39,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private RolesVisualsVisibilityHandler rolesVisualsVisibilityHandler;
         public RolesVisualsVisibilityHandler RolesVisualsVisibilityHandler  => rolesVisualsVisibilityHandler;
 
+        //Um die Spiegel auszuschalten, welche für den CalibrationState gebraucht werden.
+        [SerializeField] private MirrorSetVisibility mirrorSetVisibility;
+        public MirrorSetVisibility MirrorSetVisibility  => mirrorSetVisibility;
+
         [Header("Grösse des Spielers")]
         public float heightOfPlayerCm = 180f;
         public float avatarBaseHeightCm = 200f;
@@ -51,6 +55,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public SessionStore _store;
         public SessionModel _session;
+        public RoleCalibrationDataProvider _calibrationDataProvider;
+        public RoleCalibrationDataApplier _calibrationDataApplier;
+
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         [SerializeField] private Transform embodimentOffsetRoot;
@@ -87,6 +94,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 if (string.IsNullOrWhiteSpace(roles[i].roleId))
                     roles[i].roleId = DefaultRoleId(i);
+
+                    roles[i].ResolveAvatarName(false);
             }
         }
 
@@ -151,6 +160,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if(FolderSessionId == ""){
                     //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. FolderSessionId is Empty String : {FolderSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
                     InitializePlaybackFromLatestSession();
+
+                    
                 }else{
                     InitializePlaybackFromSession(FolderSessionId);
                     /*
@@ -159,15 +170,29 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     _store = new SessionStore(folderAndSessionId);
                     */
                 }
+                _calibrationDataApplier = new RoleCalibrationDataApplier();
+                _calibrationDataApplier.Initialize(roles);
+                _calibrationDataApplier.ApplyRoleMetasToScene(roles, _playbackController._session);
+                MirrorSetVisibility.ActivateMirror(false);
+                TurnOffVisibilityOfVisualRig();
                 
 
             }else{
                 
-                
+                // hier werden jetzt die avatarName für jede Rolle gesetzt. hier sind nun die LogWarnings auf true
+                // im OnValidate waren die Logwarnings auf false, damit man nicht mit Warnungen zugespammt wird.
+                for (int i = 0; i < roles.Count; i++)
+                {
+                    roles[i].ResolveAvatarName(true);
+                }
                 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
                 _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex);
+                //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
+                // Das passiert im Exit von CalibrationState.
+                _calibrationDataProvider = new RoleCalibrationDataProvider();
+                _calibrationDataProvider.Initialize(roles); 
 
                 
             }
@@ -180,6 +205,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
             
+        }
+        private void TurnOffVisibilityOfVisualRig()
+        {
+            //UnityEngine.Debug.Log("TurnOffVisibilityOfVisualRig was called");
+            for (int i = 0; i < roles.Count; i++){
+                roles[i].visualRolesVisibility.SetVisible(false);
+            }
+
         }
             
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -215,6 +248,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
             ApplyAllRoleVisualScales();
 
         }
+
+        public void SaveTargetTransformsAfterCalibration(){
+            
+            _recordingController.SaveTargetTransformsToSessionModel(_calibrationDataProvider.CreateRoleMetas());
+
+        }
+
 
         public void RecordingBegin(int roleIndex, int sceneCount)
         {

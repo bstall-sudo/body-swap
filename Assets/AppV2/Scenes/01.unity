@@ -261,6 +261,7 @@ MonoBehaviour:
   roleCount: 3
   avatarCalibration: {fileID: 32639114}
   rolesVisualsVisibilityHandler: {fileID: 32639115}
+  mirrorSetVisibility: {fileID: 1942974801}
   heightOfPlayerCm: 180
   avatarBaseHeightCm: 180
   autoPlayerSizeRecognition: 0
@@ -278,10 +279,14 @@ MonoBehaviour:
     rightHand: {fileID: 1495911898}
     audioSource: {fileID: 861219314}
     heightOfRoleCm: 180
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
     visualRigRoot: {fileID: 1985397412}
     visualRolesVisibility: {fileID: 1106390901}
     sittingIdle: 0
     avatarRoot: {fileID: 818458806}
+    avatarName: esel_bademantel@T-Pose
     avatar: {fileID: 818458807}
     rigFollower: {fileID: 818458808}
     visualGroundOffsetY: 0
@@ -293,10 +298,14 @@ MonoBehaviour:
     rightHand: {fileID: 1088817999}
     audioSource: {fileID: 2038182407}
     heightOfRoleCm: 210
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
     visualRigRoot: {fileID: 477317887}
     visualRolesVisibility: {fileID: 1358925940}
     sittingIdle: 0
     avatarRoot: {fileID: 2079603509}
+    avatarName: BearPigWithShapeKeys_scale_1@T-Pose
     avatar: {fileID: 2079603510}
     rigFollower: {fileID: 2079603511}
     visualGroundOffsetY: 0
@@ -308,10 +317,14 @@ MonoBehaviour:
     rightHand: {fileID: 1097616047}
     audioSource: {fileID: 711541104}
     heightOfRoleCm: 150
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
     visualRigRoot: {fileID: 1576068650}
     visualRolesVisibility: {fileID: 1692814851}
     sittingIdle: 0
     avatarRoot: {fileID: 1046647340}
+    avatarName: esel_bademantel@T-Pose
     avatar: {fileID: 1046647341}
     rigFollower: {fileID: 1046647342}
     visualGroundOffsetY: 0
@@ -10958,6 +10971,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1942974800}
+  - component: {fileID: 1942974801}
   m_Layer: 0
   m_Name: Mirror
   m_TagString: Untagged
@@ -10982,6 +10996,18 @@ Transform:
   - {fileID: 1186741125}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1942974801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942974799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96f5779044adf94fa6dd6fd195cad2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &1945528132
 GameObject:
   m_ObjectHideFlags: 0

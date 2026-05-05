@@ -17,10 +17,17 @@ namespace AppV2.Runtime.Scripts.Rig
 
         public void SetVisible(bool visible)
         {
-            if (renderersToToggle == null) return;
 
+            //UnityEngine.Debug.Log($"SetVisible was called for visible={visible} ---- Turn");
+        
+        
+            renderersToToggle = GetComponentsInChildren<Renderer>(true);
+                //UnityEngine.Debug.Log($"RenderersToToggle.Length ={renderersToToggle?.Length} ---- Turn");
+
+            
             for (int i = 0; i < renderersToToggle.Length; i++)
             {
+                //UnityEngine.Debug.Log($"SetVisible was called for i={i} ---- Turn");
                 if (renderersToToggle[i] != null)
                     renderersToToggle[i].enabled = visible;
             }

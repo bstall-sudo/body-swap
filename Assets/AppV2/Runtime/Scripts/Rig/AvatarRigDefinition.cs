@@ -80,7 +80,7 @@ namespace AppV2.Runtime.Scripts.Rig
             }
         }
 
-        // in RoleRig there is a field AvatarRigDefinition. The AvatarCalibrationController calls SetVisible
+        // in RoleRig there is a field AvatarRigDefinition avatar. The AvatarCalibrationController calls SetVisible
         // via roles[i] this is used in CalibrationState to toggle visibility
         public void SetVisible(bool visible)
         {

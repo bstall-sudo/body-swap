@@ -15,7 +15,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         public List<RoleRig> roles;
 
         private SessionStore _store;
-        private SessionModel _session;
+        public SessionModel _session;
 
         private int roleCount;
         public bool allStoppedPlaying;
