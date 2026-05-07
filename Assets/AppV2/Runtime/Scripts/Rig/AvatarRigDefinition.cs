@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using AppV2.Runtime.Scripts.Dialogue;
+using UnityEngine.Rendering;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -14,6 +15,21 @@ namespace AppV2.Runtime.Scripts.Rig
 
         [Header("Visibility")]
         [SerializeField] private Renderer[] renderersToToggle;
+
+        [Header("BlendShapes")]
+        [SerializeField] private SkinnedMeshRenderer[] headSkinnedMeshRenderers;
+
+        private readonly System.Collections.Generic.Dictionary<string, BlendShapeRef> _blendShapesByLowerName = new();
+
+        private struct BlendShapeRef
+        {
+            public SkinnedMeshRenderer Renderer;
+            public int Index;
+            public string Name;
+        }
+
+
+        private Renderer[] _headRenderers;
 
         public Animator Animator => animator;
         public RigBuilder RigBuilder => rigBuilder;
@@ -29,7 +45,7 @@ namespace AppV2.Runtime.Scripts.Rig
         [SerializeField] private Transform lookAtTarget;
         [SerializeField] private string standingIdleAnimationStateName = "Idle";
         [SerializeField] private string sittingIdleAnimationStateName = "Sitting Idle";
-        [SerializeField] private string recordPlaybackStateName = "T-Pose 0";
+        [SerializeField] private string recordPlaybackStateName = "T-Pose";
         public string lookAtTargetName = "lookAtTarget";
         public Transform LookAtTarget => lookAtTarget;
 
@@ -77,6 +93,159 @@ namespace AppV2.Runtime.Scripts.Rig
 
                 if (idleModeRig == null)
                     UnityEngine.Debug.LogError($"[{name}] IdleMode Rig with name '{idleModeRigName}' not found or has no Rig component.");
+            }
+
+            CacheHeadRenderers();
+
+   
+        }
+
+
+        private void CacheHeadRenderers()
+        {
+            SkinnedMeshRenderer[] allSkinnedMeshes =
+                GetComponentsInChildren<SkinnedMeshRenderer>(true);
+
+            var foundRenderers = new System.Collections.Generic.List<Renderer>();
+            var foundSkinnedMeshes = new System.Collections.Generic.List<SkinnedMeshRenderer>();
+
+            for (int i = 0; i < allSkinnedMeshes.Length; i++)
+            {
+                SkinnedMeshRenderer smr = allSkinnedMeshes[i];
+
+                if (smr == null)
+                    continue;
+
+                string lowerName = smr.gameObject.name.ToLowerInvariant();
+
+                // z.B. "avatar_head" oder "myCharacter_head"
+                if (lowerName.EndsWith("_head"))
+                {
+                    foundRenderers.Add(smr);
+                    foundSkinnedMeshes.Add(smr);
+
+                    Debug.Log($"[{name}] Head SkinnedMeshRenderer found: '{smr.gameObject.name}'");
+                }
+            }
+
+            _headRenderers = foundRenderers.ToArray();
+            headSkinnedMeshRenderers = foundSkinnedMeshes.ToArray();
+
+            if (_headRenderers.Length == 0)
+            {
+                Debug.LogWarning(
+                    $"[{name}] No SkinnedMeshRenderer ending with '_head' was found."
+                );
+            }
+
+            CacheHeadBlendShapes();
+        }
+
+        private void CacheHeadBlendShapes()
+        {
+            _blendShapesByLowerName.Clear();
+
+            if (headSkinnedMeshRenderers == null || headSkinnedMeshRenderers.Length == 0)
+                return;
+
+            for (int r = 0; r < headSkinnedMeshRenderers.Length; r++)
+            {
+                SkinnedMeshRenderer smr = headSkinnedMeshRenderers[r];
+
+                if (smr == null || smr.sharedMesh == null)
+                    continue;
+
+                Mesh mesh = smr.sharedMesh;
+
+                for (int i = 0; i < mesh.blendShapeCount; i++)
+                {
+                    string blendShapeName = mesh.GetBlendShapeName(i);
+                    string key = blendShapeName.ToLowerInvariant();
+
+                    if (_blendShapesByLowerName.ContainsKey(key))
+                    {
+                        Debug.LogWarning(
+                            $"[{name}] Duplicate blendshape name '{blendShapeName}'. " +
+                            $"Keeping first occurrence."
+                        );
+                        continue;
+                    }
+
+                    _blendShapesByLowerName.Add(key, new BlendShapeRef
+                    {
+                        Renderer = smr,
+                        Index = i,
+                        Name = blendShapeName
+                    });
+
+                    Debug.Log($"[{name}] Cached BlendShape: '{blendShapeName}' on '{smr.gameObject.name}'");
+                }
+            }
+        }
+
+        public bool SetHeadBlendShapeWeight(string blendShapeName, float weight)
+        {
+            if (string.IsNullOrWhiteSpace(blendShapeName))
+                return false;
+
+            string key = blendShapeName.ToLowerInvariant();
+
+            if (!_blendShapesByLowerName.TryGetValue(key, out BlendShapeRef blendShape))
+            {
+                Debug.LogWarning($"[{name}] BlendShape '{blendShapeName}' not found.");
+                return false;
+            }
+
+            weight = Mathf.Clamp(weight, 0f, 100f);
+            blendShape.Renderer.SetBlendShapeWeight(blendShape.Index, weight);
+
+            return true;
+        }
+
+        public bool SetFirstHeadBlendShapeContaining(string namePart, float weight)
+        {
+            if (string.IsNullOrWhiteSpace(namePart))
+                return false;
+
+            string lowerPart = namePart.ToLowerInvariant();
+
+            foreach (var kvp in _blendShapesByLowerName)
+            {
+                BlendShapeRef blendShape = kvp.Value;
+
+                if (blendShape.Name.ToLowerInvariant().Contains(lowerPart))
+                {
+                    weight = Mathf.Clamp(weight, 0f, 100f);
+                    blendShape.Renderer.SetBlendShapeWeight(blendShape.Index, weight);
+                    return true;
+                }
+            }
+
+            Debug.LogWarning($"[{name}] No head BlendShape containing '{namePart}' found.");
+            return false;
+        }
+
+        public void SetHeadVisible(bool visible)
+        {
+            if (_headRenderers == null || _headRenderers.Length == 0)
+                return;
+
+            for (int i = 0; i < _headRenderers.Length; i++)
+            {
+                Renderer r = _headRenderers[i];
+
+                if (r == null)
+                    continue;
+
+                if (visible)
+                {
+                    r.shadowCastingMode = ShadowCastingMode.On;
+                }
+                else
+                {
+                    // invisible but still casts shadows
+                    r.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+                }
             }
         }
 
@@ -127,6 +296,7 @@ namespace AppV2.Runtime.Scripts.Rig
         {
             if (animator == null) return;
             animator.Play(recordPlaybackStateName, 0, 0f);
+            UnityEngine.Debug.Log($"[{name}]: recordPlaybackStateName = {recordPlaybackStateName}");
             
         }
 

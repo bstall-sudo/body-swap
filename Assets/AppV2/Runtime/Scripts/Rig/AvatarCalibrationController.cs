@@ -27,6 +27,33 @@ namespace AppV2.Runtime.Scripts.Rig
             }
         }
 
+        public void SetAvatarHeadVisible(int roleIndex, bool visible){
+            if (!IsValidIndex(roleIndex)) return;
+
+            var avatar = roles[roleIndex].avatar;
+
+
+            if (avatar == null)
+            {
+                Debug.LogWarning($"No AvatarRigDefinition assigned for role {roleIndex}.");
+                return;
+            }
+
+            avatar.SetHeadVisible(visible);
+
+
+        }
+
+        public void SetAllAvatarHeadsVisible(bool visible){
+
+            for (int i = 0; i < roles.Count; i++)
+            {
+                SetAvatarHeadVisible(i, visible);
+            }
+
+
+        }
+
         public void CalibrateRole(int roleIndex)
         {
             if (!IsValidIndex(roleIndex)) return;
@@ -47,6 +74,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
             avatar.RigFollower.BuildMap();
             avatar.RigFollower.CalibrateTargetsFromAvatar();
+            Debug.Log($"CalibrateRole({roleIndex}) was called.");
         }
 
         public void ShowAllRoles()

@@ -19,7 +19,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            Debug.Log("[CalibrationState] Enter");
+            UnityEngine.Debug.Log("[CalibrationState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;
 
@@ -27,6 +27,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _avatarPlacementAtStart = _flow.Stage.AvatarPlacementAtStart;
             
             _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+
+            //make head invisible for rig that will be calibrated.
+            _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,false);
             // Set XR-Cam to Role height
             _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
             ShowCurrentRoleOrFinish();
@@ -43,10 +46,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.AvatarCalibration
                     .CalibrateRole(_currentRoleIndexForCalibration);
 
+                //make head of calibrated avatar visible again.
+                _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,true);
+
                 // 2. Zur nächsten Rolle wechseln
                 _currentRoleIndexForCalibration++;
 
                 _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+
+                
+
                 // Set XR-Cam to Role height
                 _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
 
@@ -63,6 +72,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
+            _flow.Stage.AvatarCalibration.SetAllAvatarHeadsVisible(true);
+
             //set visibility of visualRig (Debug-) Cubes
             _flow.Stage.RolesVisualsVisibilityHandler.SetAllVisible(false);
             // reset XR-Cam position to level 0 again
@@ -78,8 +89,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 return;
             }
 
-            _flow.Stage.AvatarCalibration
-                .SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+            _flow.Stage.AvatarCalibration.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+
+            //make head invisible for rig that will be calibrated.
+            _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,false);
         }
 
         private void FinishCalibration()

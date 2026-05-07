@@ -37,8 +37,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.TickPlayerAlign();
             if (_flow.Stage.PlayerAlignFinished())
             {
-                UnityEngine.Debug.Log($"[PlayerAlignState] Enter || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count}");
-                
+                UnityEngine.Debug.Log($"[PlayerAlignState] Enter || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
+                if(_flow._data.SceneCount == -1){
+                    _flow._data.GoToSpeakerState = true;
+                    UnityEngine.Debug.Log($"[PlayerAlignState] Enter || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
+                }
+
                 if(_flow._data.GoToSpeakerState){
                     _flow.SetState(new RecordSpeakerState(_flow)); 
                 }else{
@@ -70,6 +74,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Exit()
         {
             UnityEngine.Debug.Log("[PlayerAlignState] Exit");
+ 
         }
     }
 }

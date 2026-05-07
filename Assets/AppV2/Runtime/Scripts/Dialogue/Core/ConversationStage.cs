@@ -43,6 +43,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private MirrorSetVisibility mirrorSetVisibility;
         public MirrorSetVisibility MirrorSetVisibility  => mirrorSetVisibility;
 
+        //Um die Münder bzw. Gesichter der Avatare zu animieren.
+        private AnimateBlendShapesViaAudioSources _blendShapeAudioAnimator;
+        public AnimateBlendShapesViaAudioSources BlendShapeAudioAnimator => _blendShapeAudioAnimator;
+
         [Header("Grösse des Spielers")]
         public float heightOfPlayerCm = 180f;
         public float avatarBaseHeightCm = 200f;
@@ -154,6 +158,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _playbackController = new PlaybackController();
             _reactiveIdleController = new ReactiveIdleController();
 
+
+
             if(StartInPlaybackFullConversationMode){
 
                 UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. Folder Id is: {FolderSessionId}");
@@ -193,6 +199,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 // Das passiert im Exit von CalibrationState.
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
                 _calibrationDataProvider.Initialize(roles); 
+
+                //Für die Animation der Münder
+                _blendShapeAudioAnimator = new AnimateBlendShapesViaAudioSources();
+                _blendShapeAudioAnimator.Initialize(roles);
 
                 
             }
@@ -262,7 +272,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR ORIGIN WORLD POS before recording: {XrOrigin.position}");
             RoleRig role = roles[roleIndex];
             float roleScale = (float)roles[roleIndex].heightOfRoleCm / heightOfPlayerCm;
-
+            avatarCalibration.SetAvatarHeadVisible(roleIndex,false);
             //public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
             _recordingController.BeginRecording(_stageRoot, roleScale, roleIndex, sceneCount, _input);
         }
@@ -283,6 +293,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //UnityEngine.Debug.Log($"RecordingEnd called in Conversation Stage roleIndex{roleIndex} sceneCount{sceneCount}");
             RoleRig role = roles[roleIndex];
             _recordingController.EndRecording( roleIndex, role.roleId, sceneCount); 
+            avatarCalibration.SetAvatarHeadVisible(roleIndex,true);
         }
 
         public bool RecordingSaveCompleted(){
@@ -300,7 +311,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void PlaybackStart(List<int> roleIndices,  int sceneCount){
 
                 
-
+               
                 if(_takeIndex.TryGetTakeForScene(roleIndices[0], sceneCount, out TakeMeta takeMeta)){
                     string sessionId = takeMeta.SessionId;
                     _playbackController.PlaybackForIndexListBegin(roleIndices, heightOfPlayerCm, sceneCount, sessionId);
@@ -311,6 +322,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
       
         public void PlaybackTick(List<int> roleIndices){
             _playbackController.TickForIndexList(roleIndices);
+            _blendShapeAudioAnimator.Tick(Time.deltaTime, roleIndices);
+
         }
 
         public bool PlaybacksAreAllStopped(){
