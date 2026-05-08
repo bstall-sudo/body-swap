@@ -119,6 +119,39 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &20188117 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3183993032973567291, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+  m_PrefabInstance: {fileID: 7153911968249715115}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &20188118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20188117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a8098103f299b44be14d0de50e7fe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IKFootSolver
+  isMovingForward: 0
+  terrainLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  body: {fileID: 622851853}
+  otherFoot: {fileID: 786389524}
+  speed: 4
+  stepDistance: 0.2
+  stepLength: 0.2
+  sideStepLength: 0.1
+  stepHeight: 0.3
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.1
+  rayStartYOffset: 0
+  rayLength: 1.5
 --- !u!4 &20654217 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3480699329000672020, guid: 8affff5d6554c8045bb9964407712182, type: 3}
@@ -648,6 +681,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1599847273}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &622851853 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4500593101827085862, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+  m_PrefabInstance: {fileID: 7153911968249715115}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &650057820 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7078722787440015773, guid: 1f2d670b45110cc4c9df1b3e43bb1089, type: 3}
@@ -818,6 +856,39 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -3746190272939815206, guid: 8affff5d6554c8045bb9964407712182, type: 3}
   m_PrefabInstance: {fileID: 1015495956}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &786389522 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3766294651593906466, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+  m_PrefabInstance: {fileID: 7153911968249715115}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &786389524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786389522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a8098103f299b44be14d0de50e7fe3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IKFootSolver
+  isMovingForward: 0
+  terrainLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  body: {fileID: 622851853}
+  otherFoot: {fileID: 20188118}
+  speed: 4
+  stepDistance: 0.2
+  stepLength: 0.2
+  sideStepLength: 0.1
+  stepHeight: 0.3
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.1
+  rayStartYOffset: 0
+  rayLength: 1.5
 --- !u!4 &787466002 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 366175167995203695, guid: 1f2d670b45110cc4c9df1b3e43bb1089, type: 3}
@@ -1336,7 +1407,8 @@ GameObject:
   - component: {fileID: 1106387496}
   - component: {fileID: 1106387495}
   - component: {fileID: 1106387494}
-  m_Layer: 0
+  - component: {fileID: 1106387497}
+  m_Layer: 3
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1415,6 +1487,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &1106387497
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1106387492}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!4 &1110829832 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -2770666803903516498, guid: 8affff5d6554c8045bb9964407712182, type: 3}
@@ -2052,6 +2146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1580464396}
   - component: {fileID: 1580464395}
+  - component: {fileID: 1580464397}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -2139,6 +2234,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1580464397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1580464394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!4 &1590513079 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1864740628597940677, guid: 8affff5d6554c8045bb9964407712182, type: 3}
@@ -3181,10 +3305,24 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7536067266338081884, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 2c32f7bfd0da7d54d95976c0d11397f5, type: 2}
+    - target: {fileID: 7536067266338081884, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3183993032973567291, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 20188118}
+    - targetCorrespondingSourceObject: {fileID: 3766294651593906466, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 786389524}
   m_SourcePrefab: {fileID: 100100000, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

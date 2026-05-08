@@ -74,14 +74,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
-            UnityEngine.Debug.Log($"[RecordListenersState] Enter || Playback by Index: {playbacks[0]} || toBeRecorded Index: {toBeRecorded} || Scene: {sceneCount} || ReactiveIdleCount: {reactiveIdles.Count}");
+            UnityEngine.Debug.Log("[RecordListenersState] Enter");
+            PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
 
 
         }
 
         public void Tick(float dt)
         {
-            _flow.Stage.ReactiveIdleTick(reactiveIdles, toBeRecorded);
+            _flow.Stage.ReactiveIdleTick(reactiveIdles, playbacks, toBeRecorded, dt);
             // Solange noch nicht beendet wird: normales Verhalten
             if (!_waitingForRecordingSave)
             {
@@ -195,7 +196,35 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
            */
             UnityEngine.Debug.Log("[RecordListenersState] Exit");
+            PrintRoleLists("[RecordListenersState] Exit", playbacks, reactiveIdles, toBeRecorded);
         }
+
+        //für das Debugging
+        private void PrintRoleLists(
+            string text, 
+            List<int> playbacks,
+            List<int> reactiveIdles,
+            int toBeRecorded)
+        {
+            string playbacksString =
+                playbacks == null || playbacks.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", playbacks) + "]";
+
+            string reactiveIdlesString =
+                reactiveIdles == null || reactiveIdles.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", reactiveIdles) + "]";
+
+            Debug.Log(
+                $"[{text}] " +
+                $"[RoleLists] " +
+                $"playbacks={playbacksString} | " +
+                $"reactiveIdles={reactiveIdlesString} | " +
+                $"toBeRecorded={toBeRecorded}"
+            );
+        }
+
 
     }
 }

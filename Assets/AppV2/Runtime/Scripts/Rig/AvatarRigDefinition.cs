@@ -21,6 +21,15 @@ namespace AppV2.Runtime.Scripts.Rig
 
         private readonly System.Collections.Generic.Dictionary<string, BlendShapeRef> _blendShapesByLowerName = new();
 
+        [SerializeField] private string mouthOpenBlendShapeName;
+        [SerializeField] private string eyebrowRaiseBlendShapeName;
+
+        [SerializeField] private string mouthOpenSearchPart = "open";
+        [SerializeField] private string eyebrowRaiseSearchPart = "eyebrow";
+
+        private BlendShapeRef? _mouthOpenBlendShape;
+        private BlendShapeRef? _eyebrowRaiseBlendShape;
+
         private struct BlendShapeRef
         {
             public SkinnedMeshRenderer Renderer;
@@ -163,13 +172,7 @@ namespace AppV2.Runtime.Scripts.Rig
                     string key = blendShapeName.ToLowerInvariant();
 
                     if (_blendShapesByLowerName.ContainsKey(key))
-                    {
-                        Debug.LogWarning(
-                            $"[{name}] Duplicate blendshape name '{blendShapeName}'. " +
-                            $"Keeping first occurrence."
-                        );
                         continue;
-                    }
 
                     _blendShapesByLowerName.Add(key, new BlendShapeRef
                     {
@@ -177,10 +180,10 @@ namespace AppV2.Runtime.Scripts.Rig
                         Index = i,
                         Name = blendShapeName
                     });
-
-                    Debug.Log($"[{name}] Cached BlendShape: '{blendShapeName}' on '{smr.gameObject.name}'");
                 }
             }
+
+            ResolveImportantBlendShapes();
         }
 
         public bool SetHeadBlendShapeWeight(string blendShapeName, float weight)
@@ -202,27 +205,90 @@ namespace AppV2.Runtime.Scripts.Rig
             return true;
         }
 
-        public bool SetFirstHeadBlendShapeContaining(string namePart, float weight)
+private void ResolveImportantBlendShapes()
+{
+    _mouthOpenBlendShape = ResolveBlendShape(
+        mouthOpenBlendShapeName,
+        mouthOpenSearchPart,
+        "mouthOpen"
+    );
+
+    _eyebrowRaiseBlendShape = ResolveBlendShape(
+        eyebrowRaiseBlendShapeName,
+        eyebrowRaiseSearchPart,
+        "eyebrowRaise"
+    );
+}
+
+        private BlendShapeRef? ResolveBlendShape(
+            string explicitName,
+            string fallbackSearchPart,
+            string label)
         {
-            if (string.IsNullOrWhiteSpace(namePart))
-                return false;
-
-            string lowerPart = namePart.ToLowerInvariant();
-
-            foreach (var kvp in _blendShapesByLowerName)
+            if (!string.IsNullOrWhiteSpace(explicitName))
             {
-                BlendShapeRef blendShape = kvp.Value;
+                string key = explicitName.ToLowerInvariant();
 
-                if (blendShape.Name.ToLowerInvariant().Contains(lowerPart))
+                if (_blendShapesByLowerName.TryGetValue(key, out BlendShapeRef exact))
                 {
-                    weight = Mathf.Clamp(weight, 0f, 100f);
-                    blendShape.Renderer.SetBlendShapeWeight(blendShape.Index, weight);
-                    return true;
+                    Debug.Log($"[{name}] {label} BlendShape set explicitly: '{exact.Name}'");
+                    return exact;
+                }
+
+                Debug.LogWarning($"[{name}] Explicit {label} BlendShape '{explicitName}' not found.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackSearchPart))
+            {
+                string lowerPart = fallbackSearchPart.ToLowerInvariant();
+
+                foreach (var kvp in _blendShapesByLowerName)
+                {
+                    BlendShapeRef blendShape = kvp.Value;
+
+                    if (blendShape.Name.ToLowerInvariant().Contains(lowerPart))
+                    {
+                        Debug.Log($"[{name}] {label} BlendShape auto-found: '{blendShape.Name}'");
+
+                        if (label == "mouthOpen")
+                            mouthOpenBlendShapeName = blendShape.Name;
+
+                        if (label == "eyebrowRaise")
+                            eyebrowRaiseBlendShapeName = blendShape.Name;
+
+                        return blendShape;
+                    }
                 }
             }
 
-            Debug.LogWarning($"[{name}] No head BlendShape containing '{namePart}' found.");
-            return false;
+            Debug.LogWarning($"[{name}] No {label} BlendShape found.");
+            return null;
+        }
+
+        public void AnimateMouth(float weight)
+        {
+            SetBlendShapeWeight(_mouthOpenBlendShape, weight);
+        }
+
+ 
+
+        public void AnimateEyebrow(float weight)
+        {
+            SetBlendShapeWeight(_eyebrowRaiseBlendShape, weight);
+        }
+
+        private void SetBlendShapeWeight(BlendShapeRef? blendShapeRef, float weight)
+        {
+            if (!blendShapeRef.HasValue)
+                return;
+
+            BlendShapeRef blendShape = blendShapeRef.Value;
+
+            if (blendShape.Renderer == null)
+                return;
+
+            weight = Mathf.Clamp(weight, 0f, 100f);
+            blendShape.Renderer.SetBlendShapeWeight(blendShape.Index, weight);
         }
 
         public void SetHeadVisible(bool visible)

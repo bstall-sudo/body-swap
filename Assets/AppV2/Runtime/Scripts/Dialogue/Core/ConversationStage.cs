@@ -200,13 +200,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
                 _calibrationDataProvider.Initialize(roles); 
 
-                //Für die Animation der Münder
-                _blendShapeAudioAnimator = new AnimateBlendShapesViaAudioSources();
-                _blendShapeAudioAnimator.Initialize(roles);
+                
 
                 
             }
-            _reactiveIdleController.Initialize(roles);
+            //Für die Animation der Münder
+            _blendShapeAudioAnimator = new AnimateBlendShapesViaAudioSources();
+            _blendShapeAudioAnimator.Initialize(roles);
+            _reactiveIdleController.Initialize(roles, _blendShapeAudioAnimator);
 
             InitializeRoleHeightsFromPlayerIfNeeded();
 
@@ -347,11 +348,21 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
         }
 
-        public void ReactiveIdleTick(List<int> reactiveIdles, int speakerRoleIndex)
+        public void ReactiveIdleTick(List<int> reactiveIdles, List<int> playbacks, int speakerRoleIndex, float dt)
         {
             if (reactiveIdles == null) return;
+            //_reactiveIdleController.UpdateIdleLookTargets(reactiveIdles, speakerRoleIndex);
 
-            _reactiveIdleController.UpdateIdleLookTargets(reactiveIdles, speakerRoleIndex);
+            // diese Funktion führt zu Performanceproblemen.
+            //_reactiveIdleController.UpdateIdleLookTargetsToLoudestSpeaker(reactiveIdles, playbacks, speakerRoleIndex, dt);
+
+            
+            _reactiveIdleController.UpdateIdleLookTargetsToLoudestSpeakerThrottled(
+                reactiveIdles,
+                playbacks,
+                speakerRoleIndex,
+                dt
+            );
         }
 
         public void ReactiveIdleEnd(List<int> reactiveIdles)

@@ -8,6 +8,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private readonly FlowController _flow;
 
         private int toBeRecorded;
+
+        private List<int> playbacks;
         private int sceneCount;
 
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
@@ -52,6 +54,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
             sceneCount = _flow._data.SceneCount;
             toBeRecorded = _flow._data.ToBeRecorded;
+            playbacks = _flow._data.Playbacks;
 
             /*
             if(_isUsingXr){
@@ -110,7 +113,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;
 
-            UnityEngine.Debug.Log($"[RecordSpeakerState] Enter || toBeRecorded Index: {toBeRecorded} || Scene: {sceneCount} || ReactiveIdleCount: {reactiveIdles.Count}");
+            UnityEngine.Debug.Log("[RecordSpeakerState] Enter ");
+
+            PrintRoleLists("[RecordSpeakerState] Enter", playbacks, reactiveIdles, toBeRecorded);
             
         }
 
@@ -118,7 +123,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
 
         {
-            _flow.Stage.ReactiveIdleTick(reactiveIdles, toBeRecorded);
+            _flow.Stage.ReactiveIdleTick(reactiveIdles, playbacks, toBeRecorded, dt);
             if(_isRecording && !_waitingForRecordingSave){
                 _flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 _flow.Stage.RecordingTick(toBeRecorded,sceneCount);
@@ -189,9 +194,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
             _flow.SpeakerStateExit();
-            UnityEngine.Debug.Log($"[RecordSpeakerState] To Be Recorded: {_flow._data.ToBeRecorded}");
+           
             
             UnityEngine.Debug.Log("[RecordSpeakerState] Exit");
+            PrintRoleLists("[RecordSpeakerState] Exit", playbacks, reactiveIdles, toBeRecorded);
             //damit der PlayerAlignState weiss, ob er zu RecordSpeaker oder zu RecordListenersState wechseln soll. 
             _flow._data.GoToSpeakerState = false;
             /*
@@ -204,6 +210,32 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             */
            
             
+        }
+
+        //für das Debugging
+        private void PrintRoleLists(
+            string text, 
+            List<int> playbacks,
+            List<int> reactiveIdles,
+            int toBeRecorded)
+        {
+            string playbacksString =
+                playbacks == null || playbacks.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", playbacks) + "]";
+
+            string reactiveIdlesString =
+                reactiveIdles == null || reactiveIdles.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", reactiveIdles) + "]";
+
+            Debug.Log(
+                $"[{text}] " +
+                $"[RoleLists] " +
+                $"playbacks={playbacksString} | " +
+                $"reactiveIdles={reactiveIdlesString} | " +
+                $"toBeRecorded={toBeRecorded}"
+            );
         }
 
     }

@@ -13,6 +13,10 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public Transform head;
         public Transform leftHand;
         public Transform rightHand;
+        public Transform leftFoot;
+        public Transform rightRoot;
+        public Transform hip;
+
         
         public AudioSource audioSource;
         [Header("Role size")]

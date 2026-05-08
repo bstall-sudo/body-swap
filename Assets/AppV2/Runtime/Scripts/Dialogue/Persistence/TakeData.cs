@@ -25,6 +25,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public PoseSample Head;
         public PoseSample Left;
         public PoseSample Right;
+        public PoseSample Hip;
+        public PoseSample LeftFoot;
+        public PoseSample RightFoot;
     }
 
     public class TakeData
