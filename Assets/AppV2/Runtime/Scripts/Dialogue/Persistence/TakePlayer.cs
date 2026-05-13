@@ -9,6 +9,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         private readonly Transform _headT;
         private readonly Transform _leftT;
         private readonly Transform _rightT;
+
+        private readonly Transform _hipT;
+        private readonly Transform _leftFootT;
+        private readonly Transform _rightFootT;
         private readonly AudioSource _audio;
 
         private TakeData _take;
@@ -22,10 +26,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public bool IsPlaying => _playing;
 
-        public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, AudioSource audio)
+        public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, Transform hip, Transform leftFoot, Transform rightFoot, AudioSource audio)
         {
             _actorRoot = actorRoot;
-            _headT = head; _leftT = left; _rightT = right;
+            _headT = head; _leftT = left; _rightT = right; _hipT = hip; _leftFootT = leftFoot; _rightFootT = rightFoot;
             _audio = audio;
         }
 
@@ -125,20 +129,38 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             if (_headT)
             {
-                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u);// * _roleScale; könnte sein, dass das dann doppelt ist 29.04.2026
+                _headT.localPosition = Vector3.Lerp(a.Head.Pos, b.Head.Pos, u);
                 _headT.localRotation = Quaternion.Slerp(a.Head.Rot, b.Head.Rot, u);
             }
 
             if (_leftT)
             {
-                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u);// * _roleScale; 
+                _leftT.localPosition = Vector3.Lerp(a.Left.Pos, b.Left.Pos, u);
                 _leftT.localRotation = Quaternion.Slerp(a.Left.Rot, b.Left.Rot, u);
             }
 
             if (_rightT)
             {
-                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u);// * _roleScale; 
+                _rightT.localPosition = Vector3.Lerp(a.Right.Pos, b.Right.Pos, u);
                 _rightT.localRotation = Quaternion.Slerp(a.Right.Rot, b.Right.Rot, u);
+            }
+
+            if (_hipT)
+            {
+                _hipT.localPosition = Vector3.Lerp(a.Hip.Pos, b.Hip.Pos, u);
+                _hipT.localRotation = Quaternion.Slerp(a.Hip.Rot, b.Hip.Rot, u);
+            }
+
+            if (_leftFootT)
+            {
+                _leftFootT.localPosition = Vector3.Lerp(a.LeftFoot.Pos, b.LeftFoot.Pos, u);
+                _leftFootT.localRotation = Quaternion.Slerp(a.LeftFoot.Rot, b.LeftFoot.Rot, u);
+            }
+
+            if (_rightFootT)
+            {
+                _rightFootT.localPosition = Vector3.Lerp(a.RightFoot.Pos, b.RightFoot.Pos, u);
+                _rightFootT.localRotation = Quaternion.Slerp(a.RightFoot.Rot, b.RightFoot.Rot, u);
             }
         }
 
@@ -166,20 +188,28 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 _rightT.localPosition = f.Right.Pos; // * _roleScale;
                 _rightT.localRotation = f.Right.Rot;
             }
+
+            if (_hipT)
+            {
+                _hipT.localPosition = f.Hip.Pos; // * _roleScale;  //als Test, weil RoleX_ScaleRoot ist ja auch schon skaliert. Daher ist das hier vielleicht nicht nötig.
+                _hipT.localRotation = f.Hip.Rot;
+            }
+
+            if (_leftFootT)
+            {
+                _leftFootT.localPosition = f.LeftFoot.Pos; // * _roleScale;
+                _leftFootT.localRotation = f.LeftFoot.Rot;
+            }
+
+            if (_rightFootT)
+            {
+                _rightFootT.localPosition = f.RightFoot.Pos; // * _roleScale;
+                _rightFootT.localRotation = f.RightFoot.Rot;
+            }
         }
 
 
-        /*
-        private void ApplyFrame(Frame f)
-        {
-            _actorRoot.localPosition = f.Body.Pos;
-            _actorRoot.localRotation = Quaternion.Euler(0f, f.Body.YawDeg, 0f);
 
-            if (_headT) { _headT.localPosition = f.Head.Pos; _headT.localRotation = f.Head.Rot; }
-            if (_leftT) { _leftT.localPosition = f.Left.Pos; _leftT.localRotation = f.Left.Rot; }
-            if (_rightT) { _rightT.localPosition = f.Right.Pos; _rightT.localRotation = f.Right.Rot; }
-        }
-        */
 
         //Stoppen und RAM leeren.
         public void Stop()

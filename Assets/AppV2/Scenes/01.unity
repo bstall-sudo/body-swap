@@ -220,8 +220,11 @@ MonoBehaviour:
     leftHand: {fileID: 1573626204}
     rightHand: {fileID: 1495911898}
     leftFoot: {fileID: 972480782}
-    rightRoot: {fileID: 2013212747}
+    rightFoot: {fileID: 2013212747}
     hip: {fileID: 1208686202}
+    hipSolver: {fileID: 1208686206}
+    leftFootSolver: {fileID: 972480786}
+    rightFootSolver: {fileID: 2013212751}
     audioSource: {fileID: 861219314}
     heightOfRoleCm: 180
     hasInitialStartPose: 0
@@ -234,6 +237,7 @@ MonoBehaviour:
     avatarName: esel_bademantel_01
     avatar: {fileID: 818458807}
     rigFollower: {fileID: 818458808}
+    visualRigFollower: {fileID: 1106390900}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
   - roleId: B
@@ -242,8 +246,11 @@ MonoBehaviour:
     leftHand: {fileID: 1575694759}
     rightHand: {fileID: 1088817999}
     leftFoot: {fileID: 1954654705}
-    rightRoot: {fileID: 809510983}
+    rightFoot: {fileID: 809510983}
     hip: {fileID: 1393575059}
+    hipSolver: {fileID: 1393575063}
+    leftFootSolver: {fileID: 1954654709}
+    rightFootSolver: {fileID: 809510987}
     audioSource: {fileID: 2038182407}
     heightOfRoleCm: 210
     hasInitialStartPose: 0
@@ -256,6 +263,7 @@ MonoBehaviour:
     avatarName: BearPigWithShapeKeys_scale_1@T-Pose
     avatar: {fileID: 2079603510}
     rigFollower: {fileID: 2079603511}
+    visualRigFollower: {fileID: 1358925939}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
   - roleId: C
@@ -264,8 +272,11 @@ MonoBehaviour:
     leftHand: {fileID: 125770113}
     rightHand: {fileID: 1097616047}
     leftFoot: {fileID: 638371922}
-    rightRoot: {fileID: 1754586966}
+    rightFoot: {fileID: 1754586966}
     hip: {fileID: 61434634}
+    hipSolver: {fileID: 61434638}
+    leftFootSolver: {fileID: 638371926}
+    rightFootSolver: {fileID: 1754586970}
     audioSource: {fileID: 711541104}
     heightOfRoleCm: 150
     hasInitialStartPose: 0
@@ -278,6 +289,7 @@ MonoBehaviour:
     avatarName: esel_bademantel_01
     avatar: {fileID: 1046647341}
     rigFollower: {fileID: 1046647342}
+    visualRigFollower: {fileID: 1692814850}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
   UseXR: 1
@@ -485,6 +497,7 @@ GameObject:
   - component: {fileID: 61434637}
   - component: {fileID: 61434636}
   - component: {fileID: 61434635}
+  - component: {fileID: 61434638}
   m_Layer: 0
   m_Name: hip
   m_TagString: Untagged
@@ -585,6 +598,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 61434633}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &61434638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 61434633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3c5520168e6bb14fa67c4dad727b8b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralHipSolver
+  bodyRoot: {fileID: 195997951}
+  head: {fileID: 1806493406}
+  hipHeight: 0.95
+  hipBackOffset: 0.08
+  smoothSpeed: 12
 --- !u!1 &74956076
 GameObject:
   m_ObjectHideFlags: 0
@@ -2386,6 +2416,7 @@ GameObject:
   - component: {fileID: 638371925}
   - component: {fileID: 638371924}
   - component: {fileID: 638371923}
+  - component: {fileID: 638371926}
   m_Layer: 0
   m_Name: leftFoot
   m_TagString: Untagged
@@ -2486,6 +2517,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 638371921}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &638371926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638371921}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 195997951}
+  otherFoot: {fileID: 1754586970}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!1 &638662129
 GameObject:
   m_ObjectHideFlags: 0
@@ -2528,11 +2586,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 638662129}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoleRigUpdatePipeline
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.RoleRigUpdatePipeline
   visualRigFollower: {fileID: 0}
   avatarRigFollower: {fileID: 0}
 --- !u!1 &682927385
@@ -3210,6 +3268,7 @@ GameObject:
   - component: {fileID: 809510986}
   - component: {fileID: 809510985}
   - component: {fileID: 809510984}
+  - component: {fileID: 809510987}
   m_Layer: 0
   m_Name: rightFoot
   m_TagString: Untagged
@@ -3310,6 +3369,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809510982}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &809510987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 809510982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 702877649}
+  otherFoot: {fileID: 1954654709}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!1 &818458804
 GameObject:
   m_ObjectHideFlags: 0
@@ -3695,7 +3781,7 @@ GameObject:
   - component: {fileID: 910519300}
   - component: {fileID: 910519299}
   - component: {fileID: 910519303}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4748,6 +4834,7 @@ GameObject:
   - component: {fileID: 972480785}
   - component: {fileID: 972480784}
   - component: {fileID: 972480783}
+  - component: {fileID: 972480786}
   m_Layer: 0
   m_Name: leftFoot
   m_TagString: Untagged
@@ -4848,6 +4935,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 972480781}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &972480786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 972480781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 1884059423}
+  otherFoot: {fileID: 2013212751}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!1001 &1030368479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6412,6 +6526,7 @@ GameObject:
   - component: {fileID: 1208686205}
   - component: {fileID: 1208686204}
   - component: {fileID: 1208686203}
+  - component: {fileID: 1208686206}
   m_Layer: 0
   m_Name: hip
   m_TagString: Untagged
@@ -6512,6 +6627,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1208686201}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1208686206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208686201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3c5520168e6bb14fa67c4dad727b8b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralHipSolver
+  bodyRoot: {fileID: 1884059423}
+  head: {fileID: 1909882236}
+  hipHeight: 0.95
+  hipBackOffset: 0.08
+  smoothSpeed: 12
 --- !u!1 &1267062897
 GameObject:
   m_ObjectHideFlags: 0
@@ -6866,7 +6998,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1378051319}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
   m_Name: 
@@ -6885,6 +7017,7 @@ GameObject:
   - component: {fileID: 1393575062}
   - component: {fileID: 1393575061}
   - component: {fileID: 1393575060}
+  - component: {fileID: 1393575063}
   m_Layer: 0
   m_Name: hip
   m_TagString: Untagged
@@ -6985,6 +7118,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1393575058}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1393575063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1393575058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3c5520168e6bb14fa67c4dad727b8b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralHipSolver
+  bodyRoot: {fileID: 702877649}
+  head: {fileID: 943885936}
+  hipHeight: 0.95
+  hipBackOffset: 0.08
+  smoothSpeed: 12
 --- !u!1 &1396105575
 GameObject:
   m_ObjectHideFlags: 0
@@ -8401,6 +8551,7 @@ GameObject:
   - component: {fileID: 1754586969}
   - component: {fileID: 1754586968}
   - component: {fileID: 1754586967}
+  - component: {fileID: 1754586970}
   m_Layer: 0
   m_Name: rightFoot
   m_TagString: Untagged
@@ -8501,6 +8652,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1754586965}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1754586970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754586965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 195997951}
+  otherFoot: {fileID: 638371926}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!1 &1783727430
 GameObject:
   m_ObjectHideFlags: 0
@@ -9422,6 +9600,7 @@ GameObject:
   - component: {fileID: 1954654708}
   - component: {fileID: 1954654707}
   - component: {fileID: 1954654706}
+  - component: {fileID: 1954654709}
   m_Layer: 0
   m_Name: leftFoot
   m_TagString: Untagged
@@ -9522,6 +9701,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1954654704}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1954654709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954654704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 702877649}
+  otherFoot: {fileID: 809510987}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!1 &1985397411
 GameObject:
   m_ObjectHideFlags: 0
@@ -9655,6 +9861,7 @@ GameObject:
   - component: {fileID: 2013212750}
   - component: {fileID: 2013212749}
   - component: {fileID: 2013212748}
+  - component: {fileID: 2013212751}
   m_Layer: 0
   m_Name: rightFoot
   m_TagString: Untagged
@@ -9755,6 +9962,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2013212746}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &2013212751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013212746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20165fb6e0b8a794c9d12c68a900bc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.ProceduralFootSolver
+  bodyRoot: {fileID: 1884059423}
+  otherFoot: {fileID: 972480786}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  rayStartHeight: 1
+  rayLength: 3
+  stepDistance: 0.28
+  stepLength: 0.22
+  sideStepLength: 0.12
+  stepHeight: 0.12
+  stepSpeed: 5
+  footOffset: {x: 0, y: 0, z: 0}
+  footRotationOffset: {x: 0, y: 0, z: 0}
+  footYPosOffset: 0.02
 --- !u!4 &2025236437 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 202364688, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
@@ -10251,7 +10485,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2110021514}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
   m_Name: 

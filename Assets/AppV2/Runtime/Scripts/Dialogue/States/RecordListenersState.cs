@@ -86,8 +86,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             // Solange noch nicht beendet wird: normales Verhalten
             if (!_waitingForRecordingSave)
             {
-                _flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
-                _flow.Stage.RecordingTick(toBeRecorded, sceneCount);
+                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
+                //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 _flow.Stage.PlaybackTick(playbacks);
                 
             }
@@ -104,7 +104,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 }
            if (_waitingForRecordingSave)
             {
-                _flow.Stage.RecordingTick(toBeRecorded, sceneCount);
+                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
+                //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 // Wir warten nur noch auf das fertige Speichern
                 
                 if (_flow.Stage.RecordingSaveCompleted())

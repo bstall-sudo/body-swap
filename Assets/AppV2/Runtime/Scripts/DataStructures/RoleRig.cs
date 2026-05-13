@@ -14,9 +14,12 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public Transform leftHand;
         public Transform rightHand;
         public Transform leftFoot;
-        public Transform rightRoot;
+        public Transform rightFoot;
         public Transform hip;
 
+        public ProceduralHipSolver hipSolver;
+        public ProceduralFootSolver leftFootSolver;
+        public ProceduralFootSolver rightFootSolver;
         
         public AudioSource audioSource;
         [Header("Role size")]
@@ -38,6 +41,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string avatarName;
         public AvatarRigDefinition avatar;
         public AvatarRigFollower rigFollower;
+
+        public VisualRigFollower visualRigFollower;
 
         public float visualGroundOffsetY = 0f;
 

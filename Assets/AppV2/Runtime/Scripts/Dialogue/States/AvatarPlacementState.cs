@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -8,6 +9,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int _currentRoleIndexForPlacement;
         private bool selectableNext;
 
+        private List<int> _allRolesIndices;
 
 
         private Vector3 testVectorPlacement = new Vector3(0f, 0f, 1f);
@@ -27,14 +29,20 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             Debug.Log("[AvatarPlacementState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;
-
+            _allRolesIndices = new List<int>();
             _currentRoleIndexForPlacement = 0;
 
             for (int i = 0; i < _flow.Stage.roleCount; i++){
-
+                _allRolesIndices.Add(i);
                 PlaceCurrentRoleAndAdvance();
+                
+                UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
 
             }
+            _flow.Stage.RigUpdatePipeline(_allRolesIndices);
+
+            
+            
             
         }
 
@@ -110,6 +118,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
+            _flow.Stage.RigUpdatePipeline(_allRolesIndices);
+            _flow.Stage.AvatarCalibration.ShowAllRoles();
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
         }

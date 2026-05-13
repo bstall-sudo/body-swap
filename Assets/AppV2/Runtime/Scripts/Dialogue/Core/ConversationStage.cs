@@ -121,6 +121,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool UseXR = false;
         public float SmoothAlignSeconds = 0.6f;
         public bool FullBodyTrackers = false;
+
+        public bool ProceduralHipAndFeetMove = false;
         public bool AvatarPlacementAtStart = true;
 
         [Header("Start im Playback Mode. Grundeinstellung: letzte Aufnahme, sonst SessionId")]
@@ -135,6 +137,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform XrLeftHand;
         public Transform XrRightHand;
         public Transform XrOrigin;
+        public Transform XrHip;
+        public Transform XrLeftFoot;
+        public Transform XrRightFoot;
 
         // wird für StartPlayerAlignToActor gebraucht.
         //damit man beim RoleSwitch an die Stelle der anderen Figur teleportiert wird
@@ -236,7 +241,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             if (UseXR)
             {
-                _input = new XRInputTransforms(XrHead, XrLeftHand, XrRightHand);
+                _input = new XRInputTransforms(XrHead, XrLeftHand, XrRightHand, XrHip, XrLeftFoot, XrRightFoot);
 
                 //Das setzt den Anker für die Transforms siehe XRInputTransforms
                 _input.SetAnchorFromTakeRoot(_stageRoot);
@@ -282,10 +287,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             RoleRig role = roles[roleIndex];
 
-            //// damit das embodimentOffset im Recording auch berücksichtigt wird:
-            float embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
-            _recordingController.TickRecording(roleIndex, role.roleId, sceneCount, embodimentDeltaY);
-            //_recordingController.TickRecording( roleIndex, role.roleId, sceneCount);
+            _recordingController.TickRecording(roleIndex, role.roleId, sceneCount);  
             
         }
 
@@ -323,8 +325,40 @@ namespace AppV2.Runtime.Scripts.Dialogue
       
         public void PlaybackTick(List<int> roleIndices){
             _playbackController.TickForIndexList(roleIndices);
+            RigUpdatePipeline(roleIndices);
             _blendShapeAudioAnimator.Tick(Time.deltaTime, roleIndices);
 
+        }
+
+        public void RigUpdatePipeline(List<int> roleIndices)
+        {
+            for (int i = 0; i < roleIndices.Count; i++)
+            {
+                int roleIndex = roleIndices[i];
+
+                if (roles[roleIndex].visualRigFollower != null)
+                {
+                    roles[roleIndex].visualRigFollower.ApplyFollow();
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError($"No VisualRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+                }
+                
+
+                if (roles[roleIndex].rigFollower != null)
+                {
+                    roles[roleIndex].rigFollower.ApplyFollow();
+                }                
+                else
+                {
+                    UnityEngine.Debug.LogError($"No AvatarRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+                }
+                    
+                
+                
+            }
+            
         }
 
         public bool PlaybacksAreAllStopped(){
@@ -400,114 +434,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
                         
 
-/*
-        // Wird z.B. im Update() von den States pro Frame aufgerufen
-        public void DriveActiveRoleFromInput(int roleIndex)
+        public void DriveAndRecordTickActiveRole(int roleIndex, int sceneCount, float dt)
         {
-            if (!_input.TryGetHeadPose(out var headPos, out var headRot))
-                return;
-
-            var rig = roles[roleIndex];
-
-            // Keyboard-Modus erstmal unverändert lassen
-            // (kann man später auch auf roleScale umbauen, wenn gewünscht)
-            if (_input is KeyboardInputTransforms)
-            {
-                Vector3 p = rig.root.position;
-                p.x = headPos.x;
-                p.z = headPos.z;
-
-                float yaw = headRot.eulerAngles.y;
-                Quaternion r = Quaternion.Euler(0f, yaw, 0f);
-
-                rig.root.SetPositionAndRotation(p, r);
-            }
-            else
-            {
-                var p = _input;
-                if (p == null) return;
-
-                float embodimentDeltaY = 0f;
-                if (embodimentOffsetRoot != null)
-                {
-                    embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
-                }
-
-                if (!p.TryGetHeadPose(out var headStage, out var headRotStage)) return;
-                p.TryGetLeftHandPose(out var leftStage, out var leftRotStage);
-                p.TryGetRightHandPose(out var rightStage, out var rightRotStage);
+            DriveActiveRoleFromInput(roleIndex, dt);
 
 
-                //hier muss jetzt der Höhenunterschied des EmbodimentCameraOffsets wieder rausgerechnet werden.
-                headStage.y -= embodimentDeltaY;
-                leftStage.y -= embodimentDeltaY;
-                rightStage.y -= embodimentDeltaY;
 
-                // Rollengröße semantisch berechnen, nicht über visualRigRoot.localScale
-                float roleScale = 1f;
-                if (heightOfPlayerCm > 0.01f)
-                {
-                    roleScale = (float)rig.heightOfRoleCm / heightOfPlayerCm;
-                }
+            RecordingTick(roleIndex, sceneCount);
 
-                // Body aus Head ableiten
-                Vector3 bodyPos = headStage;
-                bodyPos.y = 0f;
-
-                float yaw = headRotStage.eulerAngles.y;
-
-                Transform role = rig.root;
-                Transform h = rig.head;
-                Transform l = rig.leftHand;
-                Transform r = rig.rightHand;
-
-                // Body bleibt unskaliert stage-local
-                role.localPosition = bodyPos;
-                role.localRotation = Quaternion.Euler(0f, yaw, 0f);
-
-                // Head/Hands relativ zum Body, dann embodied auf Rollenmaß skalieren
-                Quaternion invActorRot = Quaternion.Inverse(role.localRotation);
-
-                Vector3 ToLocalPosScaled(Vector3 pStage)
-                {
-                    Vector3 delta = pStage - bodyPos;
-                    Vector3 localNeutral = invActorRot * delta;
-                    Vector3 localEmbodied = localNeutral * roleScale;
-                    return localEmbodied;
-                }
-
-                Quaternion ToLocalRot(Quaternion rStage)
-                {
-                    return invActorRot * rStage;
-                }
-
-                if (h)
-                {
-                    h.localPosition = ToLocalPosScaled(headStage);
-                    h.localRotation = ToLocalRot(headRotStage);
-
-                }
-
-                if (l)
-                {
-                    l.localPosition = ToLocalPosScaled(leftStage);
-                    l.localRotation = ToLocalRot(leftRotStage);
-                }
-
-                if (r)
-                {
-                    r.localPosition = ToLocalPosScaled(rightStage);
-                    r.localRotation = ToLocalRot(rightRotStage);
-                }
-
-                // Optionales Debug:
-                // UnityEngine.Debug.Log($"DriveActiveRoleFromInput role={rig.roleId} roleScale={roleScale} headLocal={h?.localPosition}");
-            }
         }
-*/
 
+        /*
          // Wird z.B. im Update() von den States pro Frame aufgerufen
-        public void DriveActiveRoleFromInput(int roleIndex)
+        public void DriveActiveRoleFromInput(int roleIndex, float dt)
         {
 
 
@@ -547,21 +486,50 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     p.TryGetLeftHandPose(out var leftStage, out var leftRotStage);
                     p.TryGetRightHandPose(out var rightStage, out var rightRotStage);
 
+                    if (FullBodyTrackers)
+                    {
+                        p.TryGetHipPose(out var hipStage, out var hipRotStage);
+                        p.TryGetLeftFootPose(out var leftFootStage, out var leftFootRotStage);
+                        p.TryGetRightFootPose(out var rightFootStage, out var rightFootRotStage);
+                    } 
+                    else           
+                    {
+                        if (ProceduralHipAndFeetMove)
+                        {
+                            roles[roleIndex].hipSolver?.ApplySolver(dt);
+                            roles[roleIndex].leftFootSolver?.ApplySolver(dt);
+                            roles[roleIndex].rightFootSolver?.ApplySolver(dt);
+                        }
+
+                        var hipStage = roles[roleIndex].hip.localPosition;
+                        var hipRotStage = roles[roleIndex].hip.localRotation;
+                        var leftFootStage = roles[roleIndex].leftFoot.localPosition;
+                        var leftFootRotStage = roles[roleIndex].leftFoot.localRotation;
+                        var rightFootStage = roles[roleIndex].hip.localPosition;
+                        var rightFootRotStage = roles[roleIndex].rightFoot.localRotation;
+
+                    }
+
 
                     //hier muss jetzt der Höhenunterschied des EmbodimentCameraOffsets wieder rausgerechnet werden.
                     headStage.y -= embodimentDeltaY;
                     leftStage.y -= embodimentDeltaY;
                     rightStage.y -= embodimentDeltaY;
+                    hipStage.y -= embodimentDeltaY;
                     
 
                     // Wenn Align aktiv: ersetze BodyPose (pos+yaw) durch interpolierte, aber behalte relative Head/Hands
                     Vector3 bodyPos = headStage; bodyPos.y = 0f;
                     float yaw = headRotStage.eulerAngles.y;
 
+                    //actor, h, l, r sind keine Kopien der Transform-Daten sondern Referenzen auf dieselben Unity-Transform-Komponente wie rig.root, rig.head etc.
                     Transform actor = rig.root;
                     Transform h = rig.head;
                     Transform l = rig.leftHand;
                     Transform r = rig.rightHand;
+                    Transform hip = rig.hip;
+                    Transform lFoot = rig.leftFoot;
+                    Transform rFoot = rig.rightFoot;
 
                     actor.localPosition = bodyPos;
                     actor.localRotation = Quaternion.Euler(0f, yaw, 0f);
@@ -577,11 +545,164 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                     Quaternion ToLocalRot(Quaternion rStage) => invActorRot * rStage;
 
+                    
+
                     if (h) { h.localPosition = ToLocalPos(headStage); h.localRotation = ToLocalRot(headRotStage); }
                     if (l) { l.localPosition = ToLocalPos(leftStage); l.localRotation = ToLocalRot(leftRotStage); }
                     if (r) { r.localPosition = ToLocalPos(rightStage); r.localRotation = ToLocalRot(rightRotStage); }
+                    if (hip) { hip.localPosition = ToLocalPos(hipStage); hip.localRotation = ToLocalRot(hipRotStage); }
+                    if (lFoot) { lFoot.localPosition = ToLocalPos(leftFootStage); lFoot.localRotation = ToLocalRot(leftFootRotStage); }
+                    if (rFoot) { rFoot.localPosition = ToLocalPos(rightFootStage); rFoot.localRotation = ToLocalRot(rightFootRotStage); }
             }
+
+
    
+
+            roles[roleIndex].visualRigFollower?.ApplyFollow();
+            roles[roleIndex].rigFollower?.ApplyFollow();
+   
+        }
+
+        */
+
+        public void DriveActiveRoleFromInput(int roleIndex, float dt)
+        {
+            if (!_input.TryGetHeadPose(out var headPos, out var headRot))
+                return;
+
+            var rig = roles[roleIndex];
+
+            if (_input is KeyboardInputTransforms)
+            {
+                Vector3 p = rig.root.position;
+                p.x = headPos.x;
+                p.z = headPos.z;
+
+                float keyboardYaw = headRot.eulerAngles.y;
+                rig.root.SetPositionAndRotation(p, Quaternion.Euler(0f, keyboardYaw, 0f));
+                return;
+            }
+
+            var input = _input;
+            if (input == null) return;
+
+            float embodimentDeltaY = 0f;
+            if (embodimentOffsetRoot != null)
+                embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
+
+            if (!input.TryGetHeadPose(out var headStage, out var headRotStage)) return;
+            if (!input.TryGetLeftHandPose(out var leftStage, out var leftRotStage)) return;
+            if (!input.TryGetRightHandPose(out var rightStage, out var rightRotStage)) return;
+
+            headStage.y -= embodimentDeltaY;
+            leftStage.y -= embodimentDeltaY;
+            rightStage.y -= embodimentDeltaY;
+
+            Vector3 bodyPos = headStage;
+            bodyPos.y = 0f;
+
+            float yaw = headRotStage.eulerAngles.y;
+
+            Transform actor = rig.root;
+            actor.localPosition = bodyPos;
+            actor.localRotation = Quaternion.Euler(0f, yaw, 0f);
+
+            Quaternion invActorRot = Quaternion.Inverse(actor.localRotation);
+
+            Vector3 ToLocalPos(Vector3 pStage)
+            {
+                Vector3 delta = pStage - bodyPos;
+                return invActorRot * delta;
+            }
+
+            Quaternion ToLocalRot(Quaternion rStage)
+            {
+                return invActorRot * rStage;
+            }
+
+            if (rig.head)
+            {
+                rig.head.localPosition = ToLocalPos(headStage);
+                rig.head.localRotation = ToLocalRot(headRotStage);
+            }
+
+            if (rig.leftHand)
+            {
+                rig.leftHand.localPosition = ToLocalPos(leftStage);
+                rig.leftHand.localRotation = ToLocalRot(leftRotStage);
+            }
+
+            if (rig.rightHand)
+            {
+                rig.rightHand.localPosition = ToLocalPos(rightStage);
+                rig.rightHand.localRotation = ToLocalRot(rightRotStage);
+            }
+
+            if (FullBodyTrackers)
+            {
+                if (input.TryGetHipPose(out var hipStage, out var hipRotStage))
+                {
+                    hipStage.y -= embodimentDeltaY;
+
+                    if (rig.hip)
+                    {
+                        rig.hip.localPosition = ToLocalPos(hipStage);
+                        rig.hip.localRotation = ToLocalRot(hipRotStage);
+                    }
+                }
+
+                if (input.TryGetLeftFootPose(out var leftFootStage, out var leftFootRotStage))
+                {
+                    leftFootStage.y -= embodimentDeltaY;
+
+                    if (rig.leftFoot)
+                    {
+                        rig.leftFoot.localPosition = ToLocalPos(leftFootStage);
+                        rig.leftFoot.localRotation = ToLocalRot(leftFootRotStage);
+                    }
+                }
+
+                if (input.TryGetRightFootPose(out var rightFootStage, out var rightFootRotStage))
+                {
+                    rightFootStage.y -= embodimentDeltaY;
+
+                    if (rig.rightFoot)
+                    {
+                        rig.rightFoot.localPosition = ToLocalPos(rightFootStage);
+                        rig.rightFoot.localRotation = ToLocalRot(rightFootRotStage);
+                    }
+                }
+            }
+            else if (ProceduralHipAndFeetMove)
+            {
+                rig.hipSolver?.ApplySolver(dt);
+                rig.leftFootSolver?.ApplySolver(dt);
+                rig.rightFootSolver?.ApplySolver(dt);
+            }
+            else
+            {
+                // Fallback: lower body bleibt unter dem Kopf / Root.
+                if (rig.hip)
+                {
+                    rig.hip.localPosition = new Vector3(0f, 0.9f, 0f);
+                    rig.hip.localRotation = Quaternion.identity;
+                }
+
+                if (rig.leftFoot)
+                {
+                    rig.leftFoot.localPosition = new Vector3(-0.12f, 0f, 0f);
+                    rig.leftFoot.localRotation = Quaternion.identity;
+                }
+
+                if (rig.rightFoot)
+                {
+                    rig.rightFoot.localPosition = new Vector3(0.12f, 0f, 0f);
+                    rig.rightFoot.localRotation = Quaternion.identity;
+                }
+            }
+
+            roles[roleIndex].visualRigFollower?.ApplyFollow();
+            roles[roleIndex].rigFollower?.ApplyFollow();
         }
         //das wird bei RoleSwitch von den AlignStates im Enter() gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         //Diese Funktion berechnet nur Start- und ZielPosition, um wieviel muss das XrRig bewegt werden, damit XR-Head am richtigen Ort landet.
@@ -703,71 +824,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
                         
         
-        /*
-        public void StartPlayerAlignToActor(int roleIndex, float duration)
-        {
-            if (XrOrigin == null || XrHead == null || _stageRoot == null)
-            {
-                UnityEngine.Debug.LogError("XrOrigin, XrHead or _stageRoot == null");
-                return;
-            }
 
-            if (roleIndex < 0 || roleIndex >= roles.Count)
-            {
-                UnityEngine.Debug.LogError($"Invalid roleIndex: {roleIndex}");
-                return;
-            }
-
-            if (!_recordingController.TryGetLastEndPose(roleIndex, out Vector3 targetBodyPosLocal, out float targetBodyYaw))
-            {
-                UnityEngine.Debug.LogWarning($"No last Body end pose found for roleIndex {roleIndex}");
-                return;
-            }
-
-            if (!_recordingController.TryGetLastHeadEndPose(roleIndex, out Vector3 targetHeadPosLocal, out float targetHeadYaw))
-            {
-                UnityEngine.Debug.LogWarning($"No last Head end pose for found for roleIndex {roleIndex}");
-                return;
-            }
-
-            // Gespeicherte Body-Position aus Stage-Lokal in World umrechnen
-            Vector3 targetBodyPosWorld = _stageRoot.TransformPoint(targetBodyPosLocal);
-            Vector3 targetHeadPosWorld = _stageRoot.TransformPoint(targetHeadPosLocal);
-
-            // Startzustand merken
-            _playerAlignFromPos = XrOrigin.position;
-            _playerAlignFromYaw = YawOf(XrOrigin.rotation);
-
-            // Ziel-Yaw berechnen:
-            // Der Kopf des Users soll am Ende in dieselbe Yaw-Richtung schauen wie die Zielrolle
-            float currentHeadYaw = YawOf(XrHead.rotation);
-            float deltaYaw = Mathf.DeltaAngle(currentHeadYaw, targetBodyYaw);
-            _playerAlignToYaw = _playerAlignFromYaw + deltaYaw;
-
-            // Lokalen Kopf-Offset innerhalb des XR-Rigs holen
-            // Wichtig: nur XZ, nicht Y
-            Vector3 headLocal = XrOrigin.InverseTransformPoint(XrHead.position);
-            headLocal.y = 0f;
-
-            // Jetzt schon die Zielrotation berücksichtigen
-            Quaternion targetOriginRotation = Quaternion.Euler(0f, _playerAlignToYaw, 0f);
-            Vector3 rotatedHeadOffsetWorld = targetOriginRotation * headLocal;
-
-            // Rig so platzieren, dass der Kopf-Floor nach der Rotation auf targetBodyPosWorld landet
-            _playerAlignToPos = targetBodyPosWorld - rotatedHeadOffsetWorld;
-
-            _playerAlignDur = Mathf.Max(0.05f, duration);
-            _playerAlignT = 0f;
-            _playerAlignActive = true;
-
-            UnityEngine.Debug.Log(
-                $"StartPlayerAlignToActor: roleIndex={roleIndex}, " +
-                $"targetBodyPosWorld={targetBodyPosWorld}, targetBodyYaw={targetBodyYaw}, " +
-                $"headLocal={headLocal}, rotatedHeadOffsetWorld={rotatedHeadOffsetWorld}, " +
-                $"toPos={_playerAlignToPos}, toYaw={_playerAlignToYaw}"
-            );
-        }
-        */
 
         //das wird bei RoleSwitch von den AlignStates im Tick() gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         //Diese Funktion verschiebt das XrRig, damit XR-Head am richtigen Ort landet.
@@ -805,31 +862,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _playerAlignActive = false;
             }
         }
-        //Diese alte TickPlayerAlign Funktion berücksichtigt nicht, dass sich user auch bewegen während des aligns.
-        /*
-        public void TickPlayerAlign()
-        {
-            if (!_playerAlignActive || XrOrigin == null)
-                return;
-        
 
-            _playerAlignT += Time.deltaTime;
-            float u = Mathf.Clamp01(_playerAlignT / _playerAlignDur);
-
-            Vector3 pos = Vector3.Lerp(_playerAlignFromPos, _playerAlignToPos, u);
-            float yaw = Mathf.LerpAngle(_playerAlignFromYaw, _playerAlignToYaw, u);
-
-            XrOrigin.position = pos;
-            XrOrigin.rotation = Quaternion.Euler(0f, yaw, 0f);
-
-            if (u >= 1f)
-            {
-                _playerAlignActive = false;
-            }
-
-
-        }
-        */
         public bool PlayerAlignFinished(){
             //UnityEngine.Debug.Log("TickPlayerAlign: finished");
             return !_playerAlignActive;
@@ -905,59 +938,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
         }
 
-/*
-        public void ApplyVisualScaleToConversationStage(int roleIndex)
-        {
-            RoleRig role = roles[roleIndex];
-            if (role == null || role.visualRigRoot == null)
-                return;
 
-            if (heightOfPlayerCm <= 0.01f)
-                return;
-
-            float scale = (float)role.heightOfRoleCm / heightOfPlayerCm;
-
-            
-            _stageRoot.localScale = Vector3.one / scale;
-            role.visualRigRoot.localScale = Vector3.one * scale;
-
-            Vector3 p = role.visualRigRoot.localPosition;
-            p.y = role.visualGroundOffsetY;
-            role.visualRigRoot.localPosition = p;
-
-            UnityEngine.Debug.Log(
-                $"ApplyVisualScaleToConversationStage: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
-                $"playerHeight={heightOfPlayerCm}, scale={scale}, groundOffsetY={role.visualGroundOffsetY}" +
-                $"WorldScale={_stageRoot.localScale}"
-            );
-        }
-
-        public void ResetVisualScaleOfConversationStage(int roleIndex)
-        {
-            RoleRig role = roles[roleIndex];
-            if (role == null || role.visualRigRoot == null)
-                return;
-
-            if (heightOfPlayerCm <= 0.01f)
-                return;
-
-            float scale = (float)role.heightOfRoleCm / heightOfPlayerCm;
-
-            
-            _stageRoot.localScale = Vector3.one;
-            role.visualRigRoot.localScale = Vector3.one * scale;
-
-            Vector3 p = role.visualRigRoot.localPosition;
-            p.y = role.visualGroundOffsetY;
-            role.visualRigRoot.localPosition = p;
-
-            UnityEngine.Debug.Log(
-                $"ApplyVisualScaleToConversationStage: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
-                $"playerHeight={heightOfPlayerCm}, scale={scale}, groundOffsetY={role.visualGroundOffsetY}" +
-                $"WorldScale={_stageRoot.localScale}"
-            );
-        }
-        */
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         // Funktion wird im Enter() des RecordSpeaker- und RecordListenersState gerufen.

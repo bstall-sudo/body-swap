@@ -5,16 +5,18 @@ using System.Collections;
 
 using AppV2.Runtime.Scripts.Input;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 {
     public class TakeRecorder
     {
+        private readonly RoleRig _role;
         private readonly Transform _stageRoot;     // TakeRoot
         private readonly Transform _roleRoot;     // ActorA oder ActorB
         private readonly string _roleId;
         private readonly int _roleIndex;
-        private readonly IInputTransformsProvider _input;    // XRInputProvider (Anchor schon gesetzt)
+        
         private readonly int _micDeviceIndex;
         private int _sampleRate;
 
@@ -56,14 +58,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         }
 
 
-        public TakeRecorder(Transform stageRoot, Transform roleRoot, string roleId, int roleIndex, IInputTransformsProvider input,
+        public TakeRecorder(Transform stageRoot, RoleRig role, int roleIndex,
                             int micDeviceIndex = 0, int sampleRate = 48000)
         {
             _stageRoot = stageRoot;
-            _roleRoot = roleRoot;
-            _roleId = roleId;
+            _role = role;
+            _roleRoot = role.root;
+            _roleId = role.roleId;
             _roleIndex = roleIndex;
-            _input = input;
+   
             _micDeviceIndex = micDeviceIndex;
             _sampleRate = sampleRate;
         }
@@ -131,9 +134,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             _micStartSamplePos = 0;
 
         }
+  
 
-
-        public void Tick(float embodimentDeltaY)
+        public void Tick()
 
         {
             if (_waitingForMic && !string.IsNullOrEmpty(_device))
@@ -164,19 +167,33 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             float t = (float)sampleCount / _sampleRate;
 
-            // Live Posen vom Input (die kommen bei XR bei uns schon Anchor-local = stage-local) "out var" heisst, die out-Variablen werden direkt dort deklariert. 
-            // if (!Methode()) return; -> wenn methode fehlschl�gt, zur�ckkehren, sonst weiter
-            if (!_input.TryGetHeadPose(out var headP_stageLocal, out var headR_stageLocal)) return;
-            _input.TryGetLeftHandPose(out var leftP_stageLocal, out var leftR_stageLocal);
-            _input.TryGetRightHandPose(out var rightP_stageLocal, out var rightR_stageLocal);
+
+            // Aktuelle Posen DIREKT aus dem RoleRig lesen
+            if (_role.head == null)
+                return;
+
+            if (!TryGetStageLocalPose(_role.head, out var headP_stageLocal, out var headR_stageLocal))
+                return;
+
+            if (!TryGetStageLocalPose(_role.leftHand, out var leftP_stageLocal, out var leftR_stageLocal))
+                return;
+
+            if (!TryGetStageLocalPose(_role.rightHand, out var rightP_stageLocal, out var rightR_stageLocal))
+                return;
+
+            bool hasHip = TryGetStageLocalPose(_role.hip, out var hipP_stageLocal, out var hipR_stageLocal);
+            bool hasLeftFoot = TryGetStageLocalPose(_role.leftFoot, out var leftFootP_stageLocal, out var leftFootR_stageLocal);
+            bool hasRightFoot = TryGetStageLocalPose(_role.rightFoot, out var rightFootP_stageLocal, out var rightFootR_stageLocal);
+
+            Vector3 bodyPos = _roleRoot.localPosition;
+            float yaw = _roleRoot.localRotation.eulerAngles.y;
+
+
 
             //f�r das Rebase yawDeg => _desiredStartYaw (rotation)
             static Quaternion YawRot(float yawDeg) => Quaternion.Euler(0f, yawDeg, 0f);
 
-            // BodyPose aus Head ableiten: Bodenposition + yaw
-            Vector3 bodyPos = headP_stageLocal; bodyPos.y = 0f;
-            float yaw = headR_stageLocal.eulerAngles.y;
-
+        
             // Rebase einmalig berechnen: measuredStart -> desiredStart
             if (_hasDesiredStart && !_hasRebase)
             {
@@ -202,49 +219,56 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 leftP_stageLocal = _rebasePos + (qDelta * leftP_stageLocal);
                 rightP_stageLocal = _rebasePos + (qDelta * rightP_stageLocal);
 
+
                 // Head / Hands ROT
                 headR_stageLocal = qDelta * headR_stageLocal;
                 leftR_stageLocal = qDelta * leftR_stageLocal;
                 rightR_stageLocal = qDelta * rightR_stageLocal;
+
+
+                if (hasHip)
+                {
+                    hipP_stageLocal = _rebasePos + (qDelta * hipP_stageLocal);
+                    hipR_stageLocal = qDelta * hipR_stageLocal;
+                }
+
+                if (hasLeftFoot)
+                {
+                    leftFootP_stageLocal = _rebasePos + (qDelta * leftFootP_stageLocal);
+                    leftFootR_stageLocal = qDelta * leftFootR_stageLocal;
+                }
+
+                if (hasRightFoot)
+                {
+                    rightFootP_stageLocal = _rebasePos + (qDelta * rightFootP_stageLocal);
+                    rightFootR_stageLocal = qDelta * rightFootR_stageLocal;
+                }
             }
 
             //optional normalisieren, falls yaw �ber 360 Grad
             yaw = Mathf.Repeat(yaw, 360f);
 
-            // roleRoot entsprechend setzen (stage-local)
-            _roleRoot.localPosition = bodyPos;
-            _roleRoot.localRotation = Quaternion.Euler(0f, yaw, 0f);
 
-            // Head/Hands relativ zum roleRoot speichern:
-            // stage-local -> actor-local
-            var actorRot = _roleRoot.localRotation;
-            var invActorRot = Quaternion.Inverse(actorRot);
+            Quaternion actorRot = Quaternion.Euler(0f, yaw, 0f);
+            Quaternion invActorRot = Quaternion.Inverse(actorRot);
 
             
             PoseSample ToActorLocal(Vector3 pStage, Quaternion rStage)
             {
                 Vector3 delta = pStage - bodyPos;
                 var pLocal = invActorRot * delta;
-                pLocal.y -= embodimentDeltaY;
+                
                 var rLocal = invActorRot * rStage;
                 return new PoseSample { Pos = pLocal, Rot = rLocal };
             }
-            
 
             /*
-            PoseSample ToActorLocalNeutral(Vector3 pStage, Quaternion rStage)
-            {
-                Vector3 delta = pStage - bodyPos;
-                Vector3 pLocalEmbodied = invActorRot * delta;
-
-                // WICHTIG:
-                // Für die gespeicherten Daten wieder neutralisieren
-                Vector3 pLocalNeutral = pLocalEmbodied / _roleScale;
-
-                Quaternion rLocal = invActorRot * rStage;
-                return new PoseSample { Pos = pLocalNeutral, Rot = rLocal };
-            }
+            UnityEngine.Debug.Log(
+                $"[{_roleId}] hasHip={hasHip}, hasLeftFoot={hasLeftFoot}, hasRightFoot={hasRightFoot}"
+            );
             */
+            
+
 
             var f = new Frame
             {
@@ -253,11 +277,38 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 Head = ToActorLocal(headP_stageLocal, headR_stageLocal),
                 Left = ToActorLocal(leftP_stageLocal, leftR_stageLocal),
                 Right = ToActorLocal(rightP_stageLocal, rightR_stageLocal),
+                Hip = hasHip
+                    ? ToActorLocal(hipP_stageLocal, hipR_stageLocal)
+                    : default,
+
+                LeftFoot = hasLeftFoot
+                    ? ToActorLocal(leftFootP_stageLocal, leftFootR_stageLocal)
+                    : default,
+
+                RightFoot = hasRightFoot
+                    ? ToActorLocal(rightFootP_stageLocal, rightFootR_stageLocal)
+                    : default,
             };
 
             Current.Frames.Add(f);
             Current.DurationSec = t;
         }
+
+        //helper funktion
+        private bool TryGetStageLocalPose(Transform t, out Vector3 pos, out Quaternion rot)
+        {
+            pos = default;
+            rot = default;
+
+            if (t == null || _stageRoot == null)
+                return false;
+
+            pos = _stageRoot.InverseTransformPoint(t.position);
+            rot = Quaternion.Inverse(_stageRoot.rotation) * t.rotation;
+
+            return true;
+        }
+        
 
         //Damit nicht die Pos/Rot Daten einer anderen Rolle versehentlich übernommen werden.
         public void ClearDesiredStartPose()

@@ -58,6 +58,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     roles[i].head,
                     roles[i].leftHand,
                     roles[i].rightHand,
+                    roles[i].hip,
+                    roles[i].leftFoot,
+                    roles[i].rightFoot,
                     roles[i].audioSource
                 );
 

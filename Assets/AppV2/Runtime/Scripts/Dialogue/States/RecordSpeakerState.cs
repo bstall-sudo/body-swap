@@ -125,12 +125,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _flow.Stage.ReactiveIdleTick(reactiveIdles, playbacks, toBeRecorded, dt);
             if(_isRecording && !_waitingForRecordingSave){
-                _flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
-                _flow.Stage.RecordingTick(toBeRecorded,sceneCount);
+                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
+                //_flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
+                //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
             }
 
             if(!_isRecording && _waitingForRecordingSave ){
-                _flow.Stage.RecordingTick(toBeRecorded,sceneCount);
+                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
+                //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
             }
            
             if (!_isRecording && _flow.Stage.RecordingSaveCompleted())

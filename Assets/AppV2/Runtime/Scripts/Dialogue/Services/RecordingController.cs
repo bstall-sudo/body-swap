@@ -145,7 +145,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
        
             
             _currentSceneCount = sceneCount;
-            _takeRecorder = new TakeRecorder(stageRoot, roleRoot, roleId, roleIndex, input);
+       
+            _takeRecorder = new TakeRecorder(stageRoot, _roles[roleIndex], roleIndex);
 
             // set roleScale im RoleRecorder damit der die AufnahmeDaten vor dem Abspeichern wieder auf normal Grösse Skalieren kann. 
             //Sonst vervielfacht sich der Offset mit der Zeit und man versinkt mit jedem Rollenwechsel tiefer im Boden.
@@ -188,12 +189,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
         }
 
-        // float embodimentDeltaY damti die Augenhöhenanpassung, berücksichtigt werden kann beim Speichern
-        public void TickRecording( int roleIndex, string roleId, int sceneCount, float embodimentDeltaY)
+        
+        public void TickRecording( int roleIndex, string roleId, int sceneCount) 
         {
             if (_isRecording && _takeRecorder != null){
-                //embodimentDeltaY damti die Augenhöhenanpassung, berücksichtigt werden kann beim Speichern
-                _takeRecorder.Tick(embodimentDeltaY);
+                
+                _takeRecorder.Tick();
             }
 
             // 2) Wenn Trim/Persist noch aussteht: runterzählen

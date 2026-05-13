@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "name": "HipFeetTracker",
+    "maps": [
+        {
+            "name": "BodySwapRotPosInput",
+            "id": "2a6a1a04-d222-4480-b8f7-1dc498325da4",
+            "actions": [
+                {
+                    "name": "HipPos",
+                    "type": "Value",
+                    "id": "bf36d95a-912a-4c68-9c37-7074c9636d6f",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a0c731ce-acef-4a91-8caa-c001c717c278",
+                    "path": "<ViveTracker>/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HipPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a522e03b-f00a-49c3-9426-4d14054c94e1",
+                    "path": "<OculusTrackingReference>/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "HipPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

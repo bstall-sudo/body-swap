@@ -38,7 +38,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Tick(float dt)
         
         {
-            _flow.Stage.DriveActiveRoleFromInput(_currentRoleIndexForCalibration);
+            _flow.Stage.DriveActiveRoleFromInput(_currentRoleIndexForCalibration, dt);
             if (_flow.ConsumePrimaryAction())
             {
 
@@ -104,7 +104,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             UnityEngine.Debug.Log($"[CalibrationState] FinishCalibration() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
-            _flow.Stage.MirrorSetVisibility.ActivateMirror(false);
+            //_flow.Stage.MirrorSetVisibility.ActivateMirror(false);
 
             _flow.Stage.SaveTargetTransformsAfterCalibration();
 
