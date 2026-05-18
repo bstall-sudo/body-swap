@@ -39,6 +39,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         
         {
             _flow.Stage.DriveActiveRoleFromInput(_currentRoleIndexForCalibration, dt);
+
+            //Visual und TechnicalRig folgen hier sepparat, weil ja nicht recorded wird und auch proceduralMove noch nicht aktiv sein soll.
+            _flow.Stage.ApplyFollower(_currentRoleIndexForCalibration);
             if (_flow.ConsumePrimaryAction())
             {
 

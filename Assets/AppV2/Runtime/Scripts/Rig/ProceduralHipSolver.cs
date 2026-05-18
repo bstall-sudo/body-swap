@@ -32,5 +32,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 1f - Mathf.Exp(-smoothSpeed * dt)
             );
         }
+
+
     }
 }

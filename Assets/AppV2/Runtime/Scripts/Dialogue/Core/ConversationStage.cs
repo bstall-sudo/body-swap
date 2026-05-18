@@ -141,6 +141,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform XrLeftFoot;
         public Transform XrRightFoot;
 
+        [SerializeField] private float fallbackFootSpacing = 0.2f;
+        [SerializeField] private float fallbackHipHeight = 0.9f;
+
         // wird für StartPlayerAlignToActor gebraucht.
         //damit man beim RoleSwitch an die Stelle der anderen Figur teleportiert wird
         private Vector3 _playerAlignTargetHeadPosWorld;
@@ -433,137 +436,34 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _playbackController.InitializeFromSession(roles, _store, _takeIndex, sessionId);
         }
                         
-
+        //Diese Funktion stellt die Execution-Order sicher.
         public void DriveAndRecordTickActiveRole(int roleIndex, int sceneCount, float dt)
         {
             DriveActiveRoleFromInput(roleIndex, dt);
-
-
-
+            ApplyProceduralLowerBodyIfNeeded(roleIndex, dt);
+            ApplyFollower(roleIndex);
             RecordingTick(roleIndex, sceneCount);
-
         }
 
-        /*
-         // Wird z.B. im Update() von den States pro Frame aufgerufen
-        public void DriveActiveRoleFromInput(int roleIndex, float dt)
+        public void ApplyFollower(int roleIndex)
         {
-
-
+            roles[roleIndex].visualRigFollower?.ApplyFollow();
+            roles[roleIndex].rigFollower?.ApplyFollow();
             
-            if (!_input.TryGetHeadPose(out var headPos, out var headRot))
-                return;
+        }
+
+
+        public void ApplyProceduralLowerBodyIfNeeded(int roleIndex, float dt)
+        {
+            if (FullBodyTrackers) return;
+            if (!ProceduralHipAndFeetMove) return;
 
             var rig = roles[roleIndex];
 
-            //kann man später löschen, weil das führt nur zu abfragen pro Frame.
-            if (_input is KeyboardInputTransforms)
-            {
-                // Root anhand HeadPose bewegen (Fix 1: nur XZ + yaw)
-                Vector3 p = rig.root.position;
-                p.x = headPos.x;
-                p.z = headPos.z;
-
-                float yaw = headRot.eulerAngles.y;
-                Quaternion r = Quaternion.Euler(0f, yaw, 0f);
-
-                rig.root.SetPositionAndRotation(p, r);
-
-            } else{
-                    var p = _input;
-                    if (p == null) return;
-
-
-                    float embodimentDeltaY = 0f;
-                    if (embodimentOffsetRoot != null)
-                    {
-                        embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
-                    }
-                  
-
-
-                    if (!p.TryGetHeadPose(out var headStage, out var headRotStage)) return;
-                    p.TryGetLeftHandPose(out var leftStage, out var leftRotStage);
-                    p.TryGetRightHandPose(out var rightStage, out var rightRotStage);
-
-                    if (FullBodyTrackers)
-                    {
-                        p.TryGetHipPose(out var hipStage, out var hipRotStage);
-                        p.TryGetLeftFootPose(out var leftFootStage, out var leftFootRotStage);
-                        p.TryGetRightFootPose(out var rightFootStage, out var rightFootRotStage);
-                    } 
-                    else           
-                    {
-                        if (ProceduralHipAndFeetMove)
-                        {
-                            roles[roleIndex].hipSolver?.ApplySolver(dt);
-                            roles[roleIndex].leftFootSolver?.ApplySolver(dt);
-                            roles[roleIndex].rightFootSolver?.ApplySolver(dt);
-                        }
-
-                        var hipStage = roles[roleIndex].hip.localPosition;
-                        var hipRotStage = roles[roleIndex].hip.localRotation;
-                        var leftFootStage = roles[roleIndex].leftFoot.localPosition;
-                        var leftFootRotStage = roles[roleIndex].leftFoot.localRotation;
-                        var rightFootStage = roles[roleIndex].hip.localPosition;
-                        var rightFootRotStage = roles[roleIndex].rightFoot.localRotation;
-
-                    }
-
-
-                    //hier muss jetzt der Höhenunterschied des EmbodimentCameraOffsets wieder rausgerechnet werden.
-                    headStage.y -= embodimentDeltaY;
-                    leftStage.y -= embodimentDeltaY;
-                    rightStage.y -= embodimentDeltaY;
-                    hipStage.y -= embodimentDeltaY;
-                    
-
-                    // Wenn Align aktiv: ersetze BodyPose (pos+yaw) durch interpolierte, aber behalte relative Head/Hands
-                    Vector3 bodyPos = headStage; bodyPos.y = 0f;
-                    float yaw = headRotStage.eulerAngles.y;
-
-                    //actor, h, l, r sind keine Kopien der Transform-Daten sondern Referenzen auf dieselben Unity-Transform-Komponente wie rig.root, rig.head etc.
-                    Transform actor = rig.root;
-                    Transform h = rig.head;
-                    Transform l = rig.leftHand;
-                    Transform r = rig.rightHand;
-                    Transform hip = rig.hip;
-                    Transform lFoot = rig.leftFoot;
-                    Transform rFoot = rig.rightFoot;
-
-                    actor.localPosition = bodyPos;
-                    actor.localRotation = Quaternion.Euler(0f, yaw, 0f);
-
-                    // Head/Hands actor-local setzen (damit sie �kleben�, aber der Body sanft aligned)
-                    var invActorRot = Quaternion.Inverse(actor.localRotation);
-
-                    Vector3 ToLocalPos(Vector3 pStage)
-                    {
-                        Vector3 delta = pStage - bodyPos;
-                        return invActorRot * delta;
-                    }
-
-                    Quaternion ToLocalRot(Quaternion rStage) => invActorRot * rStage;
-
-                    
-
-                    if (h) { h.localPosition = ToLocalPos(headStage); h.localRotation = ToLocalRot(headRotStage); }
-                    if (l) { l.localPosition = ToLocalPos(leftStage); l.localRotation = ToLocalRot(leftRotStage); }
-                    if (r) { r.localPosition = ToLocalPos(rightStage); r.localRotation = ToLocalRot(rightRotStage); }
-                    if (hip) { hip.localPosition = ToLocalPos(hipStage); hip.localRotation = ToLocalRot(hipRotStage); }
-                    if (lFoot) { lFoot.localPosition = ToLocalPos(leftFootStage); lFoot.localRotation = ToLocalRot(leftFootRotStage); }
-                    if (rFoot) { rFoot.localPosition = ToLocalPos(rightFootStage); rFoot.localRotation = ToLocalRot(rightFootRotStage); }
-            }
-
-
-   
-
-            roles[roleIndex].visualRigFollower?.ApplyFollow();
-            roles[roleIndex].rigFollower?.ApplyFollow();
-   
+            rig.hipSolver?.ApplySolver(dt);
+            rig.leftFootSolver?.ApplySolver(dt);
+            rig.rightFootSolver?.ApplySolver(dt);
         }
-
-        */
 
         public void DriveActiveRoleFromInput(int roleIndex, float dt)
         {
@@ -598,10 +498,34 @@ namespace AppV2.Runtime.Scripts.Dialogue
             leftStage.y -= embodimentDeltaY;
             rightStage.y -= embodimentDeltaY;
 
-            Vector3 bodyPos = headStage;
-            bodyPos.y = 0f;
+            Vector3 bodyPos;
+            float yaw;
 
-            float yaw = headRotStage.eulerAngles.y;
+            bool inputForHip = input.TryGetHipPose(out var hipStageForBody, out var hipRotStageForBody);
+            
+            bool hasHipForBody =
+                FullBodyTrackers &&
+                inputForHip;
+
+            //if has Hip, the body position should be derived from the hip
+            if (hasHipForBody )
+            {
+                
+                hipStageForBody.y -= embodimentDeltaY;
+
+                bodyPos = hipStageForBody;
+                bodyPos.y = 0f;
+
+                yaw = hipRotStageForBody.eulerAngles.y;
+            }
+            //if does not have Hip, the body position should be derived from the head
+            else
+            {
+                bodyPos = headStage;
+                bodyPos.y = 0f;
+
+                yaw = headRotStage.eulerAngles.y;
+            }
 
             Transform actor = rig.root;
             actor.localPosition = bodyPos;
@@ -644,7 +568,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     hipStage.y -= embodimentDeltaY;
 
-                    if (rig.hip)
+                    if (hasHipForBody && rig.hip)
                     {
                         rig.hip.localPosition = ToLocalPos(hipStage);
                         rig.hip.localRotation = ToLocalRot(hipRotStage);
@@ -673,37 +597,45 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     }
                 }
             }
-            else if (ProceduralHipAndFeetMove)
-            {
-                rig.hipSolver?.ApplySolver(dt);
-                rig.leftFootSolver?.ApplySolver(dt);
-                rig.rightFootSolver?.ApplySolver(dt);
-            }
             else
             {
                 // Fallback: lower body bleibt unter dem Kopf / Root.
                 if (rig.hip)
                 {
-                    rig.hip.localPosition = new Vector3(0f, 0.9f, 0f);
+                    rig.hip.localPosition = new Vector3(0f, fallbackHipHeight, 0f);
                     rig.hip.localRotation = Quaternion.identity;
                 }
 
                 if (rig.leftFoot)
                 {
-                    rig.leftFoot.localPosition = new Vector3(-0.12f, 0f, 0f);
+                    rig.leftFoot.localPosition = new Vector3(- fallbackFootSpacing, 0f, 0f);
                     rig.leftFoot.localRotation = Quaternion.identity;
                 }
 
                 if (rig.rightFoot)
                 {
-                    rig.rightFoot.localPosition = new Vector3(0.12f, 0f, 0f);
+                    rig.rightFoot.localPosition = new Vector3(fallbackFootSpacing, 0f, 0f);
                     rig.rightFoot.localRotation = Quaternion.identity;
                 }
             }
 
-            roles[roleIndex].visualRigFollower?.ApplyFollow();
-            roles[roleIndex].rigFollower?.ApplyFollow();
+;
         }
+
+
+
+        
+        //das wird aus den States RecordListener/RecordSpeaker beim Rollenwechsel gerufen.
+        public void ValidateFootSolver(int roleIndex)
+        {
+            if (ProceduralHipAndFeetMove)
+            {
+                var rig = roles[roleIndex];
+                rig.leftFootSolver?.ValidateSetup(rig.roleId);
+                rig.rightFootSolver?.ValidateSetup(rig.roleId);
+            }
+        }
+        
         //das wird bei RoleSwitch von den AlignStates im Enter() gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         //Diese Funktion berechnet nur Start- und ZielPosition, um wieviel muss das XrRig bewegt werden, damit XR-Head am richtigen Ort landet.
         public void StartPlayerAlignToActor(int roleIndex, float duration)

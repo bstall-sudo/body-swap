@@ -109,6 +109,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.Stage.ApplyVisualScaleToConversationStage(toBeRecorded);
             }
 
+            //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren
+            _flow.Stage.ValidateFootSolver(toBeRecorded);
+
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;

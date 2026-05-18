@@ -139,7 +139,7 @@ namespace AppV2.Runtime.Scripts.Rig
             isCalibrated = value;
         }
 
-        // is called in RoleRigUpdatePipeline
+        // is called in by the states via ConversationStage to ensure correct execution order. visualrig follows technicalrig, avatarRig follows visualRig...
         public void ApplyFollow()
         {
             if (!followAfterCalibration || !isCalibrated)

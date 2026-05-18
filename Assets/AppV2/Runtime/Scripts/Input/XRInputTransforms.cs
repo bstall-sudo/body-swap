@@ -63,13 +63,13 @@ namespace AppV2.Runtime.Scripts.Input
             => WorldToAnchorLocal(_right, out position, out rotation);
 
         public bool TryGetHipPose(out Vector3 position, out Quaternion rotation)
-            => WorldToAnchorLocal(_head, out position, out rotation);
+            => WorldToAnchorLocal(_hip, out position, out rotation);
         
         public bool TryGetLeftFootPose(out Vector3 position, out Quaternion rotation)
-            => WorldToAnchorLocal(_left, out position, out rotation);
+            => WorldToAnchorLocal(_leftFoot, out position, out rotation);
 
         public bool TryGetRightFootPose(out Vector3 position, out Quaternion rotation)
-            => WorldToAnchorLocal(_right, out position, out rotation);
+            => WorldToAnchorLocal(_rightFoot, out position, out rotation);
         
 
     }

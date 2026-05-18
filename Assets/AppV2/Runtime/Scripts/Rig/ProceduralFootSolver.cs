@@ -144,5 +144,16 @@ namespace AppV2.Runtime.Scripts.Rig
 
             transform.rotation = groundTilt * bodyRoot.rotation * offset;
         }
+
+        public void ValidateSetup(string roleName)
+        {
+            UnityEngine.Debug.Log(
+                $"[FootSolver Validate] role={roleName}, solver={name}, " +
+                $"bodyRoot={(bodyRoot ? bodyRoot.name : "NULL")}, " +
+                $"otherFoot={(otherFoot ? otherFoot.name : "NULL")}, " +
+                $"layerMask={groundLayer.value}, " +
+                $"position={transform.position}"
+            );
+        }
     }
 }

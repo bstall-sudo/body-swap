@@ -70,6 +70,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             reactiveIdles = _flow._data.ReactiveIdles;
             playbacks = _flow._data.Playbacks;
 
+            //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren
+            _flow.Stage.ValidateFootSolver(toBeRecorded);
+            
             _flow.Stage.PlaybackStart(playbacks, sceneCount);
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);

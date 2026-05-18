@@ -14,13 +14,58 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "HipRot",
+                    "type": "Value",
+                    "id": "a8097727-34a6-426c-b7ed-d871ac203109",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightFootPos",
+                    "type": "Value",
+                    "id": "3dc1cecd-3e22-4171-9709-414e5e5ad5a5",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightFootRot",
+                    "type": "Value",
+                    "id": "ea8c3cbc-5a2b-42ac-baa7-ae3ff3839c4f",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "LeftFootPos",
+                    "type": "Value",
+                    "id": "a9641387-3a38-4b31-a5ef-4f2b026395bb",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "LeftFootRot",
+                    "type": "Value",
+                    "id": "6975916f-64cf-4ade-9ef4-5a3d8f7042d0",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "a0c731ce-acef-4a91-8caa-c001c717c278",
-                    "path": "<ViveTracker>/devicePosition",
+                    "id": "a522e03b-f00a-49c3-9426-4d14054c94e1",
+                    "path": "<XRViveTracker>{Waist}/devicePosition",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -30,12 +75,56 @@
                 },
                 {
                     "name": "",
-                    "id": "a522e03b-f00a-49c3-9426-4d14054c94e1",
-                    "path": "<OculusTrackingReference>/devicePosition",
+                    "id": "8c610b53-818b-491a-b882-967c1e29ecd6",
+                    "path": "<XRViveTracker>{Waist}/deviceRotation",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "HipPos",
+                    "action": "HipRot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3c86c26-c23f-449f-8c28-85ae966b154b",
+                    "path": "<XRViveTracker>{Right Foot}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightFootPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ae558ba-04c2-41af-a509-69a0a749805c",
+                    "path": "<XRViveTracker>{Right Foot}/deviceRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightFootRot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c911a5b3-a91c-42c0-b268-b0f6cc62e133",
+                    "path": "<XRViveTracker>{Left Foot}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftFootPos",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c1fb4295-f985-4d2b-8c52-7a64caaf95d1",
+                    "path": "<XRViveTracker>{Left Foot}/deviceRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftFootRot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
