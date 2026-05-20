@@ -1,4 +1,5 @@
 using UnityEngine;
+using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -8,6 +9,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int _currentRoleIndexForCalibration;
         private bool selectableNext;
         private bool _avatarPlacementAtStart;
+
+        private bool _seatedMode;
+
+        private bool _rolesSetToPlayerPosition =false;
+
+        private StagePose _playerPosRot;
 
         public DialogueMode Mode => DialogueMode.Calibration;
 
@@ -22,6 +29,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             UnityEngine.Debug.Log("[CalibrationState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;
+
+            _seatedMode = _flow.Stage.SeatedMode;
+
+
 
             _currentRoleIndexForCalibration = 0;
             _avatarPlacementAtStart = _flow.Stage.AvatarPlacementAtStart;
@@ -44,26 +55,38 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ApplyFollower(_currentRoleIndexForCalibration);
             if (_flow.ConsumePrimaryAction())
             {
+                if(_seatedMode && !_rolesSetToPlayerPosition)
+                {
+                    _playerPosRot = _flow.Stage.GetPlayerPosRotForSeatedModeRigCalibration();
+                    _flow.Stage.AvatarCalibration.PlaceAvatarsAtUserPosition(_playerPosRot);
+                    _flow.Stage.PlaceMirrorInFrontOfPlayer();
+                    _rolesSetToPlayerPosition = true;
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[CalibrationState] ConsumePrimaryAction was called");
+                    // 1. Aktuelle sichtbare Rolle kalibrieren
+                    _flow.Stage.AvatarCalibration
+                        .CalibrateRole(_currentRoleIndexForCalibration);
 
-                UnityEngine.Debug.Log($"[CalibrationState] ConsumePrimaryAction was called");
-                // 1. Aktuelle sichtbare Rolle kalibrieren
-                _flow.Stage.AvatarCalibration
-                    .CalibrateRole(_currentRoleIndexForCalibration);
+                    //make head of calibrated avatar visible again.
+                    _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,true);
 
-                //make head of calibrated avatar visible again.
-                _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,true);
+                    // 2. Zur nächsten Rolle wechseln
+                    _currentRoleIndexForCalibration++;
 
-                // 2. Zur nächsten Rolle wechseln
-                _currentRoleIndexForCalibration++;
+                    _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
 
-                _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+                    
 
-                
+                    // Set XR-Cam to Role height
+                    _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
 
-                // Set XR-Cam to Role height
-                _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
+                    ShowCurrentRoleOrFinish();
+                    
+                }
 
-                ShowCurrentRoleOrFinish();
+
             }
 
             if (_flow.ConsumeSecondaryAction())

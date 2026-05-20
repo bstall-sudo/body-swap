@@ -121,6 +121,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool UseXR = false;
         public float SmoothAlignSeconds = 0.6f;
         public bool FullBodyTrackers = false;
+        public bool SeatedMode = false;
 
         public bool ProceduralHipAndFeetMove = false;
         public bool AvatarPlacementAtStart = true;
@@ -233,6 +234,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
 
         }
+
+        //called in CalibrationState
+        public void PlaceMirrorInFrontOfPlayer()
+        {
+            MirrorSetVisibility.PlaceMirrorInFrontOfAvatar(roles[0].visualRigRoot);
+        }
             
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -277,11 +284,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void RecordingBegin(int roleIndex, int sceneCount)
         {
-            UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR HEAD WORLD Y before recording: {XrHead.position.y}");
-            UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR ORIGIN WORLD POS before recording: {XrOrigin.position}");
+            //UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR HEAD WORLD Y before recording: {XrHead.position.y}");
+            //UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR ORIGIN WORLD POS before recording: {XrOrigin.position}");
             RoleRig role = roles[roleIndex];
             float roleScale = (float)roles[roleIndex].heightOfRoleCm / heightOfPlayerCm;
             avatarCalibration.SetAvatarHeadVisible(roleIndex,false);
+            //damit die Figur entweder sitting oder standing Idle als Grundposition hat.
+            ApplyRecordingAvatarPoseForRole(roleIndex);
             //public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
             _recordingController.BeginRecording(_stageRoot, roleScale, roleIndex, sceneCount, _input);
         }
@@ -373,6 +382,45 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             return _playbackController.HasAnyTakeForScene(sceneCount);
         }
+/*
+        //damit avatar im Sitting Idle ist, während der Aufnahme, das wird hier im conversationStage von RecordingBegin gerufen. 
+        public void ApplyRecordingAvatarPoseForRole(int roleIndex)
+        {
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+                return;
+
+            var role = roles[roleIndex];
+
+            if (role.avatar == null)
+                return;
+
+            //role.avatar.SetRigModeRecordPlayback();
+            _reactiveIdleController.SetRoleToRecordPlayback(roleIndex, SeatedMode);
+        }
+*/
+        //damit avatar im Sitting Idle ist, während der Aufnahme, das wird hier im conversationStage von RecordingBegin gerufen. 
+        public void ApplyRecordingAvatarPoseForRole(int roleIndex)
+        {
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+                return;
+
+            var role = roles[roleIndex];
+
+            if (role.avatar == null)
+                return;
+
+            bool seated = SeatedMode || role.sittingIdle;
+
+            /*
+            role.avatar.SetRigModeRecordPlayback();
+            role.avatar.PlayBasePose(
+                seated ? AvatarBasePose.SittingIdle : AvatarBasePose.TPose
+            );*/
+            role.avatar.SetLowerBodyIKWeight(seated ? 0f : 1f);
+            _reactiveIdleController.SetRoleToRecordPlayback(roleIndex, SeatedMode);
+
+            
+        }
 
         public void ReactiveIdleStart(List<int> reactiveIdles, int speakerRoleIndex)
         {
@@ -381,7 +429,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             for (int i = 0; i < reactiveIdles.Count; i++)
             {
                 int roleIndex = reactiveIdles[i];
-                _reactiveIdleController.SetRoleToIdleLookingAt(roleIndex, speakerRoleIndex);
+                _reactiveIdleController.SetRoleToIdleLookingAt(roleIndex, speakerRoleIndex, SeatedMode);
             }
         }
 
@@ -409,7 +457,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             for (int i = 0; i < reactiveIdles.Count; i++)
             {
                 int roleIndex = reactiveIdles[i];
-                _reactiveIdleController.SetRoleToRecordPlayback(roleIndex);
+                _reactiveIdleController.SetRoleToRecordPlayback(roleIndex, SeatedMode);
             }
         }
 
@@ -799,6 +847,41 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //UnityEngine.Debug.Log("TickPlayerAlign: finished");
             return !_playerAlignActive;
             
+        }
+
+
+        //Das wird im CalibrationState(SeatedMode) gerufen, damit die Rollen am richtigen Ort platziert werden können.
+        public StagePose GetPlayerPosRotForSeatedModeRigCalibration()
+        {
+            if (XrHead == null)
+            {
+                UnityEngine.Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] XrHead not found!");
+                return default;
+            }
+
+            if (_stageRoot == null)
+            {
+                UnityEngine.Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] _stageRoot not found!");
+                return default;
+            }
+
+            Vector3 worldPos = XrHead.position;
+            worldPos.y = 0f;
+
+            Quaternion worldRot = Quaternion.Euler(
+                0f,
+                YawOf(XrHead.rotation),
+                0f
+            );
+
+            Vector3 stageLocalPos = _stageRoot.InverseTransformPoint(worldPos);
+            Quaternion stageLocalRot = Quaternion.Inverse(_stageRoot.rotation) * worldRot;
+
+            return new StagePose
+            {
+                Position = stageLocalPos,
+                Rotation = stageLocalRot
+            };
         }
 
         //Grösse des Spielers, entweder aufgrund von XR Headset zu Boden Distanz, oder die definierte Variable

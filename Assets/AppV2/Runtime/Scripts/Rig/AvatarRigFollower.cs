@@ -139,6 +139,24 @@ namespace AppV2.Runtime.Scripts.Rig
             isCalibrated = value;
         }
 
+        // is called in CalibrationState when SeatedMode active, so that the avatar Rig jumps to player position.
+        public void SetAvatarToPlayerPosition()
+        {
+            if (visualRoot != null && avatarRoot != null)
+            {
+                if (copyRootPosition)
+                    avatarRoot.position = visualRoot.position;
+
+                if (copyRootRotation)
+                    avatarRoot.rotation = visualRoot.rotation;
+
+                if (copyRootScale)
+                    avatarRoot.localScale = visualRoot.localScale;
+            }
+
+        }
+
+
         // is called in by the states via ConversationStage to ensure correct execution order. visualrig follows technicalrig, avatarRig follows visualRig...
         public void ApplyFollow()
         {

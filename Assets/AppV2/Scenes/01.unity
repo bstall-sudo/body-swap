@@ -296,7 +296,8 @@ MonoBehaviour:
   UseXR: 1
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
-  ProceduralHipAndFeetMove: 1
+  SeatedMode: 1
+  ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
   StartInPlaybackFullConversationMode: 0
   FolderSessionId: 2026-05-18-UTC-12-51-00_02
@@ -308,6 +309,8 @@ MonoBehaviour:
   XrHip: {fileID: 1628277078}
   XrLeftFoot: {fileID: 1265543182}
   XrRightFoot: {fileID: 355327816}
+  fallbackFootSpacing: 0.2
+  fallbackHipHeight: 0.9
 --- !u!114 &32639114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2029,8 +2032,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 818458806}
     m_Modifications:
+    - target: {fileID: 234004468973561415, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 508371985693932455, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Weight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2144106807600439621, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
       propertyPath: m_RigLayers.Array.data[1].m_Active
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3536083533988935842, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Weight
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3836646010659687580, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
@@ -3503,6 +3518,13 @@ MonoBehaviour:
   eyebrowRaiseBlendShapeName: 
   mouthOpenSearchPart: open
   eyebrowRaiseSearchPart: eyebrow
+  leftLegIK: {fileID: 0}
+  rightLegIK: {fileID: 0}
+  hipPositionConstraint: {fileID: 0}
+  hipRotationConstraint: {fileID: 0}
+  leftLegIKNameContains: leftFoot
+  rightLegIKNameContains: rightFoot
+  hipNameContains: hipTarget
   recordPlaybackModeRig: {fileID: 0}
   recordPlaybackModeRigName: RecordPlaybackMode
   idleModeRig: {fileID: 0}
@@ -5473,6 +5495,13 @@ MonoBehaviour:
   eyebrowRaiseBlendShapeName: 
   mouthOpenSearchPart: open
   eyebrowRaiseSearchPart: eyebrow
+  leftLegIK: {fileID: 0}
+  rightLegIK: {fileID: 0}
+  hipPositionConstraint: {fileID: 0}
+  hipRotationConstraint: {fileID: 0}
+  leftLegIKNameContains: leftFoot
+  rightLegIKNameContains: rightFoot
+  hipNameContains: hipTarget
   recordPlaybackModeRig: {fileID: 0}
   recordPlaybackModeRigName: RecordPlaybackMode
   idleModeRig: {fileID: 0}
@@ -9765,6 +9794,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96f5779044adf94fa6dd6fd195cad2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  distanceFromAvatar: 1.5
+  heightOffset: 1.2
 --- !u!1 &1945528132
 GameObject:
   m_ObjectHideFlags: 0
@@ -10612,6 +10643,13 @@ MonoBehaviour:
   eyebrowRaiseBlendShapeName: 
   mouthOpenSearchPart: open
   eyebrowRaiseSearchPart: eyebrow
+  leftLegIK: {fileID: 0}
+  rightLegIK: {fileID: 0}
+  hipPositionConstraint: {fileID: 0}
+  hipRotationConstraint: {fileID: 0}
+  leftLegIKNameContains: leftFoot
+  rightLegIKNameContains: rightFoot
+  hipNameContains: hipTarget
   recordPlaybackModeRig: {fileID: 0}
   recordPlaybackModeRigName: RecordPlaybackMode
   idleModeRig: {fileID: 0}

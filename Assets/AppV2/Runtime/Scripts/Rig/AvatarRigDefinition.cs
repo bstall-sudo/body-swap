@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using AppV2.Runtime.Scripts.Dialogue;
 using UnityEngine.Rendering;
+using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -43,6 +44,19 @@ namespace AppV2.Runtime.Scripts.Rig
         public Animator Animator => animator;
         public RigBuilder RigBuilder => rigBuilder;
         public AvatarRigFollower RigFollower => rigFollower;
+
+        //Lower Body Ik ist da, damit die Wichtung auf 0 geschaltet werden kann, falls SeatedMode
+        [Header("Lower Body IK")]
+        [SerializeField] private TwoBoneIKConstraint leftLegIK;
+        [SerializeField] private TwoBoneIKConstraint rightLegIK;
+        [SerializeField] private MultiPositionConstraint hipPositionConstraint;
+        [SerializeField] private MultiRotationConstraint hipRotationConstraint;
+
+        [SerializeField] private string leftLegIKNameContains = "leftFoot";
+        [SerializeField] private string rightLegIKNameContains = "rightFoot";
+        [SerializeField] private string hipNameContains = "hipTarget";
+
+
 
         [Header("Rig Modes")]
         [SerializeField] private UnityEngine.Animations.Rigging.Rig recordPlaybackModeRig;
@@ -106,7 +120,70 @@ namespace AppV2.Runtime.Scripts.Rig
 
             CacheHeadRenderers();
 
+            AutoFillLowerBodyIKs();
+
    
+        }
+
+        [ContextMenu("Auto Fill Lower Body IKs")]
+private void AutoFillLowerBodyIKs()
+{
+    AutoFillLegIKs();
+    AutoFillHipConstraints();
+}
+
+private void AutoFillLegIKs()
+{
+    var allLegIKs = GetComponentsInChildren<TwoBoneIKConstraint>(true);
+
+    for (int i = 0; i < allLegIKs.Length; i++)
+    {
+        var ik = allLegIKs[i];
+        string n = ik.name.ToLowerInvariant();
+
+        if (leftLegIK == null && n.Contains(leftLegIKNameContains.ToLowerInvariant()))
+        {
+            leftLegIK = ik;
+            continue;
+        }
+
+        if (rightLegIK == null && n.Contains(rightLegIKNameContains.ToLowerInvariant()))
+        {
+            rightLegIK = ik;
+            continue;
+        }
+    }
+}
+
+        private void AutoFillHipConstraints()
+        {
+            var positionConstraints = GetComponentsInChildren<MultiPositionConstraint>(true);
+
+            for (int i = 0; i < positionConstraints.Length; i++)
+            {
+                var c = positionConstraints[i];
+                string n = c.name.ToLowerInvariant();
+
+                if (hipPositionConstraint == null && n.Contains(hipNameContains.ToLowerInvariant()))
+                {
+                    hipPositionConstraint = c;
+                    break;
+                }
+            }
+
+            var rotationConstraints = GetComponentsInChildren<MultiRotationConstraint>(true);
+
+            for (int i = 0; i < rotationConstraints.Length; i++)
+            {
+                var c = rotationConstraints[i];
+                string n = c.name.ToLowerInvariant();
+
+                if (hipRotationConstraint == null && n.Contains(hipNameContains.ToLowerInvariant()))
+                {
+                    hipRotationConstraint = c;
+                    break;
+                }
+            }
         }
 
 
@@ -205,20 +282,20 @@ namespace AppV2.Runtime.Scripts.Rig
             return true;
         }
 
-private void ResolveImportantBlendShapes()
-{
-    _mouthOpenBlendShape = ResolveBlendShape(
-        mouthOpenBlendShapeName,
-        mouthOpenSearchPart,
-        "mouthOpen"
-    );
+        private void ResolveImportantBlendShapes()
+        {
+            _mouthOpenBlendShape = ResolveBlendShape(
+                mouthOpenBlendShapeName,
+                mouthOpenSearchPart,
+                "mouthOpen"
+            );
 
-    _eyebrowRaiseBlendShape = ResolveBlendShape(
-        eyebrowRaiseBlendShapeName,
-        eyebrowRaiseSearchPart,
-        "eyebrowRaise"
-    );
-}
+            _eyebrowRaiseBlendShape = ResolveBlendShape(
+                eyebrowRaiseBlendShapeName,
+                eyebrowRaiseSearchPart,
+                "eyebrowRaise"
+            );
+        }
 
         private BlendShapeRef? ResolveBlendShape(
             string explicitName,
@@ -337,6 +414,24 @@ private void ResolveImportantBlendShapes()
                 idleModeRig.weight = 1f;
         }
 
+
+        public void SetLowerBodyIKWeight(float weight)
+        {
+            weight = Mathf.Clamp01(weight);
+
+            if (leftLegIK != null)
+                leftLegIK.weight = weight;
+
+            if (rightLegIK != null)
+                rightLegIK.weight = weight;
+
+            if (hipPositionConstraint != null)
+                hipPositionConstraint.weight = weight;
+
+            if (hipRotationConstraint != null)
+                hipRotationConstraint.weight = weight;
+        }
+
         public void SetRigModeRecordPlayback()
         {
             if (recordPlaybackModeRig != null)
@@ -354,16 +449,28 @@ private void ResolveImportantBlendShapes()
                 ? sittingIdleAnimationStateName
                 : standingIdleAnimationStateName;
 
-            animator.Play(stateName, 0, 0f);
+            //animator.Play(stateName, 0, 0f);
+            animator.Play("Base Layer.Sitting Idle", 0, 0f);
+            Debug.Log($"[{name}] PlayIdleAnimation: {stateName}");
             
         }
 
-        public void BackToTPose()
+
+
+        public void PlayBasePose(AvatarBasePose pose)
         {
             if (animator == null) return;
-            animator.Play(recordPlaybackStateName, 0, 0f);
-            UnityEngine.Debug.Log($"[{name}]: recordPlaybackStateName = {recordPlaybackStateName}");
-            
+
+            string stateName = pose switch
+            {
+                AvatarBasePose.SittingIdle => sittingIdleAnimationStateName,
+                AvatarBasePose.StandingIdle => standingIdleAnimationStateName,
+                _ => recordPlaybackStateName
+            };
+
+            //animator.Play(stateName, 0, 0f);
+            animator.Play("Base Layer.Sitting Idle", 0, 0f);
+            Debug.Log($"[{name}] PlayBasePose: {stateName}");
         }
 
         public void SetLookAtTargetWorldPosition(Vector3 worldPosition)

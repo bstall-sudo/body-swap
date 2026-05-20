@@ -293,10 +293,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.ChainIKConstraint
   m_Weight: 1
   m_Data:
-    m_Root: {fileID: 4389605052653445538}
+    m_Root: {fileID: 8224983971007854258}
     m_Tip: {fileID: 7501241487217067173}
     m_Target: {fileID: 8904939797911797594}
-    m_ChainRotationWeight: 0.18
+    m_ChainRotationWeight: 0.406
     m_TipRotationWeight: 1
     m_MaxIterations: 15
     m_Tolerance: 0.0001
@@ -1013,7 +1013,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 779f20c2fd175044ea5af9d18550d3c0, type: 3}
       propertyPath: m_Name
-      value: esel_bademantel_kopf_koerper@T-Pose
+      value: esel_bademantel_01
       objectReference: {fileID: 0}
     - target: {fileID: 1852576806548013000, guid: 779f20c2fd175044ea5af9d18550d3c0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1174,7 +1174,7 @@ MonoBehaviour:
   - m_Rig: {fileID: 5784983337964345833}
     m_Active: 1
   - m_Rig: {fileID: 1236258293593975941}
-    m_Active: 0
+    m_Active: 1
   m_Effectors: []
 --- !u!114 &5753911602622470171
 MonoBehaviour:

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
+using AppV2.Runtime.Scripts.Rig;
 
 namespace AppV2.Runtime.Scripts.Dialogue.Services
 {
@@ -26,7 +27,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             _audioBlendShapeService = audioBlendShapeService;
         }
 
-        public void SetRoleToIdleLookingAt(int idleRoleIndex, int speakerRoleIndex)
+        public void SetRoleToIdleLookingAt(int idleRoleIndex, int speakerRoleIndex, bool seatedMode)
         {
             if (!IsValidRoleIndex(idleRoleIndex)) return;
             if (!IsValidRoleIndex(speakerRoleIndex)) return;
@@ -48,12 +49,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
 
             idleRole.avatar.SetRigModeIdle();
-            idleRole.avatar.PlayIdleAnimation(idleRole.sittingIdle);
+            idleRole.avatar.PlayIdleAnimation(idleRole.sittingIdle || seatedMode);
             idleRole.avatar.SetLookAtTargetWorldPosition(speakerRole.head.position);
 
         }
 
-        public void SetRoleToRecordPlayback(int roleIndex)
+        public void SetRoleToRecordPlayback(int roleIndex, bool seatedMode)
         {
             if (!IsValidRoleIndex(roleIndex)) return;
 
@@ -63,7 +64,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 return;
 
             role.avatar.SetRigModeRecordPlayback();
-            role.avatar.BackToTPose();
+
+            AvatarBasePose pose =
+                (seatedMode || role.sittingIdle)
+                    ? AvatarBasePose.SittingIdle
+                    : AvatarBasePose.TPose;
+            UnityEngine.Debug.Log($"[ReactiveIdleController] Speaker{roleIndex} Posename is: {pose}.");
+            role.avatar.PlayBasePose(pose);
         }
 
         //Das hier ist die alte Methode, welche das LookAtTarget einfach auf die Rolle richtet,

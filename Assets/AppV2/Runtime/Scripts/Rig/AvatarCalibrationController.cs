@@ -54,6 +54,26 @@ namespace AppV2.Runtime.Scripts.Rig
 
         }
 
+        public void PlaceAvatarsAtUserPosition(StagePose playerStagePose)
+        {
+            for (int i = 0; i < roles.Count; i++)
+            {
+                if (roles[i].root == null)
+                    continue;
+
+                roles[i].root.localPosition = playerStagePose.Position;
+                roles[i].root.localRotation = playerStagePose.Rotation;
+
+                roles[i].visualRigFollower?.ApplyFollow();
+                roles[i].rigFollower?.SetAvatarToPlayerPosition();
+
+                UnityEngine.Debug.Log(
+                    $"Role({i}) placed at localPosition: {playerStagePose.Position}, " +
+                    $"localRotation: {playerStagePose.Rotation.eulerAngles}."
+                );
+            }
+        }
+
         public void CalibrateRole(int roleIndex)
         {
             if (!IsValidIndex(roleIndex)) return;
@@ -74,7 +94,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
             avatar.RigFollower.BuildMap();
             avatar.RigFollower.CalibrateTargetsFromAvatar();
-            Debug.Log($"CalibrateRole({roleIndex}) was called.");
+            //Debug.Log($"CalibrateRole({roleIndex}) was called.");
         }
 
         public void ShowAllRoles()
