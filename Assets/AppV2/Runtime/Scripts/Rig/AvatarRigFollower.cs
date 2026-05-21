@@ -158,12 +158,12 @@ namespace AppV2.Runtime.Scripts.Rig
 
 
         // is called in by the states via ConversationStage to ensure correct execution order. visualrig follows technicalrig, avatarRig follows visualRig...
-        public void ApplyFollow()
+        public void ApplyFollow(bool avatarIsSeated)
         {
             if (!followAfterCalibration || !isCalibrated)
                 return;
 
-            if (visualRoot != null && avatarRoot != null)
+            if (visualRoot != null && avatarRoot != null && !avatarIsSeated)
             {
                 if (copyRootPosition)
                     avatarRoot.position = visualRoot.position;

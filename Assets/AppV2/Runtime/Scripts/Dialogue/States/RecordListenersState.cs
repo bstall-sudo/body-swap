@@ -62,7 +62,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             if(_isUsingXr){
                 //HöhenAnpassung der XR-Kamera.
-                _flow.Stage.ApplyActiveRoleEmbodimentHeight(toBeRecorded);
+                _flow.Stage.ApplyActiveRoleEmbodimentHeight(toBeRecorded, false);
                 //Anpassung Grösse der Welt an Rollengrösse anpassen.
                 //_flow.Stage.ApplyVisualScaleToConversationStage(toBeRecorded);
             }

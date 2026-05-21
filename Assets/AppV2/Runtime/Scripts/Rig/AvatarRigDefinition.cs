@@ -126,34 +126,34 @@ namespace AppV2.Runtime.Scripts.Rig
         }
 
         [ContextMenu("Auto Fill Lower Body IKs")]
-private void AutoFillLowerBodyIKs()
-{
-    AutoFillLegIKs();
-    AutoFillHipConstraints();
-}
-
-private void AutoFillLegIKs()
-{
-    var allLegIKs = GetComponentsInChildren<TwoBoneIKConstraint>(true);
-
-    for (int i = 0; i < allLegIKs.Length; i++)
-    {
-        var ik = allLegIKs[i];
-        string n = ik.name.ToLowerInvariant();
-
-        if (leftLegIK == null && n.Contains(leftLegIKNameContains.ToLowerInvariant()))
+        private void AutoFillLowerBodyIKs()
         {
-            leftLegIK = ik;
-            continue;
+            AutoFillLegIKs();
+            AutoFillHipConstraints();
         }
 
-        if (rightLegIK == null && n.Contains(rightLegIKNameContains.ToLowerInvariant()))
+        private void AutoFillLegIKs()
         {
-            rightLegIK = ik;
-            continue;
+            var allLegIKs = GetComponentsInChildren<TwoBoneIKConstraint>(true);
+
+            for (int i = 0; i < allLegIKs.Length; i++)
+            {
+                var ik = allLegIKs[i];
+                string n = ik.name.ToLowerInvariant();
+
+                if (leftLegIK == null && n.Contains(leftLegIKNameContains.ToLowerInvariant()))
+                {
+                    leftLegIK = ik;
+                    continue;
+                }
+
+                if (rightLegIK == null && n.Contains(rightLegIKNameContains.ToLowerInvariant()))
+                {
+                    rightLegIK = ik;
+                    continue;
+                }
+            }
         }
-    }
-}
 
         private void AutoFillHipConstraints()
         {
@@ -449,8 +449,8 @@ private void AutoFillLegIKs()
                 ? sittingIdleAnimationStateName
                 : standingIdleAnimationStateName;
 
-            //animator.Play(stateName, 0, 0f);
-            animator.Play("Base Layer.Sitting Idle", 0, 0f);
+            animator.Play(stateName, 0, 0f);
+            //animator.Play("Base Layer.Sitting Idle", 0, 0f);
             Debug.Log($"[{name}] PlayIdleAnimation: {stateName}");
             
         }
@@ -469,7 +469,7 @@ private void AutoFillLegIKs()
             };
 
             //animator.Play(stateName, 0, 0f);
-            animator.Play("Base Layer.Sitting Idle", 0, 0f);
+            animator.Play(stateName, 0, 0f);
             Debug.Log($"[{name}] PlayBasePose: {stateName}");
         }
 

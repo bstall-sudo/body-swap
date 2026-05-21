@@ -8,6 +8,7 @@ namespace AppV2.Runtime.Scripts.Rig
         [Header("Roots")]
         [SerializeField] private Transform technicalRoot;
         [SerializeField] private Transform visualRoot;
+        [SerializeField] private Transform seatedReferenceRoot;
 
         [Header("Auto setup")]
         [SerializeField] private bool autoBuildMapOnAwake = true;
@@ -97,9 +98,26 @@ namespace AppV2.Runtime.Scripts.Rig
             Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
         }
 
-        public void ApplyFollow()
+        // is called in CalibrationState when SeatedMode active, so that the avatar Rig jumps to player position.
+        public void SetVisualRigToPlayerPosition()
         {
-            if (technicalRoot != null && visualRoot != null)
+            if (visualRoot != null && technicalRoot != null)
+            {
+                if (copyRootPosition)
+                    visualRoot.position = technicalRoot.position;
+
+                if (copyRootRotation)
+                    visualRoot.rotation = technicalRoot.rotation;
+
+                if (copyRootScale)
+                    visualRoot.localScale = technicalRoot.localScale;
+            }
+
+        }
+
+        public void ApplyFollow(bool avatarIsSeated)
+        {
+            if (technicalRoot != null && visualRoot != null && !avatarIsSeated)
             {
                 if (copyRootPosition)
                     visualRoot.position = technicalRoot.position;
@@ -118,15 +136,69 @@ namespace AppV2.Runtime.Scripts.Rig
                 if (pair.technical == null || pair.visual == null)
                     continue;
 
-                if (copyLocalPosition)
-                    pair.visual.localPosition = pair.technical.localPosition;
 
-                if (copyLocalRotation)
-                    pair.visual.localRotation = pair.technical.localRotation;
+                if (avatarIsSeated)
+                {
+                    if (!IsUpperBodyTarget(pair.name))
+                        continue;
+                    /*
+                    Transform referenceRoot = seatedReferenceRoot != null
+                        ? seatedReferenceRoot
+                        : visualRoot;
 
-                if (copyLocalScale)
-                    pair.visual.localScale = pair.technical.localScale;
+                    Vector3 offset =
+                        Quaternion.Inverse(referenceRoot.rotation) *
+                        (pair.technical.position - referenceRoot.position);
+
+                    Quaternion rot =
+                        Quaternion.Inverse(referenceRoot.rotation) *
+                        pair.technical.rotation;
+
+                    if (copyLocalPosition)
+                        pair.visual.localPosition = offset;
+
+                    if (copyLocalRotation)
+                        pair.visual.localRotation = rot;
+
+                    */
+                    if (copyLocalPosition)
+                        pair.visual.localPosition = pair.technical.localPosition;
+
+                    if (copyLocalRotation)
+                        pair.visual.localRotation = pair.technical.localRotation;
+
+                    if (copyLocalScale)
+                        pair.visual.localScale = pair.technical.localScale;
+
+                    continue;
+                } else
+                {
+                    if (copyLocalPosition)
+                        pair.visual.localPosition = pair.technical.localPosition;
+
+                    if (copyLocalRotation)
+                        pair.visual.localRotation = pair.technical.localRotation;
+
+                    if (copyLocalScale)
+                        pair.visual.localScale = pair.technical.localScale;
+                        
+                }
+
+
             }
+        }
+
+        //im SeatedMode sollen nur Hands und Head kopiert werden
+        private bool IsUpperBodyTarget(string targetName)
+        {
+            if (string.IsNullOrEmpty(targetName))
+                return false;
+
+            string n = targetName.ToLowerInvariant();
+
+            return n.Contains("head")
+                || n.Contains("lefthand")
+                || n.Contains("righthand");
         }
 
         private Transform FindDeepChildByName(Transform root, string targetName)

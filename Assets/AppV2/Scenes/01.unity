@@ -206,6 +206,7 @@ MonoBehaviour:
   rolesVisualsVisibilityHandler: {fileID: 32639115}
   mirrorSetVisibility: {fileID: 1942974801}
   heightOfPlayerCm: 180
+  heightOfSeatedPlayerCm: 133
   avatarBaseHeightCm: 180
   autoPlayerSizeRecognition: 0
   _session:
@@ -228,6 +229,7 @@ MonoBehaviour:
     rightFootSolver: {fileID: 2013212751}
     audioSource: {fileID: 861219314}
     heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 150
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
@@ -254,6 +256,7 @@ MonoBehaviour:
     rightFootSolver: {fileID: 809510987}
     audioSource: {fileID: 2038182407}
     heightOfRoleCm: 210
+    heightOfSeatedRoleCm: 180
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
@@ -280,6 +283,7 @@ MonoBehaviour:
     rightFootSolver: {fileID: 1754586970}
     audioSource: {fileID: 711541104}
     heightOfRoleCm: 150
+    heightOfSeatedRoleCm: 50
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
@@ -300,7 +304,7 @@ MonoBehaviour:
   ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
   StartInPlaybackFullConversationMode: 0
-  FolderSessionId: 2026-05-18-UTC-12-51-00_02
+  FolderSessionId: 
   selectableNext: 0
   XrHead: {fileID: 1939431221}
   XrLeftHand: {fileID: 2025236437}
@@ -2092,6 +2096,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4896659078922150919, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Data.m_ChainRotationWeight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5753911602622470171, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -2616,7 +2624,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 638662130}
-  - component: {fileID: 638662131}
   m_Layer: 0
   m_Name: RoleA
   m_TagString: Untagged
@@ -2642,20 +2649,6 @@ Transform:
   - {fileID: 818458806}
   m_Father: {fileID: 446506845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &638662131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 638662129}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.RoleRigUpdatePipeline
-  visualRigFollower: {fileID: 0}
-  avatarRigFollower: {fileID: 0}
 --- !u!1 &682927385
 GameObject:
   m_ObjectHideFlags: 0
@@ -2886,6 +2879,14 @@ PrefabInstance:
     - target: {fileID: 4500593101827085862, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4896659078922150919, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Data.m_Root
+      value: 
+      objectReference: {fileID: 1477437541}
+    - target: {fileID: 4896659078922150919, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+      propertyPath: m_Data.m_ChainRotationWeight
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5753911602622470171, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
       propertyPath: m_Enabled
@@ -6000,6 +6001,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Dialogue.Rig.VisualRigFollower
   technicalRoot: {fileID: 1884059423}
   visualRoot: {fileID: 1106390899}
+  seatedReferenceRoot: {fileID: 1106390899}
   autoBuildMapOnAwake: 1
   copyRootPosition: 1
   copyRootRotation: 1
@@ -7169,6 +7171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Dialogue.Rig.VisualRigFollower
   technicalRoot: {fileID: 702877649}
   visualRoot: {fileID: 1358925938}
+  seatedReferenceRoot: {fileID: 1358925938}
   autoBuildMapOnAwake: 1
   copyRootPosition: 1
   copyRootRotation: 1
@@ -7205,7 +7208,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1378051320}
-  - component: {fileID: 1378051321}
   m_Layer: 0
   m_Name: RoleC
   m_TagString: Untagged
@@ -7231,20 +7233,6 @@ Transform:
   - {fileID: 1046647340}
   m_Father: {fileID: 446506845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1378051321
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1378051319}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoleRigUpdatePipeline
-  visualRigFollower: {fileID: 0}
-  avatarRigFollower: {fileID: 0}
 --- !u!1 &1393575058
 GameObject:
   m_ObjectHideFlags: 0
@@ -7446,6 +7434,11 @@ Transform:
 --- !u!4 &1456497539 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4500593101827085862, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
+  m_PrefabInstance: {fileID: 707023975}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1477437541 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8524745162218145057, guid: c7e52985fb75098478f33c1cc1f5a4f9, type: 3}
   m_PrefabInstance: {fileID: 707023975}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1486911886
@@ -8610,7 +8603,7 @@ MonoBehaviour:
     m_Root: {fileID: 1030368485}
     m_Tip: {fileID: 1030368481}
     m_Target: {fileID: 1656505325}
-    m_ChainRotationWeight: 0.183
+    m_ChainRotationWeight: 1
     m_TipRotationWeight: 1
     m_MaxIterations: 15
     m_Tolerance: 0.0001
@@ -8749,6 +8742,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Dialogue.Rig.VisualRigFollower
   technicalRoot: {fileID: 195997951}
   visualRoot: {fileID: 1692814849}
+  seatedReferenceRoot: {fileID: 1692814849}
   autoBuildMapOnAwake: 1
   copyRootPosition: 1
   copyRootRotation: 1
@@ -10698,7 +10692,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2110021515}
-  - component: {fileID: 2110021516}
   m_Layer: 0
   m_Name: RoleB
   m_TagString: Untagged
@@ -10724,20 +10717,6 @@ Transform:
   - {fileID: 2079603509}
   m_Father: {fileID: 446506845}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2110021516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2110021514}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65ce20748c196eb4abdd15607b633255, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoleRigUpdatePipeline
-  visualRigFollower: {fileID: 0}
-  avatarRigFollower: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

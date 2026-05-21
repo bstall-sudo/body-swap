@@ -58,20 +58,39 @@ namespace AppV2.Runtime.Scripts.Rig
         {
             for (int i = 0; i < roles.Count; i++)
             {
-                if (roles[i].root == null)
-                    continue;
-
-                roles[i].root.localPosition = playerStagePose.Position;
-                roles[i].root.localRotation = playerStagePose.Rotation;
-
-                roles[i].visualRigFollower?.ApplyFollow();
-                roles[i].rigFollower?.SetAvatarToPlayerPosition();
-
-                UnityEngine.Debug.Log(
-                    $"Role({i}) placed at localPosition: {playerStagePose.Position}, " +
-                    $"localRotation: {playerStagePose.Rotation.eulerAngles}."
-                );
+                PlaceAvatarAtUserPosition(i, playerStagePose);
             }
+        }
+
+        public void PlaceAvatarAtUserPosition(int roleIndex, StagePose playerStagePose)
+        {
+            RoleRig role = roles[roleIndex];
+
+            if (role.root == null)
+            {
+                UnityEngine.Debug.LogWarning($"Role {roleIndex} has no root its RoleRig.");
+                return;
+            }
+
+            role.root.localPosition = playerStagePose.Position;
+            role.root.localRotation = playerStagePose.Rotation;
+
+            /*
+            role.visualRigRoot.localPosition = playerStagePose.Position;
+            role.visualRigRoot.localRotation = playerStagePose.Rotation;
+
+            role.avatarRoot.localPosition = playerStagePose.Position;
+            role.avatarRoot.localRotation = playerStagePose.Rotation;
+            */
+            // das wird jetzt durch die Zeilen oben erfüllt
+            roles[roleIndex].visualRigFollower?.SetVisualRigToPlayerPosition();
+            roles[roleIndex].rigFollower?.SetAvatarToPlayerPosition();
+            
+            UnityEngine.Debug.Log(
+                $"Role({roleIndex}) placed at localPosition: {playerStagePose.Position}, " +
+                $"localRotation: {playerStagePose.Rotation.eulerAngles}."
+            );
+            
         }
 
         public void CalibrateRole(int roleIndex)
@@ -139,6 +158,10 @@ namespace AppV2.Runtime.Scripts.Rig
             role.initialStartPos = role.root.position;
             role.initialStartYawDeg = role.root.eulerAngles.y;
             role.hasInitialStartPose = true;
+            StagePose playerStagePose = new StagePose();
+            playerStagePose.Position = pos;
+            playerStagePose.Rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            PlaceAvatarAtUserPosition(roleIndex, playerStagePose);
         }
 
 

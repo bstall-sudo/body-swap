@@ -24,6 +24,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public AudioSource audioSource;
         [Header("Role size")]
         public int heightOfRoleCm = 180;
+     
+        public int heightOfSeatedRoleCm = 133;
 
         [Header("Initial placement")]
         public bool hasInitialStartPose = false;

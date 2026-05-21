@@ -49,6 +49,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         [Header("Grösse des Spielers")]
         public float heightOfPlayerCm = 180f;
+        public float heightOfSeatedPlayerCm = 133f;
         public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
 
@@ -66,6 +67,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         [SerializeField] private Transform embodimentOffsetRoot;
         private float _baseCameraOffsetY;
+        //das wird gebraucht für die StartPlayerAlignToActorSeated, damit das XR Rig auf den Role Root springen kann.
+        private Vector3 _playerAlignTargetOriginPosWorld;
+        // diese Variable entscheided, ob TickPlayerAlign den SeatedMode, oder den StandingMode verwendet.
+        private bool _playerAlignUseHeadOffset = true;
 
         //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
         // Unity kann Listen serialisieren, wenn das Element [Serializable] ist
@@ -348,29 +353,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 int roleIndex = roleIndices[i];
 
-                if (roles[roleIndex].visualRigFollower != null)
-                {
-                    roles[roleIndex].visualRigFollower.ApplyFollow();
-                }
-                else
-                {
-                    UnityEngine.Debug.LogError($"No VisualRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
-                }
-                
-
-                if (roles[roleIndex].rigFollower != null)
-                {
-                    roles[roleIndex].rigFollower.ApplyFollow();
-                }                
-                else
-                {
-                    UnityEngine.Debug.LogError($"No AvatarRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
-                }
-                    
-                
-                
-            }
-            
+                ApplyFollower(roleIndex);   
+            }  
         }
 
         public bool PlaybacksAreAllStopped(){
@@ -493,11 +477,55 @@ namespace AppV2.Runtime.Scripts.Dialogue
             RecordingTick(roleIndex, sceneCount);
         }
 
+
         public void ApplyFollower(int roleIndex)
         {
-            roles[roleIndex].visualRigFollower?.ApplyFollow();
-            roles[roleIndex].rigFollower?.ApplyFollow();
+            bool avatarIsSeated = SeatedMode || roles[roleIndex].sittingIdle;
+
+            if (roles[roleIndex].visualRigFollower != null)
+            {
+                roles[roleIndex].visualRigFollower.ApplyFollow(avatarIsSeated);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"No VisualRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+            }
             
+
+            if (roles[roleIndex].rigFollower != null)
+            {
+                roles[roleIndex].rigFollower.ApplyFollow(avatarIsSeated);
+            }                
+            else
+            {
+                UnityEngine.Debug.LogError($"No AvatarRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+            }
+            
+        }
+
+        public void ApplyFollowerCalibrationState(int roleIndex)
+        {
+            if (roles[roleIndex].visualRigFollower != null)
+            {
+                //hier (false) weil im CalibrationState soll alles folgen, egal ob, SeatedMode oder sittingIdle, man steht ja...
+                roles[roleIndex].visualRigFollower.ApplyFollow(false);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"No VisualRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+            }
+            
+
+            if (roles[roleIndex].rigFollower != null)
+            {
+                //hier (false) weil im CalibrationState soll alles folgen, egal ob, SeatedMode oder sittingIdle, man steht ja...
+                roles[roleIndex].rigFollower.ApplyFollow(false);
+            }                
+            else
+            {
+                UnityEngine.Debug.LogError($"No AvatarRigFollower assigned in RoleRig for Rig: '{roles[roleIndex].avatarName}' with ID: '{roles[roleIndex].roleId}'");
+            }
+
         }
 
 
@@ -514,6 +542,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         public void DriveActiveRoleFromInput(int roleIndex, float dt)
+        {
+            bool seated = SeatedMode || roles[roleIndex].sittingIdle;
+
+            if (seated)
+            {
+                DriveActiveRoleFromInputSeatedMode(roleIndex);
+                return;
+            }
+
+            DriveActiveRoleFromInputStandingMode(roleIndex, dt);
+        }
+
+        public void DriveActiveRoleFromInputStandingMode(int roleIndex, float dt)
         {
             if (!_input.TryGetHeadPose(out var headPos, out var headRot))
                 return;
@@ -665,11 +706,71 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     rig.rightFoot.localPosition = new Vector3(fallbackFootSpacing, 0f, 0f);
                     rig.rightFoot.localRotation = Quaternion.identity;
                 }
-            }
-
-;
+            };
         }
 
+
+        public void DriveActiveRoleFromInputSeatedMode(int roleIndex)
+        {
+            var rig = roles[roleIndex];
+
+            var input = _input;
+            if (input == null)
+                return;
+
+            if (rig.root == null)
+                return;
+
+            float embodimentDeltaY = 0f;
+
+            if (embodimentOffsetRoot != null)
+                embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
+
+            if (!input.TryGetHeadPose(out var headStage, out var headRotStage)) return;
+            if (!input.TryGetLeftHandPose(out var leftStage, out var leftRotStage)) return;
+            if (!input.TryGetRightHandPose(out var rightStage, out var rightRotStage)) return;
+
+            headStage.y -= embodimentDeltaY;
+            leftStage.y -= embodimentDeltaY;
+            rightStage.y -= embodimentDeltaY;
+
+            // Root bleibt, wo er ist.
+            Vector3 bodyPos = rig.root.localPosition;
+            Quaternion bodyRot = rig.root.localRotation;
+
+            Quaternion invBodyRot = Quaternion.Inverse(bodyRot);
+
+            Vector3 ToLocalPos(Vector3 pStage)
+            {
+                Vector3 delta = pStage - bodyPos;
+                return invBodyRot * delta;
+            }
+
+            Quaternion ToLocalRot(Quaternion rStage)
+            {
+                return invBodyRot * rStage;
+            }
+
+            if (rig.head)
+            {
+                rig.head.localPosition = ToLocalPos(headStage);
+                rig.head.localRotation = ToLocalRot(headRotStage);
+            }
+
+            if (rig.leftHand)
+            {
+                rig.leftHand.localPosition = ToLocalPos(leftStage);
+                rig.leftHand.localRotation = ToLocalRot(leftRotStage);
+            }
+
+            if (rig.rightHand)
+            {
+                rig.rightHand.localPosition = ToLocalPos(rightStage);
+                rig.rightHand.localRotation = ToLocalRot(rightRotStage);
+            }
+
+            //hip and feet werden nicht bearbeitet im SeatedMode
+        }
 
 
         
@@ -683,10 +784,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 rig.rightFootSolver?.ValidateSetup(rig.roleId);
             }
         }
+
+        public void StartPlayerAlignToActor(int roleIndex, float duration)
+        {
+            if (SeatedMode || roles[roleIndex].sittingIdle)
+            {
+                StartPlayerAlignToActorSeated(roleIndex, duration);
+                return;
+            }
+            else
+            {
+                StartPlayerAlignToActorStanding(roleIndex, duration);
+            }
+            
+        }
         
         //das wird bei RoleSwitch von den AlignStates im Enter() gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         //Diese Funktion berechnet nur Start- und ZielPosition, um wieviel muss das XrRig bewegt werden, damit XR-Head am richtigen Ort landet.
-        public void StartPlayerAlignToActor(int roleIndex, float duration)
+        public void StartPlayerAlignToActorStanding(int roleIndex, float duration)
         {
             if (XrOrigin == null || XrHead == null || _stageRoot == null)
             {
@@ -733,7 +848,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // Gleichmäßige Skalierung annehmen
             if (heightOfPlayerCm > 0.01f)
             {
+                
                 roleScale = (float)roles[roleIndex].heightOfRoleCm / heightOfPlayerCm;
+                if(roles[roleIndex].sittingIdle || SeatedMode)
+                {
+                    roleScale = (float)roles[roleIndex].heightOfSeatedRoleCm / heightOfSeatedPlayerCm; 
+                }
+                
+                    
+       
             }
             // 2) Head-Offset relativ zum Body skalieren
             Vector3 scaledHeadPosBodyLocal = targetHeadPosBodyLocal * roleScale;
@@ -775,6 +898,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _playerAlignT = 0f;
             _playerAlignActive = true;
 
+            // hier wird jetzt gesetzt, dass TickPlayerAlignStanding verwendet wird.
+            _playerAlignUseHeadOffset = true;
+
             /*
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH ROOT SCALE role {roleIndex}: {roles[roleIndex].root.lossyScale}");
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH HEAD SCALE role {roleIndex}: {roles[roleIndex].head.lossyScale}");
@@ -802,13 +928,75 @@ namespace AppV2.Runtime.Scripts.Dialogue
             );
             */
         }
-                        
+
+        public void StartPlayerAlignToActorSeated(int roleIndex, float duration)
+        {
+            if (XrOrigin == null || _stageRoot == null)
+            {
+                Debug.LogError("XrOrigin or _stageRoot == null");
+                return;
+            }
+
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+            {
+                Debug.LogError($"Invalid roleIndex: {roleIndex}");
+                return;
+            }
+
+            if (!_recordingController.TryGetLastEndPose(
+                    roleIndex,
+                    out Vector3 targetBodyPosLocal,
+                    out float targetBodyYaw))
+            {
+                Debug.LogWarning($"No last Body end pose found for roleIndex {roleIndex}");
+                return;
+            }
+
+            Vector3 targetRootWorld = _stageRoot.TransformPoint(targetBodyPosLocal);
+            Quaternion targetRootRotWorld =
+                _stageRoot.rotation * Quaternion.Euler(0f, targetBodyYaw, 0f);
+
+            _playerAlignFromPos = XrOrigin.position;
+            _playerAlignFromYaw = YawOf(XrOrigin.rotation);
+
+            _playerAlignToYaw = YawOf(targetRootRotWorld);
+
+            _playerAlignToPos = targetRootWorld;
+            _playerAlignToPos.y = _playerAlignFromPos.y;
+
+            _playerAlignDur = Mathf.Max(0.05f, duration);
+            _playerAlignT = 0f;
+            _playerAlignActive = true;
+
+            _playerAlignTargetOriginPosWorld = targetRootWorld;
+
+            // hier wird jetzt gesetzt, dass TickPlayerAlignSeated verwendet wird.
+            _playerAlignUseHeadOffset = false;
+
+            Debug.Log(
+                $"[SeatedAlign] role={roles[roleIndex].roleId}, " +
+                $"targetRootWorld={targetRootWorld}, targetYaw={_playerAlignToYaw}"
+            );
+        }
+                                
         
 
 
+        public void TickPlayerAlign()
+        {
+            if (_playerAlignUseHeadOffset)
+            {
+                TickPlayerAlignStanding();
+            }
+            else
+            {  
+                TickPlayerAlignSeated();
+            }
+
+        }
         //das wird bei RoleSwitch von den AlignStates im Tick() gerufen, damit man das playback des letzten Takes aus dem Blickpunkt der anderen Figur sieht.
         //Diese Funktion verschiebt das XrRig, damit XR-Head am richtigen Ort landet.
-        public void TickPlayerAlign()
+        public void TickPlayerAlignStanding()
         {
             if (!_playerAlignActive || XrOrigin == null || XrHead == null)
                 return;
@@ -841,6 +1029,38 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 _playerAlignActive = false;
             }
+        }
+
+        public void TickPlayerAlignSeated()
+        {
+            if (!_playerAlignActive || XrOrigin == null)
+                return;
+
+            _playerAlignT += Time.deltaTime;
+            float u = Mathf.Clamp01(_playerAlignT / _playerAlignDur);
+
+            float currentOriginYaw = YawOf(XrOrigin.rotation);
+            float yaw = Mathf.LerpAngle(currentOriginYaw, _playerAlignToYaw, u);
+            Quaternion targetOriginRotation = Quaternion.Euler(0f, yaw, 0f);
+
+            Vector3 desiredOriginPos;
+
+
+            desiredOriginPos = _playerAlignTargetOriginPosWorld;
+
+
+            Vector3 currentOriginPos = XrOrigin.position;
+
+            Vector3 pos = currentOriginPos;
+            pos.x = Mathf.Lerp(currentOriginPos.x, desiredOriginPos.x, u);
+            pos.z = Mathf.Lerp(currentOriginPos.z, desiredOriginPos.z, u);
+            pos.y = currentOriginPos.y;
+
+            XrOrigin.position = pos;
+            XrOrigin.rotation = targetOriginRotation;
+
+            if (u >= 1f)
+                _playerAlignActive = false;
         }
 
         public bool PlayerAlignFinished(){
@@ -957,7 +1177,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         // Funktion wird im Enter() des RecordSpeaker- und RecordListenersState gerufen.
-        public void ApplyActiveRoleEmbodimentHeight(int roleIndex)
+        public void ApplyActiveRoleEmbodimentHeight(int roleIndex, bool isCalibrationStateSeatedMode)
         {
             if (embodimentOffsetRoot == null)
                 return;
@@ -965,20 +1185,39 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if (roleIndex < 0 || roleIndex >= roles.Count)
                 return;
 
-            //die Augenhöhe ist ca. auf 92% der Körpergrösse
-            float playerEyeHeightCm = heightOfPlayerCm * 0.92f;
-            float roleEyeHeightCm = roles[roleIndex].heightOfRoleCm * 0.92f;
+            RoleRig role = roles[roleIndex];
+
+            bool useSeatedMode = SeatedMode || role.sittingIdle;
+
+            float playerEyeHeightCm;
+            float roleEyeHeightCm;
+
+            if (useSeatedMode && !isCalibrationStateSeatedMode)
+            {   
+                
+                // Erste Annäherung: sitzende Augenhöhe aus stehender Augenhöhe ableiten
+                playerEyeHeightCm = heightOfSeatedPlayerCm * 0.95f;
+                roleEyeHeightCm = role.heightOfSeatedRoleCm * 0.95f;
+                UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight] in SeatedMode: Height of Seated Role: {roleEyeHeightCm}, Height of Seated Player: {playerEyeHeightCm}");
+            }
+            else
+            {
+                playerEyeHeightCm = heightOfPlayerCm * 0.92f;
+                roleEyeHeightCm = role.heightOfRoleCm * 0.92f;
+            }
 
             float deltaM = (roleEyeHeightCm - playerEyeHeightCm) / 100f;
 
             Vector3 p = embodimentOffsetRoot.localPosition;
-            UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight]: EmbodimentOffsetRoot of Role={roles[roleIndex].roleId} is: {embodimentOffsetRoot.localPosition}");
             p.y = _baseCameraOffsetY + deltaM;
             embodimentOffsetRoot.localPosition = p;
 
-            UnityEngine.Debug.Log(
-                $"ApplyActiveRoleEmbodimentHeight: role={roles[roleIndex].roleId}, " +
-                $"baseY={_baseCameraOffsetY}, deltaM={deltaM}, newY={p.y}"
+            Debug.Log(
+                $"ApplyActiveRoleEmbodimentHeight: role={role.roleId}, " +
+                $"seated={useSeatedMode}, " +
+                $"playerEyeHeightCm={playerEyeHeightCm}, " +
+                $"roleEyeHeightCm={roleEyeHeightCm}, " +
+                $"deltaM={deltaM}, newY={p.y}"
             );
         }
 

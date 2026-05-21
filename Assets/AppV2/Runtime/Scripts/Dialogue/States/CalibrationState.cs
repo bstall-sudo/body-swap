@@ -42,17 +42,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //make head invisible for rig that will be calibrated.
             _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,false);
             // Set XR-Cam to Role height
-            _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
+            _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration, true);
             ShowCurrentRoleOrFinish();
         }
 
         public void Tick(float dt)
         
-        {
-            _flow.Stage.DriveActiveRoleFromInput(_currentRoleIndexForCalibration, dt);
+        {   
+            //im CalibrationState ist der InputDriver in Standing Mode, weil auch der Root mitverschoben werden muss.
+            _flow.Stage.DriveActiveRoleFromInputStandingMode(_currentRoleIndexForCalibration, dt);
 
-            //Visual und TechnicalRig folgen hier sepparat, weil ja nicht recorded wird und auch proceduralMove noch nicht aktiv sein soll.
-            _flow.Stage.ApplyFollower(_currentRoleIndexForCalibration);
+            //Visual und TechnicalRig folgen hier sepparat, weil ja nicht recorded wird und auch proceduralMove noch nicht aktiv sein soll. 
+            _flow.Stage.ApplyFollowerCalibrationState(_currentRoleIndexForCalibration);
             if (_flow.ConsumePrimaryAction())
             {
                 if(_seatedMode && !_rolesSetToPlayerPosition)
@@ -80,7 +81,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     
 
                     // Set XR-Cam to Role height
-                    _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration);
+                    _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration, true);
 
                     ShowCurrentRoleOrFinish();
                     
@@ -130,7 +131,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             UnityEngine.Debug.Log($"[CalibrationState] FinishCalibration() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
-            //_flow.Stage.MirrorSetVisibility.ActivateMirror(false);
+            _flow.Stage.MirrorSetVisibility.ActivateMirror(false);
 
             _flow.Stage.SaveTargetTransformsAfterCalibration();
 
