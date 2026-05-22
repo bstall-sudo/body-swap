@@ -282,7 +282,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SaveTargetTransformsAfterCalibration(){
             
-            _recordingController.SaveTargetTransformsToSessionModel(_calibrationDataProvider.CreateRoleMetas());
+            _recordingController.SaveTargetTransformsToSessionModel(_calibrationDataProvider.CreateRoleMetas(), SeatedMode);
 
         }
 
@@ -342,18 +342,21 @@ namespace AppV2.Runtime.Scripts.Dialogue
       
         public void PlaybackTick(List<int> roleIndices){
             _playbackController.TickForIndexList(roleIndices);
-            RigUpdatePipeline(roleIndices);
+            bool copyRootForPlayback = true;
+            // hier true, weil im PlaybackMode auch der Root Position und Rotation kopiert werden soll, wenn RoleRig.sittingIdle == true.
+            // im RecordMode soll der Root nicht mitkopiert werden, wenn SeatedMode.
+            RigUpdatePipeline(roleIndices, copyRootForPlayback);
             _blendShapeAudioAnimator.Tick(Time.deltaTime, roleIndices);
 
         }
 
-        public void RigUpdatePipeline(List<int> roleIndices)
+        public void RigUpdatePipeline(List<int> roleIndices, bool copyRootPosRot)
         {
             for (int i = 0; i < roleIndices.Count; i++)
             {
                 int roleIndex = roleIndices[i];
 
-                ApplyFollower(roleIndex);   
+                ApplyFollower(roleIndex, copyRootPosRot);   
             }  
         }
 
@@ -473,18 +476,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             DriveActiveRoleFromInput(roleIndex, dt);
             ApplyProceduralLowerBodyIfNeeded(roleIndex, dt);
-            ApplyFollower(roleIndex);
+
+            ApplyFollower(roleIndex, false);
             RecordingTick(roleIndex, sceneCount);
         }
 
 
-        public void ApplyFollower(int roleIndex)
+        public void ApplyFollower(int roleIndex, bool copyRootPosRot)
         {
             bool avatarIsSeated = SeatedMode || roles[roleIndex].sittingIdle;
 
             if (roles[roleIndex].visualRigFollower != null)
             {
-                roles[roleIndex].visualRigFollower.ApplyFollow(avatarIsSeated);
+                roles[roleIndex].visualRigFollower.ApplyFollow(avatarIsSeated, copyRootPosRot);
             }
             else
             {
@@ -494,7 +498,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             if (roles[roleIndex].rigFollower != null)
             {
-                roles[roleIndex].rigFollower.ApplyFollow(avatarIsSeated);
+                roles[roleIndex].rigFollower.ApplyFollow(avatarIsSeated, copyRootPosRot);
             }                
             else
             {
@@ -721,18 +725,54 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if (rig.root == null)
                 return;
 
-            float embodimentDeltaY = 0f;
-
-            if (embodimentOffsetRoot != null)
-                embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
+            
+            
 
             if (!input.TryGetHeadPose(out var headStage, out var headRotStage)) return;
             if (!input.TryGetLeftHandPose(out var leftStage, out var leftRotStage)) return;
             if (!input.TryGetRightHandPose(out var rightStage, out var rightRotStage)) return;
-
+            
+            // testweise deaktivieren, um zu schauen, ob der Offset dann verschwindet
+            /*
+            float embodimentDeltaY = 0f;
+            
+            if (embodimentOffsetRoot != null)
+                embodimentDeltaY = embodimentOffsetRoot.localPosition.y - _baseCameraOffsetY;
             headStage.y -= embodimentDeltaY;
             leftStage.y -= embodimentDeltaY;
             rightStage.y -= embodimentDeltaY;
+            */
+            //Feinkorrektur des höhenunterschiedes bei skalierten Rollen
+            float seatedDeltaM = (rig.heightOfSeatedRoleCm - heightOfSeatedPlayerCm) / 100f;
+
+            float headFactor =    0.6f;
+            float handFactor =    0.3f;
+
+            /*
+            if(heightOfSeatedPlayerCm<rig.heightOfSeatedRoleCm)
+            {
+                headFactor =  - headFactor;
+                handFactor = -  handFactor;
+
+            }
+            */
+            if(heightOfSeatedPlayerCm>rig.heightOfSeatedRoleCm)
+            {
+                headFactor =   headFactor*(headFactor * 5);
+                handFactor =   handFactor*(headFactor * 3);
+                
+
+            }
+
+            
+            
+
+
+            headStage.y -= seatedDeltaM * headFactor;
+            leftStage.y -= seatedDeltaM * handFactor;
+            rightStage.y -= seatedDeltaM * handFactor;
+            
+
 
             // Root bleibt, wo er ist.
             Vector3 bodyPos = rig.root.localPosition;
@@ -1127,6 +1167,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (role != null && role.usePlayerHeightAsDefault && role.heightOfRoleCm <= 0)
                 {
                     role.heightOfRoleCm = playerHeightCm;
+                    role.heightOfSeatedRoleCm = (int)heightOfSeatedPlayerCm;
+                }
+                if (role != null && role.heightOfRoleCm > 0 && role.heightOfSeatedRoleCm <= 0)
+                {
+                    
+                    role.heightOfSeatedRoleCm = (int)(role.heightOfRoleCm /1.35);
                 }
             }
         }
@@ -1177,7 +1223,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         // Funktion wird im Enter() des RecordSpeaker- und RecordListenersState gerufen.
-        public void ApplyActiveRoleEmbodimentHeight(int roleIndex, bool isCalibrationStateSeatedMode)
+        public void ApplyActiveRoleEmbodimentHeight(int roleIndex, bool forceStandingHeight = false)
         {
             if (embodimentOffsetRoot == null)
                 return;
@@ -1187,16 +1233,20 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             RoleRig role = roles[roleIndex];
 
-            bool useSeatedMode = SeatedMode || role.sittingIdle;
+            bool useSeatedHeight =
+                !forceStandingHeight &&
+                (SeatedMode || role.sittingIdle);
 
             float playerEyeHeightCm;
             float roleEyeHeightCm;
 
-            if (useSeatedMode && !isCalibrationStateSeatedMode)
+            if (useSeatedHeight)
             {   
                 
-                // Erste Annäherung: sitzende Augenhöhe aus stehender Augenhöhe ableiten
                 playerEyeHeightCm = heightOfSeatedPlayerCm * 0.95f;
+
+                //testweise deaktivieren
+                //roleEyeHeightCm = heightOfSeatedPlayerCm * 0.95f;
                 roleEyeHeightCm = role.heightOfSeatedRoleCm * 0.95f;
                 UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight] in SeatedMode: Height of Seated Role: {roleEyeHeightCm}, Height of Seated Player: {playerEyeHeightCm}");
             }
@@ -1214,7 +1264,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             Debug.Log(
                 $"ApplyActiveRoleEmbodimentHeight: role={role.roleId}, " +
-                $"seated={useSeatedMode}, " +
+                $"seated={useSeatedHeight}, " +
                 $"playerEyeHeightCm={playerEyeHeightCm}, " +
                 $"roleEyeHeightCm={roleEyeHeightCm}, " +
                 $"deltaM={deltaM}, newY={p.y}"

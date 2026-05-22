@@ -206,7 +206,7 @@ MonoBehaviour:
   rolesVisualsVisibilityHandler: {fileID: 32639115}
   mirrorSetVisibility: {fileID: 1942974801}
   heightOfPlayerCm: 180
-  heightOfSeatedPlayerCm: 133
+  heightOfSeatedPlayerCm: 130
   avatarBaseHeightCm: 180
   autoPlayerSizeRecognition: 0
   _session:
@@ -229,8 +229,8 @@ MonoBehaviour:
     rightFootSolver: {fileID: 2013212751}
     audioSource: {fileID: 861219314}
     heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 150
-    hasInitialStartPose: 0
+    heightOfSeatedRoleCm: 130
+    hasInitialStartPose: 1
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
     visualRigRoot: {fileID: 1985397412}
@@ -256,8 +256,8 @@ MonoBehaviour:
     rightFootSolver: {fileID: 809510987}
     audioSource: {fileID: 2038182407}
     heightOfRoleCm: 210
-    heightOfSeatedRoleCm: 180
-    hasInitialStartPose: 0
+    heightOfSeatedRoleCm: 155
+    hasInitialStartPose: 1
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
     visualRigRoot: {fileID: 477317887}
@@ -283,8 +283,8 @@ MonoBehaviour:
     rightFootSolver: {fileID: 1754586970}
     audioSource: {fileID: 711541104}
     heightOfRoleCm: 150
-    heightOfSeatedRoleCm: 50
-    hasInitialStartPose: 0
+    heightOfSeatedRoleCm: 110
+    hasInitialStartPose: 1
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
     visualRigRoot: {fileID: 1576068650}
@@ -303,7 +303,7 @@ MonoBehaviour:
   SeatedMode: 1
   ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 0
+  StartInPlaybackFullConversationMode: 1
   FolderSessionId: 
   selectableNext: 0
   XrHead: {fileID: 1939431221}

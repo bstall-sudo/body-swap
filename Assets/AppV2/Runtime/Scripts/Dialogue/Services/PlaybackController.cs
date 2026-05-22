@@ -64,6 +64,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     roles[i].audioSource
                 );
 
+
                
 
 
@@ -102,6 +103,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     */
 
                 }
+                if (roles[roleIndex].sittingIdle)
+                {
+                    roles[roleIndex].avatar.SetRigModeRecordPlayback();
+                    roles[roleIndex].avatar.PlayIdleAnimation(true);
+                    roles[roleIndex].avatar.SetLowerBodyIKWeight(0.0f);
+
+                }
+
 
 
             }

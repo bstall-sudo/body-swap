@@ -27,6 +27,15 @@ namespace AppV2.Runtime.Scripts.DataStructures
      
         public int heightOfSeatedRoleCm = 133;
 
+        public float SeatedHeadYOffsetM
+        {
+            get
+            {
+                float deltaCm = heightOfRoleCm - heightOfSeatedRoleCm;
+                return (deltaCm / 100f) * 0.6f;
+            }
+        }
+
         [Header("Initial placement")]
         public bool hasInitialStartPose = false;
         public Vector3 initialStartPos;

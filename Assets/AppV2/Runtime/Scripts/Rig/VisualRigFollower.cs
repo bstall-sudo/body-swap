@@ -115,9 +115,11 @@ namespace AppV2.Runtime.Scripts.Rig
 
         }
 
-        public void ApplyFollow(bool avatarIsSeated)
+        public void ApplyFollow(bool avatarIsSeated, bool copyRootEvenIfSeated = false)
         {
-            if (technicalRoot != null && visualRoot != null && !avatarIsSeated)
+            bool shouldCopyRoot = !avatarIsSeated || copyRootEvenIfSeated;
+
+            if (technicalRoot != null && visualRoot != null && shouldCopyRoot)
             {
                 if (copyRootPosition)
                     visualRoot.position = technicalRoot.position;

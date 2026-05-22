@@ -39,7 +39,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
 
             }
-            _flow.Stage.RigUpdatePipeline(_allRolesIndices);
+            ////hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 
+            _flow.Stage.RigUpdatePipeline(_allRolesIndices, true);
 
             
             
@@ -118,7 +119,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
-            _flow.Stage.RigUpdatePipeline(_allRolesIndices);
+            //hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 
+            _flow.Stage.RigUpdatePipeline(_allRolesIndices, true);
             _flow.Stage.AvatarCalibration.ShowAllRoles();
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 

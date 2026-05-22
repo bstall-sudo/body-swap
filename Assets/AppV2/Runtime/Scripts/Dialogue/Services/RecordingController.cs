@@ -93,19 +93,38 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
         // Das passiert im FinishCalibration() von CalibrationState _flow.Stage.SaveTargetTransformsAfterCalibration();
-        public void SaveTargetTransformsToSessionModel(List<ConversationRoleMeta> roleMetas)
+        public void SaveTargetTransformsToSessionModel(
+            List<ConversationRoleMeta> roleMetas,
+            bool seatedMode)
         {
             if (_session == null)
             {
-                UnityEngine.Debug.LogError("[RecordingController] Cannot save role calibration. SessionModel is null.");
+                UnityEngine.Debug.LogError(
+                    "[RecordingController] Cannot save role calibration. SessionModel is null."
+                );
                 return;
             }
 
-            _session.Roles = roleMetas ?? new List<ConversationRoleMeta>();
+            if (roleMetas == null)
+                roleMetas = new List<ConversationRoleMeta>();
+
+            // Wenn globaler SeatedMode aktiv ist,
+            // alle Rollen als SittingIdle markieren.
+            if (seatedMode)
+            {
+                for (int i = 0; i < roleMetas.Count; i++)
+                {
+                    roleMetas[i].SittingIdle = true;
+                }
+            }
+
+            _session.Roles = roleMetas;
 
             _store.SaveSessionModel(_session);
 
-            UnityEngine.Debug.Log($"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model.");
+            UnityEngine.Debug.Log(
+                $"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model."
+            );
         }
 
         //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
