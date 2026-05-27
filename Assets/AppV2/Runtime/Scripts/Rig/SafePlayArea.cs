@@ -70,7 +70,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 safeAreaCollider.size = new Vector3(width, 0.1f, depth);
             }
 
-            Debug.Log($"SafePlayArea updated from XR boundary. Size: {width} x {depth}");
+            //Debug.Log($"SafePlayArea updated from XR boundary. Size: {width} x {depth}");
         }
     }
 }

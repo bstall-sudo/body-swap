@@ -69,7 +69,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 (seatedMode || role.sittingIdle)
                     ? AvatarBasePose.SittingIdle
                     : AvatarBasePose.TPose;
-            UnityEngine.Debug.Log($"[ReactiveIdleController] Speaker{roleIndex} Posename is: {pose}.");
+            //UnityEngine.Debug.Log($"[ReactiveIdleController] Speaker{roleIndex} Posename is: {pose}.");
             role.avatar.PlayBasePose(pose);
         }
 

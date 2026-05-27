@@ -31,6 +31,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
+            UnityEngine.Debug.Log("[RecordListenersState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
 
             if (_flow == null)
@@ -53,11 +54,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             selectableNext = _flow.Stage.selectableNext;
             sceneCount = _flow._data.SceneCount;
-            UnityEngine.Debug.Log("[RecordListenersState] Enter");
+            
 
-
-
-   
             toBeRecorded = _flow._data.ToBeRecorded;
             
             if(_isUsingXr){
@@ -69,17 +67,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             reactiveIdles = _flow._data.ReactiveIdles;
             playbacks = _flow._data.Playbacks;
-
-            //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren
-            _flow.Stage.ValidateFootSolver(toBeRecorded);
             
             _flow.Stage.PlaybackStart(playbacks, sceneCount);
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
-            UnityEngine.Debug.Log("[RecordListenersState] Enter");
+           
             PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
-
+            UnityEngine.Debug.Log("[RecordListenersState] Enter End");
 
         }
 
@@ -189,7 +184,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Exit()
         {
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
-            _flow.ListenerStateExit();
+            if (selectableNext)
+            {
+                _flow.ListenerStateExitManualSelection();
+            }
+            else
+            {
+                _flow.ListenerStateExitAutoSelection();
+                
+            }
+            
             
             /*
             if(_isUsingXr){
@@ -208,7 +212,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             string text, 
             List<int> playbacks,
             List<int> reactiveIdles,
-            int toBeRecorded)
+            int toBeRecorded
+            )
         {
             string playbacksString =
                 playbacks == null || playbacks.Count == 0
@@ -225,7 +230,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"[RoleLists] " +
                 $"playbacks={playbacksString} | " +
                 $"reactiveIdles={reactiveIdlesString} | " +
-                $"toBeRecorded={toBeRecorded}"
+                $"toBeRecorded={toBeRecorded} " 
             );
         }
 

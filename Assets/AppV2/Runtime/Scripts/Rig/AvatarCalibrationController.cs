@@ -85,12 +85,12 @@ namespace AppV2.Runtime.Scripts.Rig
             // das wird jetzt durch die Zeilen oben erfüllt
             roles[roleIndex].visualRigFollower?.SetVisualRigToPlayerPosition();
             roles[roleIndex].rigFollower?.SetAvatarToPlayerPosition();
-            
+            /*
             UnityEngine.Debug.Log(
                 $"Role({roleIndex}) placed at localPosition: {playerStagePose.Position}, " +
                 $"localRotation: {playerStagePose.Rotation.eulerAngles}."
             );
-            
+            */
         }
 
         public void CalibrateRole(int roleIndex)

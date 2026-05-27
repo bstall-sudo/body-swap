@@ -147,6 +147,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
         public void ValidateSetup(string roleName)
         {
+            /*
             UnityEngine.Debug.Log(
                 $"[FootSolver Validate] role={roleName}, solver={name}, " +
                 $"bodyRoot={(bodyRoot ? bodyRoot.name : "NULL")}, " +
@@ -154,6 +155,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 $"layerMask={groundLayer.value}, " +
                 $"position={transform.position}"
             );
+            */
         }
     }
 }

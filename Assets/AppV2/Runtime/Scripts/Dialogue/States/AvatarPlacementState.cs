@@ -36,7 +36,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _allRolesIndices.Add(i);
                 PlaceCurrentRoleAndAdvance();
                 
-                UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
+                //UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
 
             }
             ////hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 

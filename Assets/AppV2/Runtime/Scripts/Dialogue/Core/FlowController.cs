@@ -70,6 +70,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 SetState(new PlaybackFullConversationState(this));
             }else{
                 if(_xrMode){
+                   
                     SetState(new CalibrationState(this));
                 }else {
                     if(selectableNext)
@@ -94,7 +95,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             _state?.Exit();
             _state = next;
-            UnityEngine.Debug.Log($"[Flow] State -> {_state.Mode}");
+            //UnityEngine.Debug.Log($"[Flow] State -> {_state.Mode}");
             _state.Enter();
         }
 
@@ -270,13 +271,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     if(i != nextSpeaker){
                         reactiveIdles.Add(i);
+                        UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] {i} was added to reactiveIdles.");
                     }
                 }
                 _data.ReactiveIdles = reactiveIdles;
             }
         }
 
-        public bool SpeakerStateExit(){
+
+        public bool SpeakerStateExitAutoSelection(){
             if (_data.ReactiveIdles.Count == 0){
                 UnityEngine.Debug.LogError($"[RecordSpeakerState] Exit: ReactiveIdle List is empty");
                 
@@ -285,33 +288,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
 
             foreach (int var in _data.ReactiveIdles){
-                UnityEngine.Debug.Log($"still in reactive Idles: {var}");
+                UnityEngine.Debug.Log($"[SpeakerStateExit] still in reactive Idles: {var}");
             }
             
             int nextListener;
-            int reactiveIdlesIndex;
-            int selected = _data.SelectedNext;
-           
-            // checken ob ein nächster Aktiver Zuhörer gewählt wurde.
-            if(selected == -1)
-            {
-                reactiveIdlesIndex = 0;
-            }else
-            {
-                reactiveIdlesIndex = selected;
-                // nachher den "nächsten ausgewählten Zuhörer" wieder zurücksetzen, damit es nächstes mal wieder klappt.
-                _data.SelectedNext = -1;
-            }
             
-            //nächsten Sprecher setzen, entweder 0 (default) oder etwas anderes, fall ein nächster gewählt wurde.
-            nextListener = _data.ReactiveIdles[reactiveIdlesIndex];
-            if(selected == -1)
-            {
-                _data.ReactiveIdles.RemoveAt(0);
-            }else
-            {
-                _data.ReactiveIdles.Remove(reactiveIdlesIndex);
-            }
+            
+            //nächsten Sprecher setzen, mit 0 weil AutoSelection.
+            nextListener = _data.ReactiveIdles[0];
+
+            _data.ReactiveIdles.RemoveAt(0);
+            
+           
             //den den Aktiven Sprecher aus der Vorrunde zu den Playbacks hinzufügen.
             _data.Playbacks.Add(_data.ToBeRecorded);
   
@@ -319,52 +307,79 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _data.ToBeRecorded = nextListener;
 
                 
-            UnityEngine.Debug.Log($"Next Active Listener has index: {nextListener}");
+            UnityEngine.Debug.Log($"[SpeakerStateExit] Next Active Listener has index: {nextListener}");
             
             return true;
         }
+       
 
-        public bool ListenerStateExit(){
+        public bool SpeakerStateExitManualSelection(){
             if (_data.ReactiveIdles.Count == 0){
-                UnityEngine.Debug.Log($"[RecordListenersState] Exit: ReactiveIdle List is empty -> Switch to RecordSpeakerState: SceneCount is: {_data.SceneCount}");
+                UnityEngine.Debug.LogError($"[RecordSpeakerState] Exit: ReactiveIdle List is empty");
+                return false;
+            }
+
+            foreach (int var in _data.ReactiveIdles){
+                UnityEngine.Debug.Log($"[SpeakerStateExit] still in reactive Idles: {var}");
+            }
+            
+            _data.ReactiveIdles.Remove(_data.ToBeRecorded);
+           
+            //den den Aktiven Sprecher aus der Vorrunde zu den Playbacks hinzufügen.
+            _data.Playbacks.Add(_data.ToBeRecorded);
+
+  
+
+            return true;
+        }
+        public bool ListenerStateExitAutoSelection(){
+            if (_data.ReactiveIdles.Count == 0){
+                UnityEngine.Debug.Log($"[ListenerStateExit] Exit: ReactiveIdle List is empty -> Switch to RecordSpeakerState: SceneCount is: {_data.SceneCount}");
                 IncrementSceneCount();
                 SpeakerStateEnter();
-                UnityEngine.Debug.Log($"[ListenerStateExit] Reactive Idles Count is: {_data.ReactiveIdles.Count}");
-                foreach (int var in _data.ReactiveIdles){
-                UnityEngine.Debug.Log($"[ListenerStateExit] still in reactive Idles: {var}");
-            }
                 return false;
             }
             int nextListener;
-            int reactiveIdlesIndex;
-            int selected = _data.SelectedNext;
-           
-            // checken ob ein nächster Aktiver Zuhörer gewählt wurde.
-            if(selected == -1)
-            {
-                reactiveIdlesIndex = 0;
-            }else
-            {
-                reactiveIdlesIndex = selected;
-                // nachher den "nächsten ausgewählten Zuhörer" wieder zurücksetzen, damit es nächstes mal wieder klappt.
-                _data.SelectedNext = -1;
-            }
+        
+
             
-            //nächsten Sprecher setzen, entweder 0 (default) oder etwas anderes, fall ein nächster gewählt wurde.
-            nextListener = _data.ReactiveIdles[reactiveIdlesIndex];
+            //nächsten Sprecher setzen, entweder 0 weil AutoSelection
+            nextListener = _data.ReactiveIdles[0];
             //den gewählten Sprecher aus der Liste der Idles entfernen. 
-            _data.ReactiveIdles.RemoveAt(reactiveIdlesIndex);
+            _data.ReactiveIdles.RemoveAt(0);
             //den den Aktiven Sprecher aus der Vorrunde zu den Playbacks hinzufügen.
             _data.Playbacks.Add(_data.ToBeRecorded);
             // im FlowStateData Objekt den aktuellen nächsten Aufzunehmenden setzen.
             _data.ToBeRecorded = nextListener;
 
-                
+
             //UnityEngine.Debug.Log($"Next Active Listener has index: {nextListener}");
             
             return true;
         }
+        
 
+        
+
+        public bool ListenerStateExitManualSelection(){
+            if (_data.ReactiveIdles.Count == 0){
+                UnityEngine.Debug.Log($"[ListenerStateExit] Exit: ReactiveIdle List is empty -> Switch to RecordSpeakerState: SceneCount is: {_data.SceneCount}");
+                IncrementSceneCount();
+                SpeakerStateEnter();
+                return false;
+            }
+
+            
+           
+            //den gewählten Sprecher aus der Liste der Idles entfernen. 
+            _data.ReactiveIdles.Remove(_data.ToBeRecorded);
+            //den den Aktiven Sprecher aus der Vorrunde zu den Playbacks hinzufügen.
+            _data.Playbacks.Add(_data.ToBeRecorded);
+     
+            
+            return true;
+        }
+        
 
     }
 }

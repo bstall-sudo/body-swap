@@ -39,6 +39,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private RolesVisualsVisibilityHandler rolesVisualsVisibilityHandler;
         public RolesVisualsVisibilityHandler RolesVisualsVisibilityHandler  => rolesVisualsVisibilityHandler;
 
+        [SerializeField] private ChooseSpeakerController chooseSpeakerController;
+        public ChooseSpeakerController ChooseSpeakerController  => chooseSpeakerController;
+
         //Um die Spiegel auszuschalten, welche für den CalibrationState gebraucht werden.
         [SerializeField] private MirrorSetVisibility mirrorSetVisibility;
         public MirrorSetVisibility MirrorSetVisibility  => mirrorSetVisibility;
@@ -176,7 +179,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             if(StartInPlaybackFullConversationMode){
 
-                UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. Folder Id is: {FolderSessionId}");
+                //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. Folder Id is: {FolderSessionId}");
                 if(FolderSessionId == ""){
                     //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. FolderSessionId is Empty String : {FolderSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
                     InitializePlaybackFromLatestSession();
@@ -229,6 +232,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             avatarCalibration.Initialize(roles);
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
+
+
             
         }
         private void TurnOffVisibilityOfVisualRig()
@@ -258,13 +263,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 _input = new XRInputTransforms(XrHead, XrLeftHand, XrRightHand, XrHip, XrLeftFoot, XrRightFoot);
 
+                //UnityEngine.Debug.Log($"new _input was created");
+
                 //Das setzt den Anker für die Transforms siehe XRInputTransforms
                 _input.SetAnchorFromTakeRoot(_stageRoot);
                 //Für die Höhenanpassung der MainCamera bei Rollen mit unterschiedlichen Grössen
                 if (embodimentOffsetRoot != null)
                 {
                     _baseCameraOffsetY = 0f;
-                    UnityEngine.Debug.Log($"Base CameraOffset Y = {_baseCameraOffsetY}");
+                    //UnityEngine.Debug.Log($"Base CameraOffset Y = {_baseCameraOffsetY}");
                 }
                     
 
@@ -277,6 +284,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             //Avatare Grösse anpassen
             ApplyAllRoleVisualScales();
+
+            //used in ChooseSpeakerState to select next speaker
+            chooseSpeakerController.Initialize(roles);
 
         }
 
@@ -348,6 +358,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
             RigUpdatePipeline(roleIndices, copyRootForPlayback);
             _blendShapeAudioAnimator.Tick(Time.deltaTime, roleIndices);
 
+        }
+
+        public void PlaybackStop(List<int> roleIndices)
+        {
+            _playbackController.StopClipsForIndices(roleIndices);
         }
 
         public void RigUpdatePipeline(List<int> roleIndices, bool copyRootPosRot)
@@ -1202,10 +1217,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
             p.y = role.visualGroundOffsetY;
             role.visualRigRoot.localPosition = p;
 
+            /*
             UnityEngine.Debug.Log(
                 $"ApplyRoleVisualScale: role={role.roleId}, roleHeight={role.heightOfRoleCm}, " +
                 $"playerHeight={playerHeightCm}, avatarScale={avatarScale}, visualScale={visualScale} groundOffsetY={role.visualGroundOffsetY}"
             );
+            */
         }
 
         //Das wird im Start gerufen um die Avatare passend zu skalieren. 
@@ -1248,7 +1265,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 //testweise deaktivieren
                 //roleEyeHeightCm = heightOfSeatedPlayerCm * 0.95f;
                 roleEyeHeightCm = role.heightOfSeatedRoleCm * 0.95f;
-                UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight] in SeatedMode: Height of Seated Role: {roleEyeHeightCm}, Height of Seated Player: {playerEyeHeightCm}");
+                //UnityEngine.Debug.Log($"[ApplyActiveRoleEmbodimentHeight] in SeatedMode: Height of Seated Role: {roleEyeHeightCm}, Height of Seated Player: {playerEyeHeightCm}");
             }
             else
             {
@@ -1282,6 +1299,55 @@ namespace AppV2.Runtime.Scripts.Dialogue
             p.y = _baseCameraOffsetY;
             embodimentOffsetRoot.localPosition = p;
         }
+
+        /*
+        //Das wird im ChooseSpeakerState gerufen, damit man den nächsten Speaker von oben auswählen kann. 
+        public void PlaceConversationStageInFrontOfPlayer()
+        {
+            float distanceFromPlayer = 3.0f;
+            float heightOffset = 0.0f;
+
+            Vector3 playerPos;
+            Quaternion playerRot;
+
+            if (XrHead != null)
+            {
+                playerPos = XrHead.position;
+                playerRot = Quaternion.Euler(0f, XrHead.eulerAngles.y, 0f);
+            }
+            else
+            {
+                playerPos = Vector3.zero;
+                playerRot = Quaternion.identity;
+                Debug.LogError("[PlaceConversationStageInFrontOfPlayer] XrHead is null.");
+            }
+
+            Vector3 forward = playerRot * Vector3.forward;
+
+            Vector3 stagePos = playerPos + forward * distanceFromPlayer;
+            stagePos.y = transform.position.y + heightOffset;
+
+            transform.position = stagePos;
+
+            Vector3 lookTarget = playerPos;
+            lookTarget.y = transform.position.y;
+
+            transform.LookAt(lookTarget);
+
+            // Falls die Stage danach falsch herum steht:
+            transform.Rotate(0f, 180f, 0f);
+        }
+
+        public void PutConversationStageBackToPriorPosition(Transform priorPosRot)
+        {
+            
+            if (_stageRoot == null)
+            {
+                Debug.LogError("[PutConversationStageBackToPriorPosition] _stageRoot is null.");
+            }
+            _stageRoot = priorPosRot;
+        }
+        */
 
 
 

@@ -95,7 +95,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 });
             }
 
-            Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
+            //Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
         }
 
         // is called in CalibrationState when SeatedMode active, so that the avatar Rig jumps to player position.

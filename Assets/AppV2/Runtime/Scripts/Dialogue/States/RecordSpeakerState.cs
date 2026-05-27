@@ -35,6 +35,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Enter()
 
         {
+            UnityEngine.Debug.Log("[RecordSpeakerState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
         
             
@@ -49,7 +50,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
                 UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {_flow._data.SceneCount}, Speaker Index: {_flow._data.ToBeRecorded}, reactive Idles: ");
                 foreach (int number in _flow._data.ReactiveIdles){
-                    UnityEngine.Debug.Log($"Index: {number}");
+                    UnityEngine.Debug.Log($"[RecordSpeakerState] Index of ReactiveIdle: {number}");
                 }
             }
             sceneCount = _flow._data.SceneCount;
@@ -80,7 +81,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             reactiveIdles = _flow._data.ReactiveIdles;
             UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {sceneCount}, Speaker Index: {toBeRecorded}, reactive Idles: ");
             foreach (int number in reactiveIdles){
-                UnityEngine.Debug.Log($"Index: {number}");
+                UnityEngine.Debug.Log($"[RecordSpeakerState] Index in ReactiveIdle: {number}");
             }
             
              if (_flow == null)
@@ -116,9 +117,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;
 
-            UnityEngine.Debug.Log("[RecordSpeakerState] Enter ");
+            
 
             PrintRoleLists("[RecordSpeakerState] Enter", playbacks, reactiveIdles, toBeRecorded);
+            UnityEngine.Debug.Log("[RecordSpeakerState] Enter End");
             
         }
 
@@ -197,11 +199,25 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
+            UnityEngine.Debug.Log("[RecordSpeakerState] Exit Start");
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
-            _flow.SpeakerStateExit();
+
+            if (selectableNext)
+            {
+                UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitManualSelection() was called selectableNext: {selectableNext}");
+                _flow.SpeakerStateExitManualSelection();
+                
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitAutoSelection() was called selectableNext: {selectableNext}");
+                _flow.SpeakerStateExitAutoSelection();
+                
+            }
+            
            
             
-            UnityEngine.Debug.Log("[RecordSpeakerState] Exit");
+            
             PrintRoleLists("[RecordSpeakerState] Exit", playbacks, reactiveIdles, toBeRecorded);
             //damit der PlayerAlignState weiss, ob er zu RecordSpeaker oder zu RecordListenersState wechseln soll. 
             _flow._data.GoToSpeakerState = false;
@@ -214,7 +230,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
             */
            
-            
+            UnityEngine.Debug.Log("[RecordSpeakerState] Exit End");
         }
 
         //für das Debugging

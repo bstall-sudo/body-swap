@@ -98,10 +98,10 @@ namespace AppV2.Runtime.Scripts.Rig
                     avatar = ava
                 });
 
-                Debug.Log($"[{name}] Mapped {ikTargetName}: visual={vis.name}, avatar={ava.name}");
+                //Debug.Log($"[{name}] Mapped {ikTargetName}: visual={vis.name}, avatar={ava.name}");
             }
 
-            Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
+            //Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
         }
 
         [ContextMenu("Calibrate Targets From Avatar")]
@@ -131,7 +131,7 @@ namespace AppV2.Runtime.Scripts.Rig
             }
 
             isCalibrated = true;
-            Debug.Log($"[{name}] Calibration complete. Visual targets snapped to avatar targets.");
+            //Debug.Log($"[{name}] Calibration complete. Visual targets snapped to avatar targets.");
         }
 
         public void SetCalibrated(bool value)

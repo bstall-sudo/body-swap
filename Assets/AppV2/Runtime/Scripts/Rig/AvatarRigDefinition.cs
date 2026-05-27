@@ -210,7 +210,7 @@ namespace AppV2.Runtime.Scripts.Rig
                     foundRenderers.Add(smr);
                     foundSkinnedMeshes.Add(smr);
 
-                    Debug.Log($"[{name}] Head SkinnedMeshRenderer found: '{smr.gameObject.name}'");
+                    //Debug.Log($"[{name}] Head SkinnedMeshRenderer found: '{smr.gameObject.name}'");
                 }
             }
 
@@ -308,7 +308,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
                 if (_blendShapesByLowerName.TryGetValue(key, out BlendShapeRef exact))
                 {
-                    Debug.Log($"[{name}] {label} BlendShape set explicitly: '{exact.Name}'");
+                    //Debug.Log($"[{name}] {label} BlendShape set explicitly: '{exact.Name}'");
                     return exact;
                 }
 
@@ -325,7 +325,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
                     if (blendShape.Name.ToLowerInvariant().Contains(lowerPart))
                     {
-                        Debug.Log($"[{name}] {label} BlendShape auto-found: '{blendShape.Name}'");
+                        //Debug.Log($"[{name}] {label} BlendShape auto-found: '{blendShape.Name}'");
 
                         if (label == "mouthOpen")
                             mouthOpenBlendShapeName = blendShape.Name;
@@ -451,7 +451,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
             animator.Play(stateName, 0, 0f);
             //animator.Play("Base Layer.Sitting Idle", 0, 0f);
-            Debug.Log($"[{name}] PlayIdleAnimation: {stateName}");
+            //Debug.Log($"[{name}] PlayIdleAnimation: {stateName}");
             
         }
 
@@ -470,7 +470,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
             //animator.Play(stateName, 0, 0f);
             animator.Play(stateName, 0, 0f);
-            Debug.Log($"[{name}] PlayBasePose: {stateName}");
+            //Debug.Log($"[{name}] PlayBasePose: {stateName}");
         }
 
         public void SetLookAtTargetWorldPosition(Vector3 worldPosition)

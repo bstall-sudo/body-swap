@@ -8,6 +8,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
     {
         private readonly FlowController _flow;
 
+        private bool _seatedMode;
         private int _sceneCount;
         private bool _startInPlaybackFullConversationMode;
         
@@ -25,31 +26,46 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
+            _seatedMode = _flow.Stage.SeatedMode;
+
+            if (_seatedMode)
+            {
+                _flow.Stage.ChooseSpeakerController.MoveXrOriginBackFromStage();
+            }
+
+            
             _sceneCount = 0;
-            UnityEngine.Debug.Log($"[PlaybackFullConversationState] SceneCount is: {_sceneCount}");
+            //UnityEngine.Debug.Log($"[PlaybackFullConversationState] SceneCount is: {_sceneCount}");
             
             SetPlaybacks(_flow._data.RoleCount);
-            UnityEngine.Debug.Log($"[PlaybackFullConversationState] SceneCount is: {_playbacks.Count}");
+            //UnityEngine.Debug.Log($"[PlaybackFullConversationState] SceneCount is: {_playbacks.Count}");
             _flow.Stage.PlaybackStart(_playbacks, _sceneCount);
+            //damit man im PlaybackFullConversationState auf Standarhöhe ist und nicht auf der Höhe des letzten Recordings.
+            _flow.Stage.ResetEmbodimentHeight();
+
+            if (_flow.StatusUI != null)
+            {
+                _flow.StatusUI.ShowPlaybackFullConversationState();
+            }
         }
 
         public void Tick(float dt)
         {
             if (_flow.ConsumePrimaryAction())
             {
-                UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed PrimaryAction");
+                //UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed PrimaryAction");
                 // sp�ter: _flow.SetState(new CalibrateState(_flow));
             }
 
             if (_flow.ConsumeSecondaryAction())
             {
-                UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed SecondaryAction");
+                //UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed SecondaryAction");
                 _flow.SetState(new IdleState(_flow));
             }
 
             if (_flow.ConsumeResetAction())
             {
-                UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed ResetAction");
+                //UnityEngine.Debug.Log("[PlaybackFullConversationState] Consumed ResetAction");
             }
 
             if (!_allplaybaksStopped)
@@ -68,7 +84,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 }
                 else
                 {
-                    UnityEngine.Debug.Log("[PlaybackFullConversationState] No more scenes found. Going to IdleState.");
+                    UnityEngine.Debug.Log("[PlaybackFullConversationState] No more scenes found. Restart PlaybackFullConversation.");
                     _flow.SetState(new PlaybackFullConversationState(_flow));
                 }
             }

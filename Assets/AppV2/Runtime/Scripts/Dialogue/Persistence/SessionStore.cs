@@ -80,7 +80,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             string latestDirectory = directories[^1];
             string latestSessionId = Path.GetFileName(latestDirectory);
 
-            UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
+            //UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
             return latestSessionId;
         }
 

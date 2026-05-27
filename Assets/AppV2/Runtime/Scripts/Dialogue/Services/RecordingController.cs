@@ -122,9 +122,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             _store.SaveSessionModel(_session);
 
-            UnityEngine.Debug.Log(
-                $"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model."
-            );
+            //UnityEngine.Debug.Log($"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model.");
         }
 
         //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
@@ -452,7 +450,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             
             pos = _lastHeadEndPosList[roleIndex];
             yaw = _lastHeadEndYawList[roleIndex];
-            UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos}  und Rotation: {yaw}");
+            //UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos}  und Rotation: {yaw}");
             return true;
         }
 
@@ -470,7 +468,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         pos = Vector3.up * estimatedHeadHeightMeters;
         yaw = 0f;
-        UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos} und estimatedHeight: {estimatedHeadHeightMeters} und Rotation: {yaw}");
+        //UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos} und estimatedHeight: {estimatedHeadHeightMeters} und Rotation: {yaw}");
 
         return true;
     }

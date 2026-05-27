@@ -29,6 +29,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             SetStatusText("LISTENER");
         }
 
+        public void ShowChooseSpeakerState()
+        {
+            SetStatusText("Wähle den nächsten Sprecher aus.");
+        }
+
+        public void ShowPlaybackFullConversationState()
+        {
+            SetStatusText("Playback full conversation. No recording.");
+        }
+
         public void ShowIdleState()
         {
             SetStatusText("IDLE");

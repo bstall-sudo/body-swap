@@ -67,12 +67,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
                
 
-
+/*
                 UnityEngine.Debug.Log(
                     $"InitializePlayers: roleIndex={i}, roleId={roles[i].roleId}, " +
                     $"heightOfRoleCm={roles[i].heightOfRoleCm}, playerHeightCm={_playerHeightCm}"
                 );
-
+*/
                 players.Add(player);
             }
         }
@@ -127,6 +127,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             //prüfen, ob alle playbacks gestoppt sind.
             allStoppedPlaying = roleIndices.All(roleIndex => !players[roleIndex]._playing);
 
+        }
+
+        public void StopClipsForIndices(List<int> roleIndices)
+        {
+            foreach (var roleIndex in roleIndices)
+            {
+                players[roleIndex].Stop();
+            }
+            
         }
 
         // wird vom ConversationStage gerufen, um zu wissen, ob alle gestopped sind.. 

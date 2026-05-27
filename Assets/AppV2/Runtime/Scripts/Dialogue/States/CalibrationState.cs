@@ -26,7 +26,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            UnityEngine.Debug.Log("[CalibrationState] Enter");
+            //UnityEngine.Debug.Log("[CalibrationState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;
 
@@ -65,7 +65,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 }
                 else
                 {
-                    UnityEngine.Debug.Log($"[CalibrationState] ConsumePrimaryAction was called");
+                    //UnityEngine.Debug.Log($"[CalibrationState] ConsumePrimaryAction was called");
                     // 1. Aktuelle sichtbare Rolle kalibrieren
                     _flow.Stage.AvatarCalibration
                         .CalibrateRole(_currentRoleIndexForCalibration);
@@ -92,7 +92,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumeSecondaryAction())
             {
-                UnityEngine.Debug.Log($"[CalibrationState] ConsumeSecondaryAction was called");
+                //UnityEngine.Debug.Log($"[CalibrationState] ConsumeSecondaryAction was called");
                 FinishCalibration();
             }
         }
@@ -112,10 +112,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private void ShowCurrentRoleOrFinish()
         {
-            UnityEngine.Debug.Log($"[CalibrationState] ShowCurrentRoleOrFinish() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
+            //UnityEngine.Debug.Log($"[CalibrationState] ShowCurrentRoleOrFinish() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
             if (_currentRoleIndexForCalibration >= _flow.Stage.roleCount)
             {
-                UnityEngine.Debug.Log($"[CalibrationState] ShowCurrentRoleOrFinish() before FinishCalibration was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
+                //UnityEngine.Debug.Log($"[CalibrationState] ShowCurrentRoleOrFinish() before FinishCalibration was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
                 FinishCalibration();
                 return;
             }
@@ -128,7 +128,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private void FinishCalibration()
         {
-            UnityEngine.Debug.Log($"[CalibrationState] FinishCalibration() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
+            //UnityEngine.Debug.Log($"[CalibrationState] FinishCalibration() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
             _flow.Stage.MirrorSetVisibility.ActivateMirror(false);
