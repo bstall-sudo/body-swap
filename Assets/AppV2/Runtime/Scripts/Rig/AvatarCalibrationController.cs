@@ -130,7 +130,7 @@ namespace AppV2.Runtime.Scripts.Rig
         }
 
 
-        public void PlaceRoleAt(int roleIndex, Vector3 floorPosition, Vector3 lookAtPoint)
+        public void PlaceRoleAt(int roleIndex, Vector3 localFloorPosition, Quaternion localRotation)
         {
             if (!IsValidIndex(roleIndex)) return;
 
@@ -142,26 +142,23 @@ namespace AppV2.Runtime.Scripts.Rig
                 return;
             }
 
-            Vector3 pos = floorPosition;
-            pos.y = role.root.position.y;
+            Vector3 localPos = localFloorPosition;
+            localPos.y = role.root.localPosition.y;
 
-            role.root.position = pos;
+            role.root.localPosition = localPos;
+            role.root.localRotation = localRotation;
 
-            Vector3 direction = lookAtPoint - role.root.position;
-            direction.y = 0f;
-
-            if (direction.sqrMagnitude > 0.0001f)
-            {
-                role.root.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-            }
-
-            role.initialStartPos = role.root.position;
-            role.initialStartYawDeg = role.root.eulerAngles.y;
+            role.initialStartPos = role.root.localPosition;
+            role.initialStartYawDeg = role.root.localRotation.eulerAngles.y;
             role.hasInitialStartPose = true;
-            StagePose playerStagePose = new StagePose();
-            playerStagePose.Position = pos;
-            playerStagePose.Rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-            PlaceAvatarAtUserPosition(roleIndex, playerStagePose);
+
+            StagePose stagePose = new StagePose
+            {
+                Position = localPos,
+                Rotation = localRotation
+            };
+
+            PlaceAvatarAtUserPosition(roleIndex, stagePose);
         }
 
 

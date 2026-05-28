@@ -81,7 +81,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             foreach (var roleIndex in roleIndices){
 
-                if(_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta)){
+                PlaybackForIndexBegin(roleIndex, playerHeightCM, sceneCount, sessionId);
+            }
+            
+        }
+
+        public void PlaybackForIndexBegin(int roleIndex, float playerHeightCM, int sceneCount, string sessionId)
+        {
+            if(_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta)){
 
                     TakeData take = _store.LoadTakeData(takeMeta);
                     if (playerHeightCM > 0.01f)
@@ -110,11 +117,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     roles[roleIndex].avatar.SetLowerBodyIKWeight(0.0f);
 
                 }
-
-
-
-            }
-            
         }
 
         public void TickForIndexList(List<int> roleIndices){

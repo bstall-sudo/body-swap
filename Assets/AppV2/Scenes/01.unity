@@ -304,7 +304,7 @@ MonoBehaviour:
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
   SeatedMode: 1
-  ProceduralHipAndFeetMove: 0
+  ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
   StartInPlaybackFullConversationMode: 0
   FolderSessionId: 

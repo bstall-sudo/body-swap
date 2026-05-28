@@ -338,16 +338,47 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         
-        public void PlaybackStart(List<int> roleIndices,  int sceneCount){
 
-                
-               
-                if(_takeIndex.TryGetTakeForScene(roleIndices[0], sceneCount, out TakeMeta takeMeta)){
+        public List<int> PlaybackStart(List<int> roleIndices, int sceneCount)
+        //Die Funktion gibt eine Liste zurück mit Rollen, für welche keine Takes gefunden wurden. In den States (PlaybackFullConversationState / RecordListenerState)
+        // wird diese Liste genutzt, um die ReactiveIdles zu starten.
+        {
+            List<int> noTakesFoundIndices = new List<int>();
+
+            if (roleIndices == null)
+                return noTakesFoundIndices;
+
+            for (int i = 0; i < roleIndices.Count; i++)
+            {
+                int roleIndex = roleIndices[i];
+
+                if (_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta))
+                {
                     string sessionId = takeMeta.SessionId;
-                    _playbackController.PlaybackForIndexListBegin(roleIndices, heightOfPlayerCm, sceneCount, sessionId);
-                } else{
-                    UnityEngine.Debug.LogError($"No Take found for scene: {sceneCount}");
+
+                    _playbackController.PlaybackForIndexBegin(
+                        roleIndex,
+                        heightOfPlayerCm,
+                        sceneCount,
+                        sessionId
+                    );
                 }
+                else
+                {
+                    if(sceneCount == 0)
+                    {
+                        ApplyRoleStartPose(roleIndex);
+                    }
+                    
+                    noTakesFoundIndices.Add(roleIndex);
+
+                    Debug.Log(
+                        $"[PlaybackStart] No take found for role {roleIndex} in scene {sceneCount}. Starting idle instead."
+                    );
+                }
+            }
+
+            return noTakesFoundIndices;
         }
       
         public void PlaybackTick(List<int> roleIndices){
@@ -400,6 +431,29 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _reactiveIdleController.SetRoleToRecordPlayback(roleIndex, SeatedMode);
         }
 */
+
+        //Das wird für PlaybackFullConversation gebraucht, falls einige Rollen in der ersten Szene keinen Take haben.
+        // dann muss aus den ConversationRoleMeta von SessionModel die StartPosition geholt werden.
+        public void ApplyRoleStartPose(int roleIndex)
+        {
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+                return;
+
+            var meta = _playbackController._session?.Roles
+                ?.Find(r => r.RoleIndex == roleIndex);
+
+            if (meta == null || meta.StartRootPose == null)
+                return;
+
+            var role = roles[roleIndex];
+
+            role.root.localPosition = meta.StartRootPose.LocalPosition;
+            role.root.localRotation = meta.StartRootPose.LocalRotation;
+            
+
+            role.visualRigFollower?.ApplyFollow(role.sittingIdle, true);
+            role.rigFollower?.ApplyFollow(role.sittingIdle, true);
+        }
         //damit avatar im Sitting Idle ist, während der Aufnahme, das wird hier im conversationStage von RecordingBegin gerufen. 
         public void ApplyRecordingAvatarPoseForRole(int roleIndex)
         {
@@ -424,6 +478,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
         }
 
+//Hier muss noch eine Lösung für PlaybackFullConversationState gefunden werden, keine Figur soll sich jeweils selber anschauen...
         public void ReactiveIdleStart(List<int> reactiveIdles, int speakerRoleIndex)
         {
             if (reactiveIdles == null) return;
@@ -431,10 +486,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
             for (int i = 0; i < reactiveIdles.Count; i++)
             {
                 int roleIndex = reactiveIdles[i];
+                
                 _reactiveIdleController.SetRoleToIdleLookingAt(roleIndex, speakerRoleIndex, SeatedMode);
             }
         }
 
+//Hier muss noch eine Lösung für PlaybackFullConversationState gefunden werden, keine Figur soll sich jeweils selber anschauen...
+// aber speakerRoleIndex ist hier das Target für alle reactiveIdles, das heisst
         public void ReactiveIdleTick(List<int> reactiveIdles, List<int> playbacks, int speakerRoleIndex, float dt)
         {
             if (reactiveIdles == null) return;

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+using AppV2.Runtime.Scripts.Dialogue.Services;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -34,6 +35,12 @@ namespace AppV2.Runtime.Scripts.Rig
             {
                 var role = _roles[i];
 
+                var startRootPose = new TransformData();
+
+                startRootPose.LocalPosition = RolePlacementUtility.GetCirclePlacementPosition(i, _roles.Count);
+                startRootPose.LocalRotation = RolePlacementUtility.GetCirclePlacementRotation(startRootPose.LocalPosition);
+
+               
                 result.Add(new ConversationRoleMeta
                 {
                     RoleId = role.roleId,
@@ -41,6 +48,7 @@ namespace AppV2.Runtime.Scripts.Rig
                     RoleName = role.avatarName,
                     HeightOfRoleCm = role.heightOfRoleCm,
                     SittingIdle = role.sittingIdle,
+                    StartRootPose= startRootPose,
                     Calibration = CaptureCalibration(role)
                 });
             }

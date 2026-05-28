@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using AppV2.Runtime.Scripts.Dialogue.Services;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -9,6 +10,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int _currentRoleIndexForPlacement;
         private bool selectableNext;
 
+        private int _roleCount;
         private List<int> _allRolesIndices;
 
 
@@ -28,6 +30,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             Debug.Log("[AvatarPlacementState] Enter");
 
+            _roleCount = _flow.Stage.roleCount;
             selectableNext = _flow.Stage.selectableNext;
             _allRolesIndices = new List<int>();
             _currentRoleIndexForPlacement = 0;
@@ -73,12 +76,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 return;
             }
 
-            Vector3 placement = GetTestPlacementPosition(_currentRoleIndexForPlacement);
+            //Vector3 placement = GetTestPlacementPosition(_currentRoleIndexForPlacement);
+            Vector3 placement = RolePlacementUtility.GetCirclePlacementPosition(_currentRoleIndexForPlacement, _roleCount);
+
+            Quaternion rotation = RolePlacementUtility.GetCirclePlacementRotation(placement);
 
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 _currentRoleIndexForPlacement,
                 placement,
-                lookAt
+                rotation
             );
 
             _currentRoleIndexForPlacement++;

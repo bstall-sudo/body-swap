@@ -24,6 +24,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public int HeightOfRoleCm;
         public bool SittingIdle;
 
+        public TransformData StartRootPose;
+
         public RoleCalibrationData Calibration = new();
     }
 

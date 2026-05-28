@@ -63,6 +63,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.ApplyActiveRoleEmbodimentHeight(toBeRecorded);
                 //Anpassung Grösse der Welt an Rollengrösse anpassen.
                 //_flow.Stage.ApplyVisualScaleToConversationStage(toBeRecorded);
+                _flow.Stage.ValidateFootSolver(toBeRecorded);
             }
             
             reactiveIdles = _flow._data.ReactiveIdles;
