@@ -71,7 +71,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.StatusUI != null)
             {
-                _flow.StatusUI.ShowChooseSpeakerState();
+                _flow.StatusUI.ShowChooseSpeakerState();                
+                
+                _flow.StatusUI.ShowCustomCue(
+                    "Wähle Figur Modus.\n",
+                    new Vector2(0f, 180f),
+                    new Vector2(200f, 0f),
+                    Color.red
+                );
             }
             
 

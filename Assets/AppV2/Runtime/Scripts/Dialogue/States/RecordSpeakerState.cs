@@ -99,7 +99,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.StatusUI != null)
             {
                 _flow.StatusUI.ShowSpeakerState();
-                _flow.StatusUI.ShowTransitionToSpeaker();
+                _flow.StatusUI.ShowCustomCue(
+                    "SPRICH! AUFNAHME LÄUFT",
+                    new Vector2(0f, 180f),
+                    new Vector2(500f, 0f),
+                    Color.red
+                );
+                
             }
             
             
@@ -108,6 +114,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.ApplyActiveRoleEmbodimentHeight(toBeRecorded);
                 //Anpassung Grösse der Welt an Rollengrösse anpassen.
                 //_flow.Stage.ApplyVisualScaleToConversationStage(toBeRecorded);
+
+                //Start Record Haptik Feedback
+                _flow.Stage.haptics.Click();
             }
 
             //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren

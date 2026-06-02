@@ -150,6 +150,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform XrLeftFoot;
         public Transform XrRightFoot;
 
+        //Referenz für den haptischen Feedback
+        [SerializeField] public HapticsService haptics;
+        
+        public HapticsService HapticsService  => haptics;
+
         [SerializeField] private float fallbackFootSpacing = 0.2f;
         [SerializeField] private float fallbackHipHeight = 0.9f;
 

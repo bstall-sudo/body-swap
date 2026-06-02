@@ -12,6 +12,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private bool _seatedMode;
 
+        private bool _isCalibrationFinished = false;
+
         private bool _rolesSetToPlayerPosition =false;
 
         private StagePose _playerPosRot;
@@ -92,8 +94,33 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumeSecondaryAction())
             {
+                if (_isCalibrationFinished)
+                {
+                    FinishCalibration();
+
+                }
+                else
+                {
+                    _flow.Stage.haptics.Error();
+                    if (_flow.StatusUI != null)
+                    {
+                                   
+                        _flow.StatusUI.ShowCustomCue(
+                            "Beende Kalibrierung mit linkem Trigger, bevor du rechts klickst.\n"
+                            +
+                            "\n" +
+                            "Überprüfe: \n linker Controller -> linke Hand, \nrechter Controller -> rechte Hand :)",
+                            new Vector2(0f, 180f),
+                            new Vector2(500f, 0f),
+                            Color.red
+                        );
+                        
+        
+                    }
+
+                }
                 //UnityEngine.Debug.Log($"[CalibrationState] ConsumeSecondaryAction was called");
-                FinishCalibration();
+                
             }
         }
 
