@@ -19,6 +19,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Stage Root Transforms (self)")]
         public Transform _stageRoot; // this transform
 
+        //Das wird benötigt, um die Referenzen der Rollen automatisch auszufüllen
+        [SerializeField] private Transform rolesRoot;
+        private List<Transform> _allRoleRoots = new();
+
 
         [Header("Name for storage folder in ApplicationPersistentDataPath (nur ändern wenn wirklich nötig)")]
         [Header("")]
@@ -29,6 +33,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Roles")]
         [Min(1)]
         public int roleCount = 2;
+
+        private int maxRoleCount = 6;
         // This is used, so that CalibrationState can call Methods from AvatarRigFollower and AvatarRigDefinition 
         // e.g. set avatars visible invisible, set rot/pos of RolesVisual Targets (Cubes) to IkChainTargets.  
         [SerializeField] private AvatarCalibrationController avatarCalibration;
@@ -79,10 +85,23 @@ namespace AppV2.Runtime.Scripts.Dialogue
         // Unity kann Listen serialisieren, wenn das Element [Serializable] ist
         public List<RoleRig> roles = new List<RoleRig>();
 
-        // Wird im Editor aufgerufen, wenn du Werte im Inspector änderst
+
+
+        // Wird im Editor aufgerufen, wenn Werte im Inspector geändert werden, für Standalone löschen
         private void OnValidate()
         {
+            BuildAllRoleRoots();
+            BuildActiveRoles();
+            ApplyRoleCount();
+ 
+        }
+
+        //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
+        private void BuildActiveRoles()
+        {
             roleCount = Mathf.Max(1, roleCount);
+            roleCount = Mathf.Min(maxRoleCount, roleCount);
+            
 
             if (roles == null) roles = new List<RoleRig>();
 
@@ -104,13 +123,40 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // Falls roleId leer ist, setzen
             for (int i = 0; i < roles.Count; i++)
             {
-                if (string.IsNullOrWhiteSpace(roles[i].roleId))
-                    roles[i].roleId = DefaultRoleId(i);
+                RoleRig role = roles[i];
 
-                    roles[i].ResolveAvatarName(false);
+                if (string.IsNullOrWhiteSpace(role.roleId))
+                    role.roleId = DefaultRoleId(i);
+
+                if (rolesRoot != null)
+                {
+                    string roleRootName = $"Role{role.roleId}";
+                    role.roleRoot = rolesRoot.Find(roleRootName);
+                }
+
+                if (role.roleRoot != null)
+                {
+                    role.AutoResolveReferences();
+                    role.ResolveAvatarName(false);
+                }
             }
         }
+        
+        private void BuildAllRoleRoots()
+        {
+            _allRoleRoots.Clear();
 
+            foreach (Transform child in rolesRoot)
+            {
+                if (child.name.StartsWith("Role"))
+                {
+                    _allRoleRoots.Add(child);
+                    UnityEngine.Debug.Log($"[ApplyRoleCount] {child.name}");
+                }
+
+            }
+        }
+        
         private static string DefaultRoleId(int index)
         {
             // 0->A, 1->B, 2->C ... danach Role 27 etc.
@@ -119,7 +165,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
             return $"Role {index + 1}";
         }
 
-        //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
+        //nicht benötigte Rollen werden deaktiviert.
+        public void ApplyRoleCount()
+        {
+            
+
+            for (int i = 0; i < _allRoleRoots.Count; i++)
+            {
+                bool active = i < roleCount;
+
+                
+                _allRoleRoots[i].gameObject.SetActive(active);
+
+                UnityEngine.Debug.Log($"[ApplyRoleCount] Role{_allRoleRoots[i].name} was SetActive= {active}");
+            }
+        }
+
 
         public IInputTransformsProvider _input;
         private XRInputTransforms _xrInput;
@@ -173,6 +234,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void Awake()
         {
+            BuildAllRoleRoots();
+            BuildActiveRoles();
+            ApplyRoleCount();
+
             _takeIndex = new SessionTakeIndex();
             _store = new SessionStore(_storageFolderName);
 

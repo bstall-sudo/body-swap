@@ -9,6 +9,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
     public class RoleRig
     {
         public string roleId;                 // z.B. "A", "B", "C" oder "Role 1"
+
+        public Transform roleRoot;
         public Transform root;
         public Transform head;
         public Transform leftHand;
@@ -59,6 +61,59 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         [Tooltip("If true, heightOfRoleCm will be initialized from the player height once.")]
         public bool usePlayerHeightAsDefault = true;
+
+    
+        public void AutoResolveReferences()
+        {
+            if (roleRoot == null)
+            {
+                Debug.LogWarning("[RoleRig] roleRoot is null.");
+                return;
+            }
+
+            Transform technicalRoot = roleRoot.Find("TechnicalRoot");
+            Transform visualRoot = roleRoot.Find("VisualRoot");
+            Transform avatarContainer = roleRoot.Find("Avatar");
+
+            if (technicalRoot != null)
+            {
+                root = technicalRoot;
+                head = technicalRoot.Find("head");
+                leftHand = technicalRoot.Find("leftHand");
+                rightHand = technicalRoot.Find("rightHand");
+                hip = technicalRoot.Find("hip");
+                leftFoot = technicalRoot.Find("leftFoot");
+                rightFoot = technicalRoot.Find("rightFoot");
+
+                audioSource = technicalRoot.GetComponentInChildren<AudioSource>(true);
+
+                hipSolver = technicalRoot.GetComponentInChildren<ProceduralHipSolver>(true);
+                leftFootSolver = leftFoot?.GetComponent<ProceduralFootSolver>();
+                rightFootSolver = rightFoot?.GetComponent<ProceduralFootSolver>();
+            }
+
+            if (visualRoot != null)
+            {
+                visualRigRoot = visualRoot.Find("ScaleRoot/visualRigRoot");
+
+                visualRolesVisibility = visualRoot.GetComponentInChildren<RolesVisualsSetVisibility>(true);
+                visualRigFollower = visualRoot.GetComponentInChildren<VisualRigFollower>(true);
+            }
+
+            if (avatarContainer != null)
+            {
+                avatarRoot = avatarContainer;
+
+                avatar = avatarRoot.GetComponentInChildren<AvatarRigDefinition>(true);
+                rigFollower = avatarRoot.GetComponentInChildren<AvatarRigFollower>(true);
+
+                ResolveAvatarName();
+            }
+
+            Debug.Log($"[RoleRig] Resolved {roleId}");
+        }    
+
+
 
         public void ResolveAvatarName(bool logWarnings = false)
         {
