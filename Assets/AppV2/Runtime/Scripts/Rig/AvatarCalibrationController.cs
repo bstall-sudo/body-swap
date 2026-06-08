@@ -143,7 +143,8 @@ namespace AppV2.Runtime.Scripts.Rig
             }
 
             Vector3 localPos = localFloorPosition;
-            localPos.y = role.root.localPosition.y;
+            //das deaktivieren, weil das überschreibt die GroundHeight Funktion mit der der InitialStartPos aus dem RoleRig
+            //localPos.y = role.root.localPosition.y;
 
             role.root.localPosition = localPos;
             role.root.localRotation = localRotation;

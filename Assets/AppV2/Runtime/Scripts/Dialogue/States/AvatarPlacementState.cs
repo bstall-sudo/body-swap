@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Dialogue.Services;
+using AppV2.Runtime.Scripts.Rig;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -79,7 +80,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //Vector3 placement = GetTestPlacementPosition(_currentRoleIndexForPlacement);
             Vector3 placement = RolePlacementUtility.GetCirclePlacementPosition(_currentRoleIndexForPlacement, _roleCount);
 
-            Quaternion rotation = RolePlacementUtility.GetCirclePlacementRotation(placement);
+            //y wird hier dem Terrain angeglichen.
+            placement.y = _flow.Stage.GetGroundYStageLocal(placement);
+
+            //hier nochmal flach machen, damit die Rotation nicht schief wird
+            Vector3 flatPlacement = placement;
+            flatPlacement.y = 0f;
+
+            Quaternion rotation = RolePlacementUtility.GetCirclePlacementRotation(flatPlacement);
 
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 _currentRoleIndexForPlacement,

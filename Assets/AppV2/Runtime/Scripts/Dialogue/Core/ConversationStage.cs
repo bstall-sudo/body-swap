@@ -62,6 +62,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
 
+        //damit der Player immer auf dem Boden steht, auch wenn der Boden mal nicht postion.y = 0 ist
+        [SerializeField] private GroundHeightProvider groundHeightProvider;
+
+        public GroundHeightProvider GroundHeightProvider => groundHeightProvider;
+
+        public float GetGroundYStageLocal(Vector3 stageLocalPosition)
+        {
+            if (groundHeightProvider == null)
+                return 0f;
+
+            return groundHeightProvider.GetGroundYStageLocal(stageLocalPosition);
+        }
+
         private RecordingController _recordingController;
         private PlaybackController _playbackController;
         private ReactiveIdleController _reactiveIdleController;
@@ -192,6 +205,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool FullBodyTrackers = false;
         public bool SeatedMode = false;
 
+        
+        public bool allowTeleportation = false;
+
         public bool ProceduralHipAndFeetMove = false;
         public bool AvatarPlacementAtStart = true;
 
@@ -203,6 +219,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool selectableNext = false;
 
         [Header("XR References")]
+
+        
         public Transform XrHead;
         public Transform XrLeftHand;
         public Transform XrRightHand;
@@ -210,6 +228,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform XrHip;
         public Transform XrLeftFoot;
         public Transform XrRightFoot;
+
+
+        [Header("XR Origin with")]
+        // um locomotion und teleportation an und aus zu schalten.
+        public XRLocomotionToggle xRLocomotionToggle;
 
         //Referenz für den haptischen Feedback
         [SerializeField] public HapticsService haptics;
@@ -279,7 +302,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     roles[i].ResolveAvatarName(true);
                 }
                 
-                _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex);
+                _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
                 _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex);
                 //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
@@ -335,13 +358,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 //UnityEngine.Debug.Log($"new _input was created");
 
+                //Anpassung von XR-Rig an Bodenhöhe
+                SnapXrOriginToGround();
                 //Das setzt den Anker für die Transforms siehe XRInputTransforms
                 _input.SetAnchorFromTakeRoot(_stageRoot);
                 //Für die Höhenanpassung der MainCamera bei Rollen mit unterschiedlichen Grössen
                 if (embodimentOffsetRoot != null)
                 {
-                    _baseCameraOffsetY = 0f;
+                    _baseCameraOffsetY = 0.0f;
+                    //_baseCameraOffsetY = embodimentOffsetRoot.localPosition.y;
                     //UnityEngine.Debug.Log($"Base CameraOffset Y = {_baseCameraOffsetY}");
+                }
+                if (allowTeleportation)
+                {
+                    xRLocomotionToggle.SetLocomotionEnabled(true);
+                }
+                else
+                {
+                    xRLocomotionToggle.SetLocomotionEnabled(false);
                 }
                     
 
@@ -358,6 +392,30 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //used in ChooseSpeakerState to select next speaker
             chooseSpeakerController.Initialize(roles);
 
+        }
+
+        //damit passt man xr-Origin.position.y dem Terrain an
+        public void SnapXrOriginToGround()
+        {
+            if (XrOrigin == null || groundHeightProvider == null)
+                return;
+
+            Vector3 originWorld = XrOrigin.position;
+
+            Vector3 originStageLocal =
+                _stageRoot.InverseTransformPoint(originWorld);
+
+            float groundYStage =
+                groundHeightProvider.GetGroundYStageLocal(originStageLocal);
+
+            Vector3 groundStageLocal = originStageLocal;
+            groundStageLocal.y = groundYStage;
+
+            Vector3 groundWorld =
+                _stageRoot.TransformPoint(groundStageLocal);
+
+            originWorld.y = groundWorld.y;
+            XrOrigin.position = originWorld;
         }
 
         public void SaveTargetTransformsAfterCalibration(){
@@ -431,6 +489,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         heightOfPlayerCm,
                         sceneCount,
                         sessionId
+                    
                     );
                 }
                 else
@@ -603,7 +662,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
             //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
 
-            _playbackController.InitializeFromSession(roles, _store, _takeIndex, latestSessionId);
+            _playbackController.InitializeFromSession(roles, _store, _takeIndex, latestSessionId, groundHeightProvider);
             return latestSessionId;
         }
 
@@ -611,7 +670,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void InitializePlaybackFromSession(string sessionId)
         {
             
-            _playbackController.InitializeFromSession(roles, _store, _takeIndex, sessionId);
+            _playbackController.InitializeFromSession(roles, _store, _takeIndex, sessionId, groundHeightProvider);
         }
                         
         //Diese Funktion stellt die Execution-Order sicher.
@@ -750,7 +809,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 hipStageForBody.y -= embodimentDeltaY;
 
                 bodyPos = hipStageForBody;
-                bodyPos.y = 0f;
+                //bodyPos.y = 0f;
+                bodyPos.y = GetGroundYStageLocal(bodyPos);
 
                 yaw = hipRotStageForBody.eulerAngles.y;
             }
@@ -758,7 +818,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             else
             {
                 bodyPos = headStage;
-                bodyPos.y = 0f;
+                //bodyPos.y = 0f;
+                bodyPos.y = GetGroundYStageLocal(bodyPos);
 
                 yaw = headRotStage.eulerAngles.y;
             }
@@ -1003,6 +1064,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.LogWarning($"No last Body end pose found for roleIndex {roleIndex}");
                 return;
             }
+            //das hier holt die aktuelle Bodenhöhe
+            targetBodyPosLocal.y = GetGroundYStageLocal(targetBodyPosLocal);
 
             if (!_recordingController.TryGetLastHeadEndPose(roleIndex, out Vector3 targetHeadPosBodyLocal, out float targetHeadYawLocal))
             {
@@ -1135,6 +1198,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return;
             }
 
+            //das hier holt die aktuelle Bodenhöhe
+            targetBodyPosLocal.y = GetGroundYStageLocal(targetBodyPosLocal);
+
             Vector3 targetRootWorld = _stageRoot.TransformPoint(targetBodyPosLocal);
             Quaternion targetRootRotWorld =
                 _stageRoot.rotation * Quaternion.Euler(0f, targetBodyYaw, 0f);
@@ -1258,27 +1324,27 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             if (XrHead == null)
             {
-                UnityEngine.Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] XrHead not found!");
+                Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] XrHead not found!");
                 return default;
             }
 
             if (_stageRoot == null)
             {
-                UnityEngine.Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] _stageRoot not found!");
+                Debug.LogError("[GetPlayerPosRotForSeatedModeRigCalibration] _stageRoot not found!");
                 return default;
             }
 
-            Vector3 worldPos = XrHead.position;
-            worldPos.y = 0f;
+            Vector3 stageLocalPos =
+                _stageRoot.InverseTransformPoint(XrHead.position);
 
-            Quaternion worldRot = Quaternion.Euler(
-                0f,
-                YawOf(XrHead.rotation),
-                0f
-            );
+            stageLocalPos.y =
+                GetGroundYStageLocal(stageLocalPos);
 
-            Vector3 stageLocalPos = _stageRoot.InverseTransformPoint(worldPos);
-            Quaternion stageLocalRot = Quaternion.Inverse(_stageRoot.rotation) * worldRot;
+            Quaternion worldRot =
+                Quaternion.Euler(0f, YawOf(XrHead.rotation), 0f);
+
+            Quaternion stageLocalRot =
+                Quaternion.Inverse(_stageRoot.rotation) * worldRot;
 
             return new StagePose
             {

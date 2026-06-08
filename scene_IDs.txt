@@ -19,4 +19,8 @@ fcf166881d974a5c83baed58652053c1
 (State1: Player in RoleA speaking is redorded, RoleB idle) ->(State1Switch: Player switches Role from RoleA to RoleB) (State2: Player in RoleB is listening and is recorded, RoleA is in Playback mode) ->(State3: Player in Role B speaks and is recorded, RoleB idle) -> (State3Switch: Player switches Role from RoleB to RoleA) -> (State4: Player in RoleA is listening and is recorded, RoleB is in Playback mode)
 
 grosser grüner Junge:
-2026-03-27-UTC-14-05-06_81
+C:\Users\berto\AppData\LocalLow\DefaultCompany\BodySwap\SessionRecordingData\Sessions\2026-03-27-UTC-14-05-06_81
+
+
+erstes mal mit locomotion:
+C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-08-UTC-09-50-31_85

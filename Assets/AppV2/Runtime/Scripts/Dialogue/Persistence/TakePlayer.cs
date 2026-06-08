@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using AppV2.Runtime.Scripts.Rig;
 
 namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 {
@@ -15,6 +15,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         private readonly Transform _rightFootT;
         private readonly AudioSource _audio;
 
+        private readonly GroundHeightProvider _groundHeightProvider;
         private TakeData _take;
         private int _i;
         private double _dspStart;
@@ -26,11 +27,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public bool IsPlaying => _playing;
 
-        public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, Transform hip, Transform leftFoot, Transform rightFoot, AudioSource audio)
+        public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, Transform hip, Transform leftFoot, Transform rightFoot, AudioSource audio, GroundHeightProvider groundHeightProvider)
         {
             _actorRoot = actorRoot;
             _headT = head; _leftT = left; _rightT = right; _hipT = hip; _leftFootT = leftFoot; _rightFootT = rightFoot;
             _audio = audio;
+            _groundHeightProvider = groundHeightProvider;
         }
 
         // das ist wichtig um die Figur in der skalierten Grösse abzuspielen, wenn das nicht gerufen wird, wird 1:1 abgespielt.
@@ -122,6 +124,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             float u = (dt > 0.0001f) ? Mathf.Clamp01((t - a.T) / dt) : 0f;
 
             Vector3 bodyPos = Vector3.Lerp(a.Body.Pos, b.Body.Pos, u);
+            if (_groundHeightProvider != null) bodyPos.y = _groundHeightProvider.GetGroundYStageLocal(bodyPos);
+
             float bodyYaw = Mathf.LerpAngle(a.Body.YawDeg, b.Body.YawDeg, u);
 
             _actorRoot.localPosition = bodyPos;
@@ -169,8 +173,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         private void ApplyFrame(Frame f)
         {
             _actorRoot.localPosition = f.Body.Pos;
+            /*
+            if (_groundHeightProvider != null) _actorRoot.y = _groundHeightProvider.GetGroundYStageLocal(bodyPos);
             _actorRoot.localRotation = Quaternion.Euler(0f, f.Body.YawDeg, 0f);
 
+            */
+            
             if (_headT)
             {
                 _headT.localPosition = f.Head.Pos; // * _roleScale;  //als Test, weil RoleX_ScaleRoot ist ja auch schon skaliert. Daher ist das hier vielleicht nicht nötig.

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+using AppV2.Runtime.Scripts.Rig;
 // das braucht man für .All()
 using System.Linq;
 
@@ -23,27 +24,31 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private SessionTakeIndex _takeIndex;
         private float _playerHeightCm;
 
+        //wichtig für die Anpassung des y-position zum Terrain
+        private GroundHeightProvider _groundHeightProvider;
+
         private float _roleScale;
 
-        public void Initialize(List<RoleRig> roles, float playerHeigthCm, SessionStore sessionStore , SessionTakeIndex takeIndex){
+        public void Initialize(List<RoleRig> roles, float playerHeigthCm, SessionStore sessionStore , SessionTakeIndex takeIndex, GroundHeightProvider groundHeightProvider){
             _playerHeightCm = playerHeigthCm;
             _store = sessionStore;
             _takeIndex = takeIndex;
-            InitializePlayers(roles);
+            _groundHeightProvider = groundHeightProvider;
+            InitializePlayers(roles, _groundHeightProvider);
         }
         
-        public void InitializeFromSession(List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, string sessionId)
+        public void InitializeFromSession(List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, string sessionId, GroundHeightProvider groundHeightProvider)
         {
             _store = sessionStore;
             _takeIndex = takeIndex;
 
             _session = _store.LoadSessionModel(sessionId);
             _takeIndex.RebuildFromSession(_session);
-
-            InitializePlayers(roles);
+            _groundHeightProvider = groundHeightProvider;
+            InitializePlayers(roles, _groundHeightProvider);
         }
 
-        private void InitializePlayers(List<RoleRig> roles)
+        private void InitializePlayers(List<RoleRig> roles, GroundHeightProvider groundHeightProvider)
         {
             players = new List<TakePlayer>();
 
@@ -61,7 +66,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     roles[i].hip,
                     roles[i].leftFoot,
                     roles[i].rightFoot,
-                    roles[i].audioSource
+                    roles[i].audioSource,
+                    groundHeightProvider
                 );
 
 

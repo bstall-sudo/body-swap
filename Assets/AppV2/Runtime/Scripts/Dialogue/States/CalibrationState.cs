@@ -35,6 +35,23 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _seatedMode = _flow.Stage.SeatedMode;
 
 
+            //alle Rollen auf Bodenhöhe Plazieren.
+            for (int i = 0; i < _flow.Stage.roleCount; i++){
+
+                Vector3 placement = Vector3.zero;
+                placement.y = _flow.Stage.GetGroundYStageLocal(placement);
+
+                UnityEngine.Debug.Log($"placement is: {placement}");
+
+                Quaternion rotation = Quaternion.identity;
+
+                _flow.Stage.AvatarCalibration.PlaceRoleAt(
+                    i,
+                    placement,
+                    rotation
+                );
+
+            }
 
             _currentRoleIndexForCalibration = 0;
             _avatarPlacementAtStart = _flow.Stage.AvatarPlacementAtStart;

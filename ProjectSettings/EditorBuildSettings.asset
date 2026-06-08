@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/BasicGaiaLocomotion.unity
+    guid: 4aa3a1a14a4a6cc4098e64020bbca1b5
+  - enabled: 1
+    path: Assets/Scenes/Basic_with_gaia.unity
+    guid: 12dde024467b3fc4fae1d50afae180aa
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 55daccc09a3b69647bbab145b54a3ab3
   m_configObjects:
