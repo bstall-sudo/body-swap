@@ -24,3 +24,6 @@ C:\Users\berto\AppData\LocalLow\DefaultCompany\BodySwap\SessionRecordingData\Ses
 
 erstes mal mit locomotion:
 C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-08-UTC-09-50-31_85
+
+interesting:
+C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-09-UTC-08-11-27_95

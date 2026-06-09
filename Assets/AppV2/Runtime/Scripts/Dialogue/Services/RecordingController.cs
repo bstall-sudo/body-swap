@@ -25,6 +25,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private SessionTakeIndex _takeIndex;
 
         public List<RoleRig> _roles;
+
+        public string EnvironmentId; 
       
 
         // Pending finalize state
@@ -58,7 +60,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private int _currentSceneCount = -1;
 
 
-        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex)
+        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, string environmentId)
         {
             _roles = roles;
             _hasDesiredStartList = new List<bool>(new bool[roleCount]);
@@ -84,7 +86,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             _session = new SessionModel
             {
                 SessionId = sessionId,
-                CreatedUtc = DateTime.UtcNow.ToString("o")
+                CreatedUtc = DateTime.UtcNow.ToString("o"),
+
+                EnvironmentId = environmentId,
+                RoleCount = roleCount,
+                SessionVersion = 1
                 
             };
             _store.SaveSessionModel(_session);

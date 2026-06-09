@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Input;
+using AppV2.Runtime.Scripts.Environment;
 
 
 using AppV2.Runtime.Scripts.DataStructures;
@@ -18,6 +19,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         [Header("Stage Root Transforms (self)")]
         public Transform _stageRoot; // this transform
+        [Header("Environment")]
+        [SerializeField] public EnvironmentLoader environmentLoader;
+        [SerializeField] private string selectedEnvironmentId = "default";
+        public string SelectedEnvironmentId => selectedEnvironmentId;
 
         //Das wird benötigt, um die Referenzen der Rollen automatisch auszufüllen
         [SerializeField] private Transform rolesRoot;
@@ -257,6 +262,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void Awake()
         {
+            SelectEnvironment(selectedEnvironmentId);
+
+            
             BuildAllRoleRoots();
             BuildActiveRoles();
             ApplyRoleCount();
@@ -304,7 +312,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
-                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex);
+                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex, selectedEnvironmentId);
                 //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
                 // Das passiert im Exit von CalibrationState.
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
@@ -386,6 +394,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _input = new KeyboardInputTransforms();
             }
 
+            
+
             //Avatare Grösse anpassen
             ApplyAllRoleVisualScales();
 
@@ -393,6 +403,36 @@ namespace AppV2.Runtime.Scripts.Dialogue
             chooseSpeakerController.Initialize(roles);
 
         }
+
+        //später in eine andere Klasse verschieben
+        public void SelectEnvironment(string environmentId)
+        {
+            selectedEnvironmentId = environmentId;
+            environmentLoader.LoadEnvironment(environmentId);
+
+            //das muss noch dynamisch gemacht werden.
+            PlaceStageAtEnvironmentSpawn("default");
+        }
+
+        //
+        public void PlaceStageAtEnvironmentSpawn(string spawnId = "default")
+        {
+            StageSpawnPoint spawn = environmentLoader.GetSpawnPoint(spawnId);
+
+            if (spawn == null)
+            {
+                Debug.LogWarning($"No StageSpawnPoint found for spawnId: {spawnId}");
+                return;
+            }
+
+            _stageRoot.SetPositionAndRotation(
+                spawn.transform.position,
+                spawn.transform.rotation
+            );
+
+            Debug.Log($"[ConversationStage] StageRoot placed at spawn: {spawn.spawnId}");
+        }
+
 
         //damit passt man xr-Origin.position.y dem Terrain an
         public void SnapXrOriginToGround()

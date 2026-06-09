@@ -7,8 +7,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
     [Serializable]
     public class SessionModel
     {
+
         public string SessionId;
         public string CreatedUtc;
+
+        public int SessionVersion = 1;
+        public string EnvironmentId = "default";
+        public int RoleCount = 2;
+
 
         public List<ConversationRoleMeta> Roles = new();
         public List<TakeMeta> Takes = new();
@@ -23,6 +29,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public int HeightOfRoleCm;
         public bool SittingIdle;
+
 
         public TransformData StartRootPose;
 
