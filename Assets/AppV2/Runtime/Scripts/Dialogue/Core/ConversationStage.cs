@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Input;
-using AppV2.Runtime.Scripts.Environment;
+using AppV2.Runtime.Scripts.Loader;
 
 
 using AppV2.Runtime.Scripts.DataStructures;
@@ -21,8 +21,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform _stageRoot; // this transform
         [Header("Environment")]
         [SerializeField] public EnvironmentLoader environmentLoader;
-        [SerializeField] private string selectedEnvironmentId = "default";
-        public string SelectedEnvironmentId => selectedEnvironmentId;
+        [SerializeField] public SceneLoader sceneLoader;
+        [SerializeField] private string environmentId = "default";
+        public string EnvironmentId => environmentId;
+
+        [SerializeField] private string stageSpawnId = "default";
+        public string StageSpawnId => stageSpawnId;
 
         //Das wird benötigt, um die Referenzen der Rollen automatisch auszufüllen
         [SerializeField] private Transform rolesRoot;
@@ -33,6 +37,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("")]
         [SerializeField]
         public String _storageFolderName = "SessionRecordingData";
+
+        [Header("Ordnername für individuelle Session")]
+        public string _personalFolderName = "Sessions";
 
 
         [Header("Roles")]
@@ -64,6 +71,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Grösse des Spielers")]
         public float heightOfPlayerCm = 180f;
         public float heightOfSeatedPlayerCm = 133f;
+
+        [SerializeField] private float fallbackFootSpacing = 0.2f;
+        [SerializeField] private float fallbackHipHeight = 0.9f;
+
         public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
 
@@ -102,15 +113,17 @@ namespace AppV2.Runtime.Scripts.Dialogue
         //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
         // Unity kann Listen serialisieren, wenn das Element [Serializable] ist
         public List<RoleRig> roles = new List<RoleRig>();
-
+        public List<RoleRig> Roles => roles;
 
 
         // Wird im Editor aufgerufen, wenn Werte im Inspector geändert werden, für Standalone löschen
         private void OnValidate()
         {
-            BuildAllRoleRoots();
-            BuildActiveRoles();
-            ApplyRoleCount();
+            #if UNITY_EDITOR
+                BuildAllRoleRoots();
+                BuildActiveRoles();
+                //ApplyRoleCount();
+            #endif
  
         }
 
@@ -157,6 +170,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     role.AutoResolveReferences();
                     role.ResolveAvatarName(false);
                 }
+
+                UnityEngine.Debug.Log($"[BuildActiveRoles]:RoleCount is: {roleCount} | i is: {i}");
             }
         }
         
@@ -218,7 +233,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         [Header("Start im Playback Mode. Grundeinstellung: letzte Aufnahme, sonst SessionId")]
         public bool StartInPlaybackFullConversationMode = false;
-        public string FolderSessionId = "";
+        public string _sessionFolder = "";
 
         [Header("Kann der nächste Sprecher/Zuhörer gewählt werden")]
         public bool selectableNext = false;
@@ -244,8 +259,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         
         public HapticsService HapticsService  => haptics;
 
-        [SerializeField] private float fallbackFootSpacing = 0.2f;
-        [SerializeField] private float fallbackHipHeight = 0.9f;
+        
 
         // wird für StartPlayerAlignToActor gebraucht.
         //damit man beim RoleSwitch an die Stelle der anderen Figur teleportiert wird
@@ -262,37 +276,44 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void Awake()
         {
-            SelectEnvironment(selectedEnvironmentId);
-
+            
+            
             
             BuildAllRoleRoots();
             BuildActiveRoles();
             ApplyRoleCount();
 
             _takeIndex = new SessionTakeIndex();
-            _store = new SessionStore(_storageFolderName);
+            _store = new SessionStore(_storageFolderName, _personalFolderName);
 
             // das Playback-Objekt wird mit einer RoleRig-Liste und dem Ordnernamen initiiert
             _playbackController = new PlaybackController();
             _reactiveIdleController = new ReactiveIdleController();
 
 
+            //sceneLoader.LoadSessionScene(sessionId,_store,_takeIndex);
 
             if(StartInPlaybackFullConversationMode){
 
-                //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. Folder Id is: {FolderSessionId}");
-                if(FolderSessionId == ""){
-                    //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. FolderSessionId is Empty String : {FolderSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
+                
+                //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. Folder Id is: {_sessionFolder}");
+                if(_sessionFolder == ""){
+                    //_sessionFolder = _store.GetLatestSessionId();
+                    //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. _sessionFolder is Empty String : {_sessionFolder}+++++++++++++++++++++++++++++++++++++++++++++");
                     InitializePlaybackFromLatestSession();
 
                     
                 }else{
-                    InitializePlaybackFromSession(FolderSessionId);
+                    
+                    InitializePlaybackFromSession(_sessionFolder);
                     /*
-                    string folderAndSessionId = Path.Combine(_storageFolderName, FolderSessionId);
-                    UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. FolderSessionId is Empty String : {folderAndSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
+                    string folderAndSessionId = Path.Combine(_storageFolderName, _sessionFolder);
+                    UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. _sessionFolder is Empty String : {folderAndSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
                     _store = new SessionStore(folderAndSessionId);
                     */
+                    
+                    
+
                 }
                 _calibrationDataApplier = new RoleCalibrationDataApplier();
                 _calibrationDataApplier.Initialize(roles);
@@ -309,17 +330,33 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     roles[i].ResolveAvatarName(true);
                 }
+
                 
+
+                _sessionFolder = _store.CreateNewSessionFolder(out string sessionId);
+
+                _session = new SessionModel
+                {
+                    SessionId = sessionId,
+                    CreatedUtc = DateTime.UtcNow.ToString("o"),
+                    EnvironmentId = environmentId,
+                    StageSpawnId = stageSpawnId,
+                    RoleCount = roleCount,
+                    SessionVersion = 1
+                };
+                sceneLoader.LoadSceneForRecordingMode(environmentId,stageSpawnId,roles);
+                UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
+
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
-                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex, selectedEnvironmentId);
+                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex, _session);
                 //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
                 // Das passiert im Exit von CalibrationState.
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
                 _calibrationDataProvider.Initialize(roles); 
 
                 
-
+                
                 
             }
             //Für die Animation der Münder
@@ -337,6 +374,37 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             
         }
+
+        
+
+/// <summary>
+/// ///////////Das ist für den SceneLoader
+/// </summary>
+/// <param name="session"></param>
+        public void SetSession(SessionModel session)
+        {
+            _session = session;
+            environmentId = session.EnvironmentId;
+            stageSpawnId = session.StageSpawnId;
+            roleCount = session.RoleCount;
+            BuildAllRoleRoots();
+            //BuildActiveRoles();
+            //ApplyRoleCount();
+            
+        }
+
+        public void ApplyRoleCountFromSession(int count)
+        {
+            roleCount = count;
+            BuildActiveRoles();
+            ApplyRoleCount();
+        }
+
+
+
+/// <summary>
+/// ////////////////
+/// </summary>
         private void TurnOffVisibilityOfVisualRig()
         {
             //UnityEngine.Debug.Log("TurnOffVisibilityOfVisualRig was called");
@@ -350,6 +418,16 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void PlaceMirrorInFrontOfPlayer()
         {
             MirrorSetVisibility.PlaceMirrorInFrontOfAvatar(roles[0].visualRigRoot);
+        }
+
+        public void PlaceXrOriginAtStageOrigin()
+        {
+            if (XrOrigin == null || _stageRoot == null)
+                return;
+
+            XrOrigin.position = _stageRoot.position;
+            XrOrigin.rotation = _stageRoot.rotation;
+            UnityEngine.Debug.Log($"StageRootPosition is: {_stageRoot.position}");
         }
             
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -403,35 +481,23 @@ namespace AppV2.Runtime.Scripts.Dialogue
             chooseSpeakerController.Initialize(roles);
 
         }
-
-        //später in eine andere Klasse verschieben
-        public void SelectEnvironment(string environmentId)
+        public void SetEnvironmentId(string id)
         {
-            selectedEnvironmentId = environmentId;
-            environmentLoader.LoadEnvironment(environmentId);
-
-            //das muss noch dynamisch gemacht werden.
-            PlaceStageAtEnvironmentSpawn("default");
+            environmentId = id;
         }
 
-        //
-        public void PlaceStageAtEnvironmentSpawn(string spawnId = "default")
+        public void PlaceStageRoot(Transform spawn)
         {
-            StageSpawnPoint spawn = environmentLoader.GetSpawnPoint(spawnId);
-
-            if (spawn == null)
-            {
-                Debug.LogWarning($"No StageSpawnPoint found for spawnId: {spawnId}");
+            if (spawn == null || _stageRoot == null)
                 return;
-            }
 
             _stageRoot.SetPositionAndRotation(
-                spawn.transform.position,
-                spawn.transform.rotation
+                spawn.position,
+                spawn.rotation
             );
-
-            Debug.Log($"[ConversationStage] StageRoot placed at spawn: {spawn.spawnId}");
         }
+
+
 
 
         //damit passt man xr-Origin.position.y dem Terrain an
@@ -522,7 +588,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 if (_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta))
                 {
-                    string sessionId = takeMeta.SessionId;
+                    string sessionId = _session.SessionId;
+
+                    //string sessionId = _sessionFolder;
+
+                    UnityEngine.Debug.Log($"[PlaybackStart] sessionId is: {sessionId}");
 
                     _playbackController.PlaybackForIndexBegin(
                         roleIndex,
@@ -651,11 +721,17 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void ReactiveIdleStart(List<int> reactiveIdles, int speakerRoleIndex)
         {
             if (reactiveIdles == null) return;
-
+            
+          
             for (int i = 0; i < reactiveIdles.Count; i++)
             {
+               
                 int roleIndex = reactiveIdles[i];
+
                 
+                Vector3 pos = roles[roleIndex].root.localPosition;
+                pos.y = GetGroundYStageLocal(pos);
+                roles[roleIndex].root.localPosition = pos;
                 _reactiveIdleController.SetRoleToIdleLookingAt(roleIndex, speakerRoleIndex, SeatedMode);
             }
         }
@@ -691,26 +767,43 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         //wenn der Folder Session Id String leer is, dann soll die letzte Aufnahme geladen werden.
-        public string InitializePlaybackFromLatestSession()
+        public void InitializePlaybackFromLatestSession()
         {
             string latestSessionId = _store.GetLatestSessionId();
 
             if (string.IsNullOrEmpty(latestSessionId))
             {
                 UnityEngine.Debug.LogError("ConversationStage.InitializePlaybackFromLatestSession: No latest session found.");
-                return null;
+                
             }
-            //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}+++++++++++++++++++++++++++++++++++++++++++++");
-
-            _playbackController.InitializeFromSession(roles, _store, _takeIndex, latestSessionId, groundHeightProvider);
-            return latestSessionId;
+            UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}");
+            InitializePlaybackFromSession(latestSessionId);
+            //_playbackController.InitializeFromSession(roles, _store, _takeIndex, _session, groundHeightProvider);
+            
         }
 
 
         public void InitializePlaybackFromSession(string sessionId)
         {
-            
-            _playbackController.InitializeFromSession(roles, _store, _takeIndex, sessionId, groundHeightProvider);
+            SessionModel loadedSession =
+                sceneLoader.LoadSessionScene(sessionId, _store, _takeIndex);
+
+            if (loadedSession == null)
+            {
+                Debug.LogError($"[ConversationStage] Could not load session: {sessionId}");
+                return;
+            }
+
+            Debug.Log($"[ConversationStage] InitializePlaybackFromSession RoleCount is: {loadedSession.RoleCount} session: {sessionId}");
+            _session = loadedSession;
+
+            _playbackController.InitializeFromSession(
+                roles,
+                _store,
+                _takeIndex,
+                _session,
+                groundHeightProvider
+            );
         }
                         
         //Diese Funktion stellt die Execution-Order sicher.

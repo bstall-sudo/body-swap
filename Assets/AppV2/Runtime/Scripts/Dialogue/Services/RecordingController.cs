@@ -26,9 +26,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         public List<RoleRig> _roles;
 
-        public string EnvironmentId; 
-      
-
+    
         // Pending finalize state
         private bool _hasPendingFinalize;
         private int _pendingFinalizeTicksRemaining;
@@ -60,7 +58,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private int _currentSceneCount = -1;
 
 
-        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, string environmentId)
+        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, SessionModel session)
         {
             _roles = roles;
             _hasDesiredStartList = new List<bool>(new bool[roleCount]);
@@ -78,21 +76,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
 
             _store = _storeFromConversationStage; // 
-            sessionFolder = _store.CreateNewSessionFolder(out string sessionId);
+            sessionFolder = _store.GetCurrentSessionFolder();
 
             // in diesem Index ist verzeichnet, wo welcher Take gespeichert ist, jeweils für $"{sceneCount}:{roleIndex}" siehe SessionTakeIndex
             _takeIndex = takeIndex;
 
-            _session = new SessionModel
-            {
-                SessionId = sessionId,
-                CreatedUtc = DateTime.UtcNow.ToString("o"),
+            _session = session;
 
-                EnvironmentId = environmentId,
-                RoleCount = roleCount,
-                SessionVersion = 1
-                
-            };
             _store.SaveSessionModel(_session);
             //UnityEngine.Debug.Log("Session folder: " + sessionFolder);
         }
@@ -367,7 +357,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 // 3) Meta
                 var meta = new TakeMeta
                 {
-                    SessionId = _session.SessionId,
+                    //SessionId = _session.SessionId,
                     TakeId = takeId,
                     RoleId = roleId,
                     RoleIndex = roleIndex,

@@ -15,7 +15,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string EnvironmentId = "default";
         public int RoleCount = 2;
 
-
+        public string StageSpawnId = "default";
         public List<ConversationRoleMeta> Roles = new();
         public List<TakeMeta> Takes = new();
     }
@@ -24,14 +24,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
     public class ConversationRoleMeta
     {
         public string RoleId;
+
+        public string AvatarId;
+        public string AvatarSpawnId;
         public int RoleIndex;
         public string RoleName;
 
         public int HeightOfRoleCm;
         public bool SittingIdle;
 
+        public string RoleSpawnId = "default";
 
+        //das bezieht sich auf TechnicalRoot
         public TransformData StartRootPose;
+
+        //das bezieht sich bspw. auf RoleA/RoleB... nützlich für die Begegnung mit zuvor eingespielten Figuren.
+        public TransformData StartRoleRootPose;
 
         public RoleCalibrationData Calibration = new();
     }
@@ -58,7 +66,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
     [Serializable]
     public class TakeMeta
     {
-        public string SessionId;
+        //public string SessionId;
         public string TakeId;
         public string RoleId;
         public float DurationSec;

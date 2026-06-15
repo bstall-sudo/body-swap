@@ -72,9 +72,21 @@ namespace AppV2.Runtime.Scripts.Rig
                 return;
             }
 
+            Debug.Log(
+                $"[PlaceRoleAt AFTER ROOT] role={role.roleId}, " +
+                $"root.local={role.roleRoot.localPosition}, root.world={role.roleRoot.position}, " +
+                $"tech.local={role.root.localPosition}, tech.world={role.root.position}"
+            );
+            
+
             role.root.localPosition = playerStagePose.Position;
             role.root.localRotation = playerStagePose.Rotation;
 
+            Debug.Log(
+                $"[PlaceRoleAt AFTER ROOT] role={role.roleId}, " +
+                $"root.local={role.roleRoot.localPosition}, root.world={role.roleRoot.position}, " +
+                $"tech.local={role.root.localPosition}, tech.world={role.root.position}"
+            );
             /*
             role.visualRigRoot.localPosition = playerStagePose.Position;
             role.visualRigRoot.localRotation = playerStagePose.Rotation;
@@ -85,13 +97,15 @@ namespace AppV2.Runtime.Scripts.Rig
             // das wird jetzt durch die Zeilen oben erfüllt
             roles[roleIndex].visualRigFollower?.SetVisualRigToPlayerPosition();
             roles[roleIndex].rigFollower?.SetAvatarToPlayerPosition();
-            /*
+            
             UnityEngine.Debug.Log(
                 $"Role({roleIndex}) placed at localPosition: {playerStagePose.Position}, " +
                 $"localRotation: {playerStagePose.Rotation.eulerAngles}."
             );
-            */
+            
         }
+
+        
 
         public void CalibrateRole(int roleIndex)
         {

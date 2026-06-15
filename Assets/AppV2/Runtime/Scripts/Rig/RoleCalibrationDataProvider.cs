@@ -44,6 +44,8 @@ namespace AppV2.Runtime.Scripts.Rig
                 result.Add(new ConversationRoleMeta
                 {
                     RoleId = role.roleId,
+                    AvatarId = role.avatarId,
+                    AvatarSpawnId = role.avatarSpawnId,
                     RoleIndex = i,
                     RoleName = role.avatarName,
                     HeightOfRoleCm = role.heightOfRoleCm,

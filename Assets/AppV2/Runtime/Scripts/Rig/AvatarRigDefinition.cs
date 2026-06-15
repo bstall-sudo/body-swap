@@ -74,6 +74,12 @@ namespace AppV2.Runtime.Scripts.Rig
 
         private void Awake()
         {
+            //RefreshReferences();
+
+        }
+
+        public void RefreshReferences()
+        {
             if (animator == null)
                 animator = GetComponentInChildren<Animator>(true);
 
@@ -121,8 +127,6 @@ namespace AppV2.Runtime.Scripts.Rig
             CacheHeadRenderers();
 
             AutoFillLowerBodyIKs();
-
-   
         }
 
         [ContextMenu("Auto Fill Lower Body IKs")]

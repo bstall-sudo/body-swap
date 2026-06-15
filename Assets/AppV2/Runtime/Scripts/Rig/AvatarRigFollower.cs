@@ -50,11 +50,17 @@ namespace AppV2.Runtime.Scripts.Rig
 
         private void Awake()
         {
+            RefreshReferences();
+        }
+
+        public void RefreshReferences()
+        {
             if (avatarRoot == null)
                 avatarRoot = transform;
 
             if (autoBuildMapOnAwake)
                 BuildMap();
+            
         }
 
         [ContextMenu("Build Map")]

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace AppV2.Runtime.Scripts.Environment
+namespace AppV2.Runtime.Scripts.Loader
 {
     public class StageSpawnPoint : MonoBehaviour
     {

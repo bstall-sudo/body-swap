@@ -34,14 +34,20 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             _seatedMode = _flow.Stage.SeatedMode;
 
+            //um während der Kalibrierung eine neutrale Umgebung zu haben.
+            _flow.Stage.sceneLoader.EnterCalibrationEnvironment("default", "default");
+            UnityEngine.Debug.Log($"[Enter CalibrationState] Loaded environmentId is: default | stageSpawnId is: default");
+            
+            _flow.Stage.PlaceXrOriginAtStageOrigin();
 
             //alle Rollen auf Bodenhöhe Plazieren.
             for (int i = 0; i < _flow.Stage.roleCount; i++){
 
                 Vector3 placement = Vector3.zero;
-                placement.y = _flow.Stage.GetGroundYStageLocal(placement);
+                //placement.y = _flow.Stage.GetGroundYStageLocal(placement);
 
                 UnityEngine.Debug.Log($"placement is: {placement}");
+                
 
                 Quaternion rotation = Quaternion.identity;
 
@@ -151,7 +157,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.RolesVisualsVisibilityHandler.SetAllVisible(false);
             // reset XR-Cam position to level 0 again
             _flow.Stage.ResetEmbodimentHeight();
-            
+            _flow.Stage.sceneLoader.ExitCalibrationEnvironment();
         }
 
         private void ShowCurrentRoleOrFinish()

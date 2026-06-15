@@ -9,31 +9,57 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
     {
         private readonly string _appFolder;
 
-        private string sessionFolderName = "Sessions";
+        private string _currentSessionId;
 
-        public SessionStore(string appFolder = "AppData")
+        public string CurrentSessionId => _currentSessionId;
+
+        private string _sessionFolderName ;
+
+        public SessionStore(string appFolder = "AppData", string sessionFolderName = "Sessions")
         {
             _appFolder = appFolder;
+            _sessionFolderName = sessionFolderName;
         }
 
 
         
 
-        public string Root => Path.Combine(Application.persistentDataPath, _appFolder, sessionFolderName);
+        public string Root => Path.Combine(Application.persistentDataPath, _appFolder, _sessionFolderName);
 
         public string CreateNewSessionFolder(out string sessionId)
         {
             //sessionId = Guid.NewGuid().ToString("N");
             sessionId =  DateTime.UtcNow.ToString("yyyy-MM-dd-UTC-HH-mm-ss_ff");
+
+            _currentSessionId = sessionId; 
             string dir = Path.Combine(Root, sessionId);
             Directory.CreateDirectory(dir);
             return dir;
         }
 
-        //public string DirPathToCombineWithApplicationPersistentDataPath => Path.Combine( _appFolder, sessionFolderName, sessionId);
+        public string GetCurrentSessionFolder()
+        {
+            if (string.IsNullOrEmpty(_currentSessionId))
+            {
+                UnityEngine.Debug.LogError($"GetCurrentSessionFolder _currentSessionId={_currentSessionId}");
+                return null;
+            }
+            
+            return GetSessionFolder(_currentSessionId);
+        }
+
+        public void SetCurrentSession(string sessionId)
+        {
+            _currentSessionId = sessionId;
+        }
 
         public string GetSessionFolder(string sessionId)
-            => Path.Combine(Root, sessionId);
+        {
+            UnityEngine.Debug.Log($"[GetCurrentSessionFolder] _currentSessionId={Path.Combine(Root, sessionId)}");
+            return Path.Combine(Root, sessionId);
+
+        }
+        
 
         public string GetSessionJsonPath(string sessionId)
             => Path.Combine(GetSessionFolder(sessionId), "session.json");
@@ -80,15 +106,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             string latestDirectory = directories[^1];
             string latestSessionId = Path.GetFileName(latestDirectory);
 
-            //UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
+            UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
             return latestSessionId;
         }
 
-        public TakeData LoadTakeData(TakeMeta meta)
+        public TakeData LoadTakeData(TakeMeta meta, string sessionId)
         {
-            string sessionFolder = GetSessionFolder(meta.SessionId);
+            string sessionFolder = GetSessionFolder(sessionId);
+
+            UnityEngine.Debug.Log($"[LoadTakeData] sessionId={sessionId}, sessionFolder={sessionFolder}, framesFile={meta.FramesFile}");
 
             string framesPath = Path.Combine(sessionFolder, meta.FramesFile);
+            UnityEngine.Debug.Log($"[LoadTakeData] framesPath={framesPath}");
             string audioPath  = Path.Combine(sessionFolder, meta.AudioFile);
 
             // Frames laden

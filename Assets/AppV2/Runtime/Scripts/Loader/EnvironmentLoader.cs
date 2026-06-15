@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AppV2.Runtime.Scripts.Environment
+namespace AppV2.Runtime.Scripts.Loader
 {
     public class EnvironmentLoader : MonoBehaviour
     {
@@ -39,6 +39,22 @@ namespace AppV2.Runtime.Scripts.Environment
             );
 
             _currentEnvironment.name = entry.environmentId;
+
+            
+        }
+
+
+        public void LoadEnvironmentAtStageRoot(string environmentId, Transform stageRoot)
+        {
+            LoadEnvironment(environmentId);
+
+            if (_currentEnvironment == null || stageRoot == null)
+                return;
+
+            
+            _currentEnvironment.transform.position = stageRoot.position;
+            _currentEnvironment.transform.rotation = stageRoot.rotation;
+            
         }
 
         public StageSpawnPoint GetSpawnPoint(string spawnId = "default")

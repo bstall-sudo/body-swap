@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.Rig;
+using AppV2.Runtime.Scripts.Loader;
 
 namespace AppV2.Runtime.Scripts.DataStructures
 {
     [Serializable]
     public class RoleRig
     {
+        public string avatarId; 
+        public string avatarSpawnId= "";
         public string roleId;                 // z.B. "A", "B", "C" oder "Role 1"
+
+        public AvatarLoader avatarLoader;
 
         public Transform roleRoot;
         public Transform root;
@@ -74,6 +79,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             Transform technicalRoot = roleRoot.Find("TechnicalRoot");
             Transform visualRoot = roleRoot.Find("VisualRoot");
             Transform avatarContainer = roleRoot.Find("Avatar");
+            
 
             if (technicalRoot != null)
             {
@@ -106,6 +112,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
                 avatar = avatarRoot.GetComponentInChildren<AvatarRigDefinition>(true);
                 rigFollower = avatarRoot.GetComponentInChildren<AvatarRigFollower>(true);
+                avatarLoader = roleRoot.GetComponent<AvatarLoader>();
 
                 ResolveAvatarName();
             }

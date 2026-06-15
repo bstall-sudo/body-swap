@@ -37,13 +37,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             InitializePlayers(roles, _groundHeightProvider);
         }
         
-        public void InitializeFromSession(List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, string sessionId, GroundHeightProvider groundHeightProvider)
+        public void InitializeFromSession(List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, SessionModel session, GroundHeightProvider groundHeightProvider)
         {
             _store = sessionStore;
             _takeIndex = takeIndex;
 
-            _session = _store.LoadSessionModel(sessionId);
-            _takeIndex.RebuildFromSession(_session);
+            _session = session;
+
+            Debug.Log($"InitializeFrom Session: _session.SessionId is: {_session.SessionId}");
+            
             _groundHeightProvider = groundHeightProvider;
             InitializePlayers(roles, _groundHeightProvider);
         }
@@ -73,12 +75,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
                
 
-/*
+
                 UnityEngine.Debug.Log(
                     $"InitializePlayers: roleIndex={i}, roleId={roles[i].roleId}, " +
                     $"heightOfRoleCm={roles[i].heightOfRoleCm}, playerHeightCm={_playerHeightCm}"
                 );
-*/
+
                 players.Add(player);
             }
         }
@@ -96,7 +98,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         {
             if(_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta)){
 
-                    TakeData take = _store.LoadTakeData(takeMeta);
+                    UnityEngine.Debug.Log($"[PlaybackForIndexBegin] sessionId is: {sessionId}");
+
+                    TakeData take = _store.LoadTakeData(takeMeta, sessionId);
+
                     if (playerHeightCM > 0.01f)
                     {
                         _roleScale = (float)roles[roleIndex].heightOfRoleCm /playerHeightCM;
