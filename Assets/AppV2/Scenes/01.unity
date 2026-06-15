@@ -338,6 +338,7 @@ MonoBehaviour:
   stageSpawnId: default
   rolesRoot: {fileID: 446506845}
   _storageFolderName: SessionRecordingData
+  _personalFolderName: Sessions
   roleCount: 3
   avatarCalibration: {fileID: 32639114}
   rolesVisualsVisibilityHandler: {fileID: 32639115}
@@ -345,6 +346,8 @@ MonoBehaviour:
   mirrorSetVisibility: {fileID: 1942974801}
   heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 130
+  fallbackFootSpacing: 0.2
+  fallbackHipHeight: 0.9
   avatarBaseHeightCm: 180
   autoPlayerSizeRecognition: 0
   groundHeightProvider: {fileID: 42353635}
@@ -471,8 +474,6 @@ MonoBehaviour:
   XrRightFoot: {fileID: 355327816}
   xRLocomotionToggle: {fileID: 0}
   haptics: {fileID: 32639117}
-  fallbackFootSpacing: 0.2
-  fallbackHipHeight: 0.9
 --- !u!114 &32639114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10719,18 +10720,21 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: TurmBruecke_01
-  stageSpawnId: default
+  environmentId: Insel_01
+  stageSpawnId: 02
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  roleCount: 2
+  _personalFolderName: Sessions
+  roleCount: 4
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
   heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 130
-  avatarBaseHeightCm: 180
+  fallbackFootSpacing: 0.2
+  fallbackHipHeight: 1
+  avatarBaseHeightCm: 190
   autoPlayerSizeRecognition: 0
   groundHeightProvider: {fileID: 793401276}
   _session:
@@ -10760,8 +10764,8 @@ MonoBehaviour:
     leftFootSolver: {fileID: 755449715}
     rightFootSolver: {fileID: 1931955920}
     audioSource: {fileID: 1632719636}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
+    heightOfRoleCm: 0
+    heightOfSeatedRoleCm: 0
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
@@ -10775,7 +10779,7 @@ MonoBehaviour:
     visualRigFollower: {fileID: 2041661047}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
-  - avatarId: 
+  - avatarId: esel_001
     avatarSpawnId: 
     roleId: B
     avatarLoader: {fileID: 780788515}
@@ -10791,8 +10795,8 @@ MonoBehaviour:
     leftFootSolver: {fileID: 291678135}
     rightFootSolver: {fileID: 1140240598}
     audioSource: {fileID: 529194169}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
+    heightOfRoleCm: 0
+    heightOfSeatedRoleCm: 0
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
@@ -10806,14 +10810,76 @@ MonoBehaviour:
     visualRigFollower: {fileID: 1899071023}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
+  - avatarId: blaumann_001
+    avatarSpawnId: 
+    roleId: C
+    avatarLoader: {fileID: 1793231928}
+    roleRoot: {fileID: 1793231927}
+    root: {fileID: 2052147253}
+    head: {fileID: 1118498817}
+    leftHand: {fileID: 809324112}
+    rightHand: {fileID: 661055649}
+    leftFoot: {fileID: 491648282}
+    rightFoot: {fileID: 1803523710}
+    hip: {fileID: 1742463763}
+    hipSolver: {fileID: 1742463764}
+    leftFootSolver: {fileID: 491648278}
+    rightFootSolver: {fileID: 1803523711}
+    audioSource: {fileID: 124318373}
+    heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 133
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    visualRigRoot: {fileID: 2139258669}
+    visualRolesVisibility: {fileID: 1818411481}
+    sittingIdle: 0
+    avatarRoot: {fileID: 398669106}
+    avatarName: 
+    avatar: {fileID: 398669107}
+    rigFollower: {fileID: 398669108}
+    visualRigFollower: {fileID: 1818411482}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 1
+  - avatarId: baer_001
+    avatarSpawnId: 
+    roleId: D
+    avatarLoader: {fileID: 360767665}
+    roleRoot: {fileID: 360767664}
+    root: {fileID: 357661623}
+    head: {fileID: 1115465704}
+    leftHand: {fileID: 1420090155}
+    rightHand: {fileID: 878088444}
+    leftFoot: {fileID: 2068684918}
+    rightFoot: {fileID: 334393237}
+    hip: {fileID: 772746929}
+    hipSolver: {fileID: 772746930}
+    leftFootSolver: {fileID: 2068684914}
+    rightFootSolver: {fileID: 334393238}
+    audioSource: {fileID: 1032120564}
+    heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 133
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    visualRigRoot: {fileID: 752895107}
+    visualRolesVisibility: {fileID: 1176663728}
+    sittingIdle: 0
+    avatarRoot: {fileID: 350865735}
+    avatarName: 
+    avatar: {fileID: 350865736}
+    rigFollower: {fileID: 350865737}
+    visualRigFollower: {fileID: 1176663729}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 1
   UseXR: 1
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
   SeatedMode: 0
   allowTeleportation: 1
-  ProceduralHipAndFeetMove: 1
+  ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 0
+  StartInPlaybackFullConversationMode: 1
   _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
@@ -10825,8 +10891,6 @@ MonoBehaviour:
   XrRightFoot: {fileID: 1591742457}
   xRLocomotionToggle: {fileID: 1028122067}
   haptics: {fileID: 793401275}
-  fallbackFootSpacing: 0.2
-  fallbackHipHeight: 0.9
 --- !u!114 &793401275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20368,7 +20432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -25596,7 +25660,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -25607,7 +25671,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1748111377}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -29680,7 +29744,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -29691,7 +29755,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1998204077}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
