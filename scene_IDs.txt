@@ -30,3 +30,6 @@ C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecording
 
 Wortfindungsstörung
 C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-12-UTC-09-52-45_06
+
+VR-Laptop, spawn-point-02
+C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-16-UTC-09-38-59_56

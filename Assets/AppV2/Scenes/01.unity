@@ -3761,8 +3761,8 @@ MonoBehaviour:
     m_Bits: 8
   rayStartHeight: 1
   rayLength: 3
-  stepDistance: 0.28
-  stepLength: 0.3
+  stepDistance: 0.1
+  stepLength: 0.2
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
@@ -6401,8 +6401,8 @@ MonoBehaviour:
     m_Bits: 8
   rayStartHeight: 1
   rayLength: 3
-  stepDistance: 0.28
-  stepLength: 0.3
+  stepDistance: 0.1
+  stepLength: 0.2
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
@@ -10721,20 +10721,20 @@ MonoBehaviour:
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
   environmentId: Insel_01
-  stageSpawnId: 02
+  stageSpawnId: 
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
   _personalFolderName: Sessions
-  roleCount: 4
+  roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 180
-  heightOfSeatedPlayerCm: 130
+  heightOfPlayerCm: 130
+  heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
-  fallbackHipHeight: 1
-  avatarBaseHeightCm: 190
+  fallbackHipHeight: 0.65
+  avatarBaseHeightCm: 200
   autoPlayerSizeRecognition: 0
   groundHeightProvider: {fileID: 793401276}
   _session:
@@ -10810,76 +10810,14 @@ MonoBehaviour:
     visualRigFollower: {fileID: 1899071023}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
-  - avatarId: blaumann_001
-    avatarSpawnId: 
-    roleId: C
-    avatarLoader: {fileID: 1793231928}
-    roleRoot: {fileID: 1793231927}
-    root: {fileID: 2052147253}
-    head: {fileID: 1118498817}
-    leftHand: {fileID: 809324112}
-    rightHand: {fileID: 661055649}
-    leftFoot: {fileID: 491648282}
-    rightFoot: {fileID: 1803523710}
-    hip: {fileID: 1742463763}
-    hipSolver: {fileID: 1742463764}
-    leftFootSolver: {fileID: 491648278}
-    rightFootSolver: {fileID: 1803523711}
-    audioSource: {fileID: 124318373}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    visualRigRoot: {fileID: 2139258669}
-    visualRolesVisibility: {fileID: 1818411481}
-    sittingIdle: 0
-    avatarRoot: {fileID: 398669106}
-    avatarName: 
-    avatar: {fileID: 398669107}
-    rigFollower: {fileID: 398669108}
-    visualRigFollower: {fileID: 1818411482}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-  - avatarId: baer_001
-    avatarSpawnId: 
-    roleId: D
-    avatarLoader: {fileID: 360767665}
-    roleRoot: {fileID: 360767664}
-    root: {fileID: 357661623}
-    head: {fileID: 1115465704}
-    leftHand: {fileID: 1420090155}
-    rightHand: {fileID: 878088444}
-    leftFoot: {fileID: 2068684918}
-    rightFoot: {fileID: 334393237}
-    hip: {fileID: 772746929}
-    hipSolver: {fileID: 772746930}
-    leftFootSolver: {fileID: 2068684914}
-    rightFootSolver: {fileID: 334393238}
-    audioSource: {fileID: 1032120564}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    visualRigRoot: {fileID: 752895107}
-    visualRolesVisibility: {fileID: 1176663728}
-    sittingIdle: 0
-    avatarRoot: {fileID: 350865735}
-    avatarName: 
-    avatar: {fileID: 350865736}
-    rigFollower: {fileID: 350865737}
-    visualRigFollower: {fileID: 1176663729}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
   UseXR: 1
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
   SeatedMode: 0
   allowTeleportation: 1
-  ProceduralHipAndFeetMove: 0
+  ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 1
+  StartInPlaybackFullConversationMode: 0
   _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
@@ -16927,8 +16865,8 @@ MonoBehaviour:
     m_Bits: 8
   rayStartHeight: 1
   rayLength: 3
-  stepDistance: 0.28
-  stepLength: 0.3
+  stepDistance: 0.1
+  stepLength: 0.2
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
@@ -19221,7 +19159,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ...
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -26632,8 +26570,8 @@ MonoBehaviour:
     m_Bits: 8
   rayStartHeight: 1
   rayLength: 3
-  stepDistance: 0.28
-  stepLength: 0.3
+  stepDistance: 0.1
+  stepLength: 0.2
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5

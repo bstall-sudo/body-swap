@@ -1,0 +1,31 @@
+Internetverbindung:
+
+Congstar über Ethernet -> privates Netz
+Quest über WLAN Hubibub 5GHz
+
+Steam auf Computer starten
+SteamLink auf Quest starten -> verbinden
+
+Raum einrichten -> das weiter erforschen, manchmal ging es nicht über Laptop und manchmal ging es nicht über die Quest
+
+Anpassungen Rig:(Gegen das Zittern der Avatar-Körper bei kleinen Playern)
+RecordPlaybackMode(Rig)
+-hipTarget-> Multi-Position-Constraint Weight -> 0.472 Source Objects ->0.461
+-hipTarget->Multi-Rotation-Constraint Weight -> 0.427 Source Objects -> 0.427
+
+-headTarget -> Weight -> 0.4
+
+Das hat das Zittern beseitigt.
+
+Einstellungen ConversationStage:
+Height Of Player CM: 130
+Fallback Hip Height: 0.65
+Avatar Base Height Cm: 200
+
+Bei den Roles:
+Height of Role Cm: 0 -> dann werden automatisch die Height of Player übernommen
+Height of Seated Role Cm: 0
+
+Das hat einigermassen funktioniert:
+
+Bei den TechnicalRoot -> leftFoot, rightFoot -> Procedural Foot Solver -> Step Length, Step Distance anpassen

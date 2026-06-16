@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 796b75e345bd64d47a31edd757bd2670, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.ChainIKConstraint
-  m_Weight: 1
+  m_Weight: 0.415
   m_Data:
     m_Root: {fileID: 1069062335712905306}
     m_Tip: {fileID: 1507248730508737101}
@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c10bdb03db33fb148b858a4a3b646cea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.MultiPositionConstraint
-  m_Weight: 1
+  m_Weight: 0.49
   m_Data:
     m_ConstrainedObject: {fileID: 1069062335712905306}
     m_SourceObjects:
@@ -360,7 +360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb90b913935e644baaa86c076d788e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.MultiRotationConstraint
-  m_Weight: 1
+  m_Weight: 0.398
   m_Data:
     m_ConstrainedObject: {fileID: 1069062335712905306}
     m_SourceObjects:
