@@ -14,6 +14,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string avatarSpawnId= "";
         public string roleId;                 // z.B. "A", "B", "C" oder "Role 1"
 
+        public int roleIndex;
+
         [Header("Pre-Recorded Inputs")]
         public string sourceRoleId;        // z.B. "A"
         public string slotId;        // z.B. "A"

@@ -18,6 +18,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private bool _waitingForRecordingSave = false;
         private bool _isRecording;
         private List<int> reactiveIdles;
+        private List<int> indicesOfPassiveRoles;
 
         //das wird in ConsumeSecondaryAction auf true gesetzt, damit, sobald möglich in den PlaybackFullConversationState gewechselt werden kann.
         private bool _startWaitingToSwitchToFullPlayback = false;
@@ -56,6 +57,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             sceneCount = _flow._data.SceneCount;
             toBeRecorded = _flow._data.ToBeRecorded;
             playbacks = _flow._data.Playbacks;
+            indicesOfPassiveRoles = _flow._data.IndicesOfPassiveRoles;
 
             /*
             if(_isUsingXr){
@@ -142,6 +144,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
                 //_flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
+                //IsPlayerNearNpc(int roleIndex, Transform player, float radius)
+                _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3 );
+                
             }
 
             if(!_isRecording && _waitingForRecordingSave ){

@@ -56,7 +56,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _data.Initialize(Stage.roles);
             _startInPlaybackFullConversationMode = Stage.StartInPlaybackFullConversationMode;
             _xrMode = Stage.UseXR;
-            UnityEngine.Debug.Log($"[FlowController] roleCount is: {Stage.roleCount}");
+            UnityEngine.Debug.Log($"[FlowController] roleCount allRoles is: {Stage.roleCount} | activeRoles: {_data.ActiveRoleCount}");
         }
 
         private void OnDestroy()
@@ -116,7 +116,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             int selected = _data.SelectedNext;
 
             if(selected == -1){
-                nextSpeaker = _data.SceneCount  % _data.RoleCount;
+                nextSpeaker = _data.SceneCount  % _data.ActiveRoleCount;
                 //UnityEngine.Debug.Log($"Next Default Speaker has index: {nextSpeaker}");
                 //update Rollen, die im Idle sind in _data- object (FlowStateData)
                 RecSpeakStateSetReactiveIdles(nextSpeaker);
@@ -125,7 +125,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return nextSpeaker;
             }
             else{
-                if(selected > (_data.RoleCount -1) || selected < 0){
+                if(selected > (_data.ActiveRoleCount -1) || selected < 0){
                     UnityEngine.Debug.LogError($"selected Speaker index is out of Range");
                     return -1000;
                 }else{
@@ -155,8 +155,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 for(int i = 0; i < _data.RoleCount; i++)
                 {
-                    if(i != nextSpeaker){
-                        reactiveIdles.Add(i);
+                    if(_data.AllRoles[i].roleIndex != nextSpeaker){
+                        if (_data.AllRoles[i].isActiveConversationPartner)
+                        {
+                            reactiveIdles.Add(_data.AllRoles[i].roleIndex);
+                    
+                        }
+                        
                     }
                 }
                 _data.ReactiveIdles = reactiveIdles;
@@ -215,8 +220,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 for(int i = 0; i < _data.RoleCount; i++)
                 {
-                    if(i != nextSpeaker){
-                        reactiveIdles.Add(i);
+                    if(_data.AllRoles[i].roleIndex != nextSpeaker){
+                        if (_data.AllRoles[i].isActiveConversationPartner)
+                        {
+                            reactiveIdles.Add(_data.AllRoles[i].roleIndex);
+                    
+                        }
+                        
                     }
                 }
                 _data.ReactiveIdles = reactiveIdles;
@@ -228,7 +238,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             int selected = _data.SelectedNext;
 
             if(selected == -1){
-                nextSpeaker = _data.SceneCount  % _data.RoleCount;
+                nextSpeaker = _data.SceneCount  % _data.ActiveRoleCount;
                 //UnityEngine.Debug.Log($"Next Default Speaker has index: {nextSpeaker}");
                 //update Rollen, die im Idle sind in _data- object (FlowStateData)
                 SpeakerStateEnterSetLists(nextSpeaker);
@@ -270,9 +280,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 for(int i = 0; i < _data.RoleCount; i++)
                 {
-                    if(i != nextSpeaker){
-                        reactiveIdles.Add(i);
-                        UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] {i} was added to reactiveIdles.");
+                    if(_data.AllRoles[i].roleIndex != nextSpeaker){
+                        if (_data.AllRoles[i].isActiveConversationPartner)
+                        {
+                            reactiveIdles.Add(_data.AllRoles[i].roleIndex);
+                            UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] Role with Index{_data.AllRoles[i].roleIndex} was added to reactiveIdles.");
+                            
+                        }
+                        
                     }
                 }
                 _data.ReactiveIdles = reactiveIdles;
@@ -379,6 +394,76 @@ namespace AppV2.Runtime.Scripts.Dialogue
      
             
             return true;
+        }
+
+
+        public bool IsPlayerNearNpc(int roleIndex, Transform player, float radius)
+        {
+            if(roleIndex < 0 || roleIndex > _data.RoleCount)
+            {
+                UnityEngine.Debug.LogError("[FlowController]: roleIndex is out of Range");
+            }
+            RoleRig npc = _data.AllRoles[roleIndex];
+            float distance = Vector3.Distance(
+                npc.root.position,
+                player.position
+            );
+
+            return distance <= radius;
+        }
+
+        public void PlayerNearNpcs(
+            List<int> roleIndicesOfPassiveRoles,
+            int playerIndex,
+            float radius)
+        {
+            if (roleIndicesOfPassiveRoles == null)
+                return;
+
+            List<int> passiveSnapshot =
+                new List<int>(roleIndicesOfPassiveRoles);
+
+            foreach (int passiveIndex in passiveSnapshot)
+            {
+                if (!IsPlayerNearNpc(
+                        passiveIndex,
+                        _data.AllRoles[playerIndex].root,
+                        radius))
+                {
+                    continue;
+                }
+
+                RoleRig npc = _data.AllRoles[passiveIndex];
+                string currentNpcGroupId = npc.npcGroupId;
+
+                List<int> activatedIndices = new List<int>();
+
+                for (int i = 0; i < _data.AllRoles.Count; i++)
+                {
+                    RoleRig role = _data.AllRoles[i];
+
+                    if (role.npcGroupId != currentNpcGroupId)
+                        continue;
+
+                    _data.Roles.Add(role);
+                    _data.Playbacks.Add(i);
+                    activatedIndices.Add(i);
+                }
+
+                foreach (int index in activatedIndices)
+                {
+                    _data.IndicesOfPassiveRoles.Remove(index);
+                }
+
+                _data.ActiveRoleCount = _data.Roles.Count;
+                _data.SceneCount++;
+
+                UnityEngine.Debug.Log(
+                    $"Player came near NPC group: {currentNpcGroupId}");
+
+                SetState(new RecordListenersState(this));
+                return;
+            }
         }
         
 

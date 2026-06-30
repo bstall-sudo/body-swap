@@ -196,7 +196,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     role.slotId = role.roleId;
                 }
-                    
+
+                role.roleIndex = i;  
+                role.isActiveConversationPartner = true; 
 
                 if (rolesRoot != null)
                 {
@@ -270,6 +272,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 string slotId = DefaultRoleId(nextSlotIndex); // C, D, E ...
 
                 npcRole.slotId = slotId;
+
+                npcRole.roleIndex = nextSlotIndex;
+
+                npcRole.isActiveConversationPartner = false;
 
                 if (rolesRoot != null)
                 {

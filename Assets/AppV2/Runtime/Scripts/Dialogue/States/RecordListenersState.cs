@@ -10,6 +10,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int toBeRecorded;
         private int sceneCount;
         private List<int> reactiveIdles;
+        private List<int> indicesOfPassiveRoles;
         private List<int> playbacks;
 
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
@@ -62,6 +63,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
 
             toBeRecorded = _flow._data.ToBeRecorded;
+
+            indicesOfPassiveRoles = _flow._data.IndicesOfPassiveRoles;
             
             if(_isUsingXr){
                 //HöhenAnpassung der XR-Kamera.
@@ -93,6 +96,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
                 //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 _flow.Stage.PlaybackTick(playbacks);
+                _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3 );
                 
             }
 
