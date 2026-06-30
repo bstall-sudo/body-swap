@@ -15,16 +15,41 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         private string _sessionFolderName ;
 
-        public SessionStore(string appFolder = "AppData", string sessionFolderName = "Sessions")
-        {
-            _appFolder = appFolder;
-            _sessionFolderName = sessionFolderName;
+        private string _workshopFolderName ;
+
+        public SessionStore(string appFolder = "AppData", string workshopFolderName= "Workshop", string sessionFolderName = "Sessions") 
+        { 
+            _appFolder = appFolder; 
+            _workshopFolderName = workshopFolderName; 
+            _sessionFolderName = sessionFolderName; 
+        
         }
 
+        public string RootPath(
+            string appFolder = null,
+            string workshopFolderName = null,
+            string sessionFolderName = null)
+        {
+            appFolder ??= _appFolder;
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
 
-        
+            if (string.IsNullOrWhiteSpace(sessionFolderName))
+            {
+                return Path.Combine(
+                    Application.persistentDataPath,
+                    appFolder,
+                    workshopFolderName
+                );
+            }
 
-        public string Root => Path.Combine(Application.persistentDataPath, _appFolder, _sessionFolderName);
+            return Path.Combine(
+                Application.persistentDataPath,
+                appFolder,
+                workshopFolderName,
+                sessionFolderName
+            );
+        }
 
         public string CreateNewSessionFolder(out string sessionId)
         {
@@ -32,20 +57,26 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             sessionId =  DateTime.UtcNow.ToString("yyyy-MM-dd-UTC-HH-mm-ss_ff");
 
             _currentSessionId = sessionId; 
+            string Root = RootPath();
             string dir = Path.Combine(Root, sessionId);
             Directory.CreateDirectory(dir);
             return dir;
         }
 
-        public string GetCurrentSessionFolder()
+        public string GetCurrentSessionFolder(string workshopFolderName = null, string sessionFolderName = null)
         {
+            
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
+
             if (string.IsNullOrEmpty(_currentSessionId))
             {
                 UnityEngine.Debug.LogError($"GetCurrentSessionFolder _currentSessionId={_currentSessionId}");
                 return null;
             }
+
             
-            return GetSessionFolder(_currentSessionId);
+            return GetSessionFolder(_currentSessionId, workshopFolderName, sessionFolderName );
         }
 
         public void SetCurrentSession(string sessionId)
@@ -53,16 +84,26 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             _currentSessionId = sessionId;
         }
 
-        public string GetSessionFolder(string sessionId)
+        public string GetSessionFolder(string sessionId, string workshopFolderName = null, string sessionFolderName = null )
         {
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
+
+            string Root = RootPath(workshopFolderName:workshopFolderName, sessionFolderName:sessionFolderName);
             UnityEngine.Debug.Log($"[GetCurrentSessionFolder] _currentSessionId={Path.Combine(Root, sessionId)}");
             return Path.Combine(Root, sessionId);
 
         }
         
 
-        public string GetSessionJsonPath(string sessionId)
-            => Path.Combine(GetSessionFolder(sessionId), "session.json");
+        public string GetSessionJsonPath(string sessionId, string workshopFolderName = null, string sessionFolderName = null)
+        {
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
+
+            return Path.Combine(GetSessionFolder(sessionId, workshopFolderName, sessionFolderName), "session.json");
+        }
+            
 
         public string FramesFileName(string takeId)
             => $"{takeId}.frames.jsonl";
@@ -77,9 +118,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             File.WriteAllText(path, JsonUtility.ToJson(model, true));
         }
 
-        public SessionModel LoadSessionModel(string sessionId)
+        public SessionModel LoadSessionModel(string sessionId, string workshopFolderName = null, string sessionFolderName = null)
         {
-            string path = GetSessionJsonPath(sessionId);
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
+
+            string path = GetSessionJsonPath(sessionId,  workshopFolderName, sessionFolderName);
             string json = File.ReadAllText(path);
             return JsonUtility.FromJson<SessionModel>(json);
         }
@@ -87,6 +131,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public string GetLatestSessionId()
         {
+            string Root = RootPath();
             if (!Directory.Exists(Root))
             {
                 UnityEngine.Debug.LogWarning($"SessionStore.GetLatestSessionId: Root does not exist: {Root}");
@@ -110,9 +155,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             return latestSessionId;
         }
 
-        public TakeData LoadTakeData(TakeMeta meta, string sessionId)
+        public TakeData LoadTakeData(TakeMeta meta, string sessionId, string workshopFolderName = null, string sessionFolderName = null)
         {
-            string sessionFolder = GetSessionFolder(sessionId);
+            workshopFolderName ??= _workshopFolderName;
+            sessionFolderName ??= _sessionFolderName;
+
+            string sessionFolder = GetSessionFolder(sessionId, workshopFolderName, sessionFolderName);
 
             UnityEngine.Debug.Log($"[LoadTakeData] sessionId={sessionId}, sessionFolder={sessionFolder}, framesFile={meta.FramesFile}");
 

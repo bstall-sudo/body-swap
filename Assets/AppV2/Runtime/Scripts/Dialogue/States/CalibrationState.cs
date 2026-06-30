@@ -43,10 +43,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //alle Rollen auf Bodenhöhe Plazieren.
             for (int i = 0; i < _flow.Stage.roleCount; i++){
 
+                
                 Vector3 placement = Vector3.zero;
-                //placement.y = _flow.Stage.GetGroundYStageLocal(placement);
+                placement.y = _flow.Stage.GetGroundYStageLocal(placement);
 
-                UnityEngine.Debug.Log($"placement is: {placement}");
+                UnityEngine.Debug.Log($"[CalibrationState] placement is: {placement}");
                 
 
                 Quaternion rotation = Quaternion.identity;

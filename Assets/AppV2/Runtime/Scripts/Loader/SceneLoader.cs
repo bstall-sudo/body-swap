@@ -147,42 +147,7 @@ public class SceneLoader : MonoBehaviour
             );
         }
     }
-/*
-    private void PlaceRoleRoot(RoleRig role)
-    {
-        if (role == null || role.root == null)
-            return;
 
-        // Leerer avatarSpawnId = Stage-Ursprung
-        if (string.IsNullOrWhiteSpace(role.avatarSpawnId))
-        {
-            role.root.localPosition = Vector3.zero;
-            role.root.localRotation = Quaternion.identity;
-            return;
-        }
-
-        StageSpawnPoint spawn =
-            environmentLoader.GetSpawnPoint(role.avatarSpawnId);
-
-        if (spawn == null)
-        {
-            Debug.LogWarning(
-                $"[SceneLoader] Avatar spawn not found: {role.avatarSpawnId}. Using Stage origin."
-            );
-
-            role.root.localPosition = Vector3.zero;
-            role.root.localRotation = Quaternion.identity;
-            return;
-        }
-        Debug.Log(
-                $"[SceneLoader] Avatar spawn is at x: {spawn.transform.position.x}, y: {spawn.transform.position.y}, z: {spawn.transform.position.z} : {role.avatarSpawnId}. Using Stage origin."
-            );
-        role.root.SetPositionAndRotation(
-            spawn.transform.position,
-            spawn.transform.rotation
-        );
-    }
-*/
 
     private void PlaceRoleRoot(RoleRig role)
     {

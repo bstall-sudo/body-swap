@@ -28,6 +28,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private string stageSpawnId = "default";
         public string StageSpawnId => stageSpawnId;
 
+        [Header("NPC Imports")]
+        [Range(0,6)]
+        public int preRecordedSceneCount = 0;
+
+        public List<PreRecordedSceneImport> preRecordedScenes =
+            new List<PreRecordedSceneImport>();
+
+        public List<RoleRig> importedNpcRoles = new();
+
         //Das wird benötigt, um die Referenzen der Rollen automatisch auszufüllen
         [SerializeField] private Transform rolesRoot;
         private List<Transform> _allRoleRoots = new();
@@ -38,9 +47,31 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField]
         public String _storageFolderName = "SessionRecordingData";
 
+        [Header("Ordnername Workshop)")]
+        public string _workshopFolderName;
+
         [Header("Ordnername für individuelle Session")]
         public string _personalFolderName = "Sessions";
 
+        [ContextMenu("Build Imported NPC Roles")]
+
+        
+        public void BuildImportedNpcRoles(SessionStore store)
+        {
+            string sessionRootPath = Path.Combine(
+                Application.persistentDataPath,
+                _storageFolderName
+            );
+
+            importedNpcRoles =
+                PreRecordedSceneImporter.BuildRoleRigsFromImports(
+                    preRecordedScenes,
+                    sessionRootPath, store
+                );
+
+            Debug.Log($"[ConversationStage] Imported NPC roles: {importedNpcRoles.Count}");
+        }
+        
 
         [Header("Roles")]
         [Min(1)]
@@ -123,6 +154,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 BuildAllRoleRoots();
                 BuildActiveRoles();
                 //ApplyRoleCount();
+                //BuildImportedNpcRoles(_store);
             #endif
  
         }
@@ -143,6 +175,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 roles.Add(new RoleRig
                 {
                     roleId = DefaultRoleId(idx) // "A", "B", "C", ...
+                    
                 });
             }
 
@@ -159,9 +192,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (string.IsNullOrWhiteSpace(role.roleId))
                     role.roleId = DefaultRoleId(i);
 
+                if (string.IsNullOrWhiteSpace(role.slotId))
+                {
+                    role.slotId = role.roleId;
+                }
+                    
+
                 if (rolesRoot != null)
                 {
-                    string roleRootName = $"Role{role.roleId}";
+                    string roleRootName = $"Role{role.slotId}";
                     role.roleRoot = rolesRoot.Find(roleRootName);
                 }
 
@@ -214,6 +253,44 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
         }
 
+        private void AddImportedNpcRolesToFreeSlots(SessionStore store)
+        {
+
+            int nextSlotIndex = roles.Count;
+
+            foreach (RoleRig npcRole in importedNpcRoles)
+            {
+                if (nextSlotIndex >= maxRoleCount)
+                {
+                    UnityEngine.Debug.LogWarning(
+                        $"[ConversationStage] No free role slot for imported NPC {npcRole.roleId}");
+                    break;
+                }
+
+                string slotId = DefaultRoleId(nextSlotIndex); // C, D, E ...
+
+                npcRole.slotId = slotId;
+
+                if (rolesRoot != null)
+                {
+                    string roleRootName = $"Role{slotId}";
+                    npcRole.roleRoot = rolesRoot.Find(roleRootName);
+                    UnityEngine.Debug.Log(
+                        $"[ConversationStage] RoleId {npcRole.roleId} SlotId {npcRole.slotId}");
+                }
+
+                if (npcRole.roleRoot != null)
+                {
+                    npcRole.AutoResolveReferences();
+                    npcRole.ResolveAvatarName(false);
+                }
+
+                roles.Add(npcRole);
+                nextSlotIndex++;
+            }
+
+            roleCount = roles.Count;
+        }
 
         public IInputTransformsProvider _input;
         private XRInputTransforms _xrInput;
@@ -281,10 +358,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
             BuildAllRoleRoots();
             BuildActiveRoles();
+            
+            
+
+            
+            _store = new SessionStore(_storageFolderName, _workshopFolderName, _personalFolderName);
+
+            
+            BuildImportedNpcRoles(_store);
+
+            AddImportedNpcRolesToFreeSlots(_store);
+            BuildAllRoleRoots();
+            
             ApplyRoleCount();
+            
 
             _takeIndex = new SessionTakeIndex();
-            _store = new SessionStore(_storageFolderName, _personalFolderName);
 
             // das Playback-Objekt wird mit einer RoleRig-Liste und dem Ordnernamen initiiert
             _playbackController = new PlaybackController();

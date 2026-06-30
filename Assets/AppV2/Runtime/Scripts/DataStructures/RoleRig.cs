@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.Rig;
 using AppV2.Runtime.Scripts.Loader;
+using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
 namespace AppV2.Runtime.Scripts.DataStructures
 {
@@ -12,6 +13,14 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string avatarId; 
         public string avatarSpawnId= "";
         public string roleId;                 // z.B. "A", "B", "C" oder "Role 1"
+
+        [Header("Pre-Recorded Inputs")]
+        public string sourceRoleId;        // z.B. "A"
+        public string slotId;        // z.B. "A"
+        public string npcGroupId;           // z.B. "NpcGroup1"
+        public bool hasPreRecordedTakes = false;
+        public bool isActiveConversationPartner = true;
+        public string takeSource; // Pfad zur importierten Session / Take-Datei
 
         public AvatarLoader avatarLoader;
 
@@ -47,6 +56,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public bool hasInitialStartPose = false;
         public Vector3 initialStartPos;
         public float initialStartYawDeg;
+
+
     
 
         [Header("Visual Debug Rig")]
@@ -66,6 +77,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         [Tooltip("If true, heightOfRoleCm will be initialized from the player height once.")]
         public bool usePlayerHeightAsDefault = true;
+
+        //das ist im SessionModel definiert
+        public RoleCalibrationData preRecordedCalibration;
 
     
         public void AutoResolveReferences()

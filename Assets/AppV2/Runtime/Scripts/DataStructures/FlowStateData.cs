@@ -5,6 +5,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
 {
     public class FlowStateData
     {
+        List<RoleRig> Roles;
         public int RoleCount;
         public int SceneCount;
         public int ToBeRecorded;
@@ -13,9 +14,10 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public List<int> ReactiveIdles;
         public bool GoToSpeakerState;
      
-        public void Initialize(int roleCount)
+        public void Initialize(List<RoleRig> roles)
         {
-            RoleCount = roleCount;
+            Roles = roles;
+            RoleCount = roles.Count;
             ToBeRecorded = 0;
             SelectedNext = -1;
             SceneCount = -1;

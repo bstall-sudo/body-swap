@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Dialogue.Services;
 using AppV2.Runtime.Scripts.Rig;
+using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -78,7 +79,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
 
             //Vector3 placement = GetTestPlacementPosition(_currentRoleIndexForPlacement);
-            Vector3 placement = RolePlacementUtility.GetCirclePlacementPosition(_currentRoleIndexForPlacement, _roleCount);
+            int activeRoleCount =0;
+
+            foreach (RoleRig role in _flow.Stage.roles)
+            {
+                if (!role.hasPreRecordedTakes)
+                {
+                    activeRoleCount++;
+                }
+            }
+            Vector3 placement = RolePlacementUtility.GetCirclePlacementPosition(_currentRoleIndexForPlacement, activeRoleCount);
 
             //y wird hier dem Terrain angeglichen.
             placement.y = _flow.Stage.GetGroundYStageLocal(placement);
@@ -89,6 +99,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             Quaternion rotation = RolePlacementUtility.GetCirclePlacementRotation(flatPlacement);
 
+            
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 _currentRoleIndexForPlacement,
                 placement,

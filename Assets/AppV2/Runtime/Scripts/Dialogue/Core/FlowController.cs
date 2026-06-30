@@ -53,9 +53,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private void Awake()
         {
             _data = new FlowStateData();
-            _data.Initialize(Stage.roleCount);
+            _data.Initialize(Stage.roles);
             _startInPlaybackFullConversationMode = Stage.StartInPlaybackFullConversationMode;
             _xrMode = Stage.UseXR;
+            UnityEngine.Debug.Log($"[FlowController] roleCount is: {Stage.roleCount}");
         }
 
         private void OnDestroy()

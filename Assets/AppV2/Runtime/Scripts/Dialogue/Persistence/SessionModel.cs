@@ -66,13 +66,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
     [Serializable]
     public class TakeMeta
     {
-        //public string SessionId;
+        
         public string TakeId;
         public string RoleId;
         public float DurationSec;
         public int SceneCount;
         public int RoleIndex;
 
+        public bool usesPreRecordedCalibration = false;
+        public string sourceRoleId;
+        public string npcGroupId;
         public string FramesFile;
         public string AudioFile;
     }

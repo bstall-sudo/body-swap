@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
+using AppV2.Runtime.Scripts.Loader;
 
 
 namespace AppV2.Runtime.Scripts.Rig
@@ -8,6 +9,8 @@ namespace AppV2.Runtime.Scripts.Rig
     public class AvatarCalibrationController : MonoBehaviour
     {
         private IReadOnlyList<RoleRig> roles;
+
+        [SerializeField] public EnvironmentLoader environmentLoader;
 
         public void Initialize(IReadOnlyList<RoleRig> roles)
         {
@@ -156,26 +159,63 @@ namespace AppV2.Runtime.Scripts.Rig
                 return;
             }
 
-            Vector3 localPos = localFloorPosition;
-            //das deaktivieren, weil das überschreibt die GroundHeight Funktion mit der der InitialStartPos aus dem RoleRig
-            //localPos.y = role.root.localPosition.y;
-
-            role.root.localPosition = localPos;
-            role.root.localRotation = localRotation;
-
-            role.initialStartPos = role.root.localPosition;
-            role.initialStartYawDeg = role.root.localRotation.eulerAngles.y;
-            role.hasInitialStartPose = true;
-
-            StagePose stagePose = new StagePose
+            if (!role.hasPreRecordedTakes)
             {
-                Position = localPos,
-                Rotation = localRotation
-            };
+                Vector3 localPos = localFloorPosition;
+                //das deaktivieren, weil das überschreibt die GroundHeight Funktion mit der der InitialStartPos aus dem RoleRig
+                //localPos.y = role.root.localPosition.y;
 
-            PlaceAvatarAtUserPosition(roleIndex, stagePose);
+                role.root.localPosition = localPos;
+                role.root.localRotation = localRotation;
+
+                role.initialStartPos = role.root.localPosition;
+                role.initialStartYawDeg = role.root.localRotation.eulerAngles.y;
+                role.hasInitialStartPose = true;
+
+                StagePose stagePose = new StagePose
+                {
+                    Position = localPos,
+                    Rotation = localRotation
+                };
+
+                PlaceAvatarAtUserPosition(roleIndex, stagePose);
+
+            }
+            else
+            {
+                PlaceImportedNpcRoleAtSpawnPoint(roleIndex);   
+            }
+            
+        }
+
+        public void PlaceImportedNpcRoleAtSpawnPoint(int roleIndex)
+        {
+            RoleRig role = roles[roleIndex];
+
+            if (role == null || !role.hasPreRecordedTakes)
+                return;
+
+            StageSpawnPoint spawn =
+                environmentLoader.GetSpawnPoint(role.avatarSpawnId);
+
+            if (spawn == null)
+            {
+                Debug.LogWarning($"[PlaceImportedNpcRoleAtSpawnPoint] Spawn not found: {role.avatarSpawnId}");
+                return;
+            }
+
+            if (role.roleRoot == null)
+            {
+                Debug.LogWarning($"[PlaceImportedNpcRoleAtSpawnPoint] roleRoot missing: {role.roleId}");
+                return;
+            }
+
+            role.root.position = spawn.transform.position;
+            role.root.rotation = spawn.transform.rotation;
         }
 
 
     }
+
+
 }
