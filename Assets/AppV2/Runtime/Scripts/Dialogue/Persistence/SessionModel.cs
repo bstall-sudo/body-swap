@@ -26,14 +26,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string RoleId;
 
         public string AvatarId;
-        public string AvatarSpawnId;
+        public string AvatarSpawnId = "default";
         public int RoleIndex;
         public string RoleName;
 
         public int HeightOfRoleCm;
         public bool SittingIdle;
 
-        public string RoleSpawnId = "default";
+        
 
         //das bezieht sich auf TechnicalRoot
         public TransformData StartRootPose;

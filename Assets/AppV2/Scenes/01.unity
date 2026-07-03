@@ -369,12 +369,17 @@ MonoBehaviour:
   - avatarId: 
     avatarSpawnId: 
     roleId: A
-    sourceRoleId: 
     slotId: A
+    sourceRoleId: 
+    roleIndex: 0
+    sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 0}
     roleRoot: {fileID: 638662130}
     root: {fileID: 1884059423}
@@ -425,12 +430,17 @@ MonoBehaviour:
   - avatarId: 
     avatarSpawnId: 
     roleId: B
-    sourceRoleId: 
     slotId: B
+    sourceRoleId: 
+    roleIndex: 1
+    sourceRoleIndex: 1
     npcGroupId: 
     hasPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 0}
     roleRoot: {fileID: 2110021515}
     root: {fileID: 702877649}
@@ -481,12 +491,17 @@ MonoBehaviour:
   - avatarId: 
     avatarSpawnId: 
     roleId: C
-    sourceRoleId: 
     slotId: C
+    sourceRoleId: 
+    roleIndex: 2
+    sourceRoleIndex: 2
     npcGroupId: 
     hasPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 0}
     roleRoot: {fileID: 1378051320}
     root: {fileID: 195997951}
@@ -10800,27 +10815,32 @@ MonoBehaviour:
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
   environmentId: Insel_01
-  stageSpawnId: 01
-  preRecordedSceneCount: 0
+  stageSpawnId: 02
+  preRecordedSceneCount: 1
   preRecordedScenes:
   - enabled: 1
-    npcGroupId: NpcGroup1
-    sessionSourcePath: TestWorkshop_2\Bertold\2026-06-29-UTC-09-01-34_60
-    workshopFolderName: TestWorkshop_2
-    sessionFolderName: Bertold
-    sessionId: 2026-06-29-UTC-09-01-34_60
-    spawnPoint: {fileID: 1729402802}
-    spawnId: 02
+    npcGroupId: NpcGroup_
+    sessionSourcePath: PreRecordedScene/wasmachstduhier/2026-07-02-UTC-13-53-41_54
+    workshopFolderName: PreRecordedScene
+    sessionFolderName: wasmachstduhier
+    sessionId: 2026-07-02-UTC-13-53-41_54
+    spawnPoint: {fileID: 0}
+    spawnId: default
   importedNpcRoles:
   - avatarId: 
     avatarSpawnId: 
     roleId: NpcGroup1_A
-    sourceRoleId: 
     slotId: 
+    sourceRoleId: 
+    roleIndex: 0
+    sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 1
     isActiveConversationPartner: 0
     takeSource: C:/Users/berto/AppData/LocalLow/DefaultCompany/bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-15-UTC-12-53-35_14
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 0}
     roleRoot: {fileID: 0}
     root: {fileID: 0}
@@ -10871,12 +10891,17 @@ MonoBehaviour:
   - avatarId: 
     avatarSpawnId: 
     roleId: NpcGroup1_B
-    sourceRoleId: 
     slotId: 
+    sourceRoleId: 
+    roleIndex: 0
+    sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 1
     isActiveConversationPartner: 0
     takeSource: C:/Users/berto/AppData/LocalLow/DefaultCompany/bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-15-UTC-12-53-35_14
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 0}
     roleRoot: {fileID: 0}
     root: {fileID: 0}
@@ -10926,8 +10951,8 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: TestWorkshop_2
-  _personalFolderName: Bertold
+  _workshopFolderName: Test_Prerecorded
+  _personalFolderName: 01
   roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
@@ -10954,12 +10979,17 @@ MonoBehaviour:
   - avatarId: baer_001
     avatarSpawnId: 
     roleId: A
-    sourceRoleId: 
     slotId: A
+    sourceRoleId: 
+    roleIndex: 0
+    sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 334869692}
     roleRoot: {fileID: 334869691}
     root: {fileID: 80493900}
@@ -11007,15 +11037,20 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: blaumann_001
+  - avatarId: esel_001
     avatarSpawnId: 
     roleId: B
-    sourceRoleId: 
     slotId: B
+    sourceRoleId: 
+    roleIndex: 1
+    sourceRoleIndex: 1
     npcGroupId: 
     hasPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
     avatarLoader: {fileID: 780788515}
     roleRoot: {fileID: 780788514}
     root: {fileID: 1106718683}
@@ -11070,7 +11105,7 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 1
+  StartInPlaybackFullConversationMode: 0
   _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}

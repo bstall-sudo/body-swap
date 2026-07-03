@@ -239,7 +239,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             if(selected == -1){
                 nextSpeaker = _data.SceneCount  % _data.ActiveRoleCount;
-                //UnityEngine.Debug.Log($"Next Default Speaker has index: {nextSpeaker}");
+                UnityEngine.Debug.Log($"Next Default Speaker has index: {nextSpeaker}");
                 //update Rollen, die im Idle sind in _data- object (FlowStateData)
                 SpeakerStateEnterSetLists(nextSpeaker);
                 //update nächster Sprecher in _data- object (FlowStateData)
@@ -412,17 +412,20 @@ namespace AppV2.Runtime.Scripts.Dialogue
             return distance <= radius;
         }
 
-        public void PlayerNearNpcs(
+        public bool PlayerNearNpcs(
             List<int> roleIndicesOfPassiveRoles,
             int playerIndex,
             float radius)
         {
+            bool playbackPreRecordedScene = false; 
+
             if (roleIndicesOfPassiveRoles == null)
-                return;
+                return playbackPreRecordedScene;
 
             List<int> passiveSnapshot =
                 new List<int>(roleIndicesOfPassiveRoles);
 
+            
             foreach (int passiveIndex in passiveSnapshot)
             {
                 if (!IsPlayerNearNpc(
@@ -433,37 +436,39 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     continue;
                 }
 
+                playbackPreRecordedScene = true;
                 RoleRig npc = _data.AllRoles[passiveIndex];
                 string currentNpcGroupId = npc.npcGroupId;
 
                 List<int> activatedIndices = new List<int>();
-
+                
                 for (int i = 0; i < _data.AllRoles.Count; i++)
                 {
                     RoleRig role = _data.AllRoles[i];
 
                     if (role.npcGroupId != currentNpcGroupId)
                         continue;
-
+                    UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]: npcGroupId: {role.npcGroupId} roleIndex: {role.roleIndex}, sourceRoleIndex: {role.sourceRoleIndex}");
                     _data.Roles.Add(role);
-                    _data.Playbacks.Add(i);
-                    activatedIndices.Add(i);
+                    //_data.ReactiveIdles.Add(role.roleIndex);
+                    _data.CurrentPreRecordedPlaybacks.Add(role.roleIndex);
+                    activatedIndices.Add(role.roleIndex);
                 }
 
                 foreach (int index in activatedIndices)
                 {
                     _data.IndicesOfPassiveRoles.Remove(index);
                 }
-
+                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] before update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
                 _data.ActiveRoleCount = _data.Roles.Count;
                 _data.SceneCount++;
+                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
+                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {currentNpcGroupId}");
 
-                UnityEngine.Debug.Log(
-                    $"Player came near NPC group: {currentNpcGroupId}");
-
-                SetState(new RecordListenersState(this));
-                return;
+                
+                return playbackPreRecordedScene;
             }
+            return playbackPreRecordedScene;
         }
         
 

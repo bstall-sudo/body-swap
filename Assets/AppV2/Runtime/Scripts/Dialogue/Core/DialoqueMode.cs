@@ -12,6 +12,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         PlayerAlignState,
         FinalizeConversation,
         PlaybackFullConversation,
+
+        PlaybackFullPreRecordedScenes,
         Idle,
         Test
     }

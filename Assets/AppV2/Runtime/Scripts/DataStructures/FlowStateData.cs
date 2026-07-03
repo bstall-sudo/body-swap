@@ -9,6 +9,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public List<RoleRig> AllRoles;
 
         public List<int> IndicesOfPassiveRoles;
+
+        public List<int> CurrentPreRecordedPlaybacks;
         public int RoleCount;
 
         public int ActiveRoleCount;
@@ -29,6 +31,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             ToBeRecorded = 0;
             SelectedNext = -1;
             SceneCount = -1;
+            CurrentPreRecordedPlaybacks = new List<int>();
             Playbacks = new List<int>();
             ReactiveIdles = new List<int>();
             GoToSpeakerState = false;

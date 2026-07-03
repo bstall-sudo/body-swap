@@ -127,6 +127,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private ReactiveIdleController _reactiveIdleController;
         private SessionTakeIndex _takeIndex;
 
+        //um zu wissen, woher die Daten für die PreRecorded Scenes kommen.
+        private Dictionary<int, RolePlaybackSource> _playbackSourcesByRoleIndex = new Dictionary<int, RolePlaybackSource>();
+
         public SessionStore _store;
         public SessionModel _session;
         public RoleCalibrationDataProvider _calibrationDataProvider;
@@ -190,7 +193,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 RoleRig role = roles[i];
 
                 if (string.IsNullOrWhiteSpace(role.roleId))
+                {
                     role.roleId = DefaultRoleId(i);
+                    role.sourceRoleId = role.roleId;
+                    
+                }
+                    
 
                 if (string.IsNullOrWhiteSpace(role.slotId))
                 {
@@ -198,6 +206,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 }
 
                 role.roleIndex = i;  
+                role.sourceRoleIndex = i; 
                 role.isActiveConversationPartner = true; 
 
                 if (rolesRoot != null)
@@ -239,6 +248,119 @@ namespace AppV2.Runtime.Scripts.Dialogue
             return $"Role {index + 1}";
         }
 
+// Dictionary, um zu wissen, wo die Daten gesucht werden müssen.
+        private void BuildDefaultPlaybackSources()
+        {
+            _playbackSourcesByRoleIndex.Clear();
+
+            for (int i = 0; i < roles.Count; i++)
+            {
+                _playbackSourcesByRoleIndex[i] = new RolePlaybackSource
+                {
+                    store = _store,
+                    session = _session,
+                    takeIndex = _takeIndex,
+
+                    sessionId = _session.SessionId,
+
+                    targetRoleIndex = i,
+                    sourceRoleIndex = i,
+
+                    isPreRecordedSource = false
+                };
+
+                Debug.Log(
+                    $"[PlaybackStart] jajaja target={_playbackSourcesByRoleIndex[i].targetRoleIndex}, " +
+                    $"[PlaybackStart] jajaja sourceRoleIndex={_playbackSourcesByRoleIndex[i].sourceRoleIndex}, " +
+                    $"[PlaybackStart] jajaja sessionId={_playbackSourcesByRoleIndex[i].sessionId}, " +
+                    $"[PlaybackStart] jajaja isPreRecorded={_playbackSourcesByRoleIndex[i].isPreRecordedSource}"
+                );
+            }
+
+            
+        }
+
+//Das wird verwendet, weil der BuildDefaultPlaybackSources manchmal leer ist, obwohl er es nicht sein sollte.
+        private RolePlaybackSource GetOrCreatePlaybackSourceForRole(int roleIndex)
+        {
+            if (_playbackSourcesByRoleIndex.TryGetValue(roleIndex, out RolePlaybackSource source))
+                return source;
+
+            if (_session == null || _takeIndex == null || _store == null)
+            {
+                Debug.LogError($"[PlaybackSource] Cannot create source for role {roleIndex}. Session/store/takeIndex missing.");
+                return null;
+            }
+
+            source = new RolePlaybackSource
+            {
+                store = _store,
+                session = _session,
+                takeIndex = _takeIndex,
+
+                sessionId = _session.SessionId,
+
+                targetRoleIndex = roleIndex,
+                sourceRoleIndex = roleIndex,
+
+                isPreRecordedSource = false
+            };
+
+            _playbackSourcesByRoleIndex[roleIndex] = source;
+
+            Debug.Log($"[PlaybackSource] Created default source for role {roleIndex}, session={_session.SessionId}");
+
+            return source;
+        }
+// Dictionary, um zu wissen, wo die Daten gesucht werden müssen.
+        private void SetPreRecordedPlaybackSourceForRole(
+            int targetRoleIndex,
+            RoleRig role,
+            SessionModel sourceSession,
+            SessionTakeIndex sourceTakeIndex,
+            SessionStore sourceStore)
+        {
+            _playbackSourcesByRoleIndex[targetRoleIndex] = new RolePlaybackSource
+            {
+                store = sourceStore,
+                session = sourceSession,
+                takeIndex = sourceTakeIndex,
+
+                sessionId = sourceSession.SessionId,
+
+                targetRoleIndex = targetRoleIndex,
+                sourceRoleIndex = role.sourceRoleIndex,
+
+                isPreRecordedSource = true
+            };
+        }
+
+        //hier werden dann die Sources für die PreRecorded Scenens auf die aktuelle Session umgeleitet, nachdem sie das Intro gespielt haben. 
+        public void SwitchNpcGroupToCurrentSession(string npcGroupId)
+        {
+            for (int i = 0; i < roles.Count; i++)
+            {
+                if (roles[i].npcGroupId != npcGroupId)
+                    continue;
+
+                SwitchRoleToCurrentSession(i);
+            }
+        }
+
+        public void SwitchRoleToCurrentSession(int roleIndex)
+        {
+            _playbackSourcesByRoleIndex[roleIndex] = new RolePlaybackSource
+            {
+                store = _store,
+                session = _session,
+                takeIndex = _takeIndex,
+
+                targetRoleIndex = roleIndex,
+                sourceRoleIndex = roleIndex,
+
+                isPreRecordedSource = false
+            };
+        }
         //nicht benötigte Rollen werden deaktiviert.
         public void ApplyRoleCount()
         {
@@ -255,6 +377,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
         }
 
+/*
         private void AddImportedNpcRolesToFreeSlots(SessionStore store)
         {
 
@@ -296,6 +419,135 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
 
             roleCount = roles.Count;
+        }
+*/
+        private void AddImportedNpcRolesToFreeSlots()
+        {
+            foreach (PreRecordedSceneImport import in preRecordedScenes)
+            {
+                if (!TryCreatePreRecordedSource(
+                        import,
+                        out SessionStore sourceStore,
+                        out SessionModel sourceSession,
+                        out SessionTakeIndex sourceTakeIndex))
+                {
+                    continue;
+                }
+
+                List<RoleRig> importedRoles =
+                    PreRecordedSceneImporter.BuildRoleRigsFromImportedSession(
+                        import,
+                        sourceStore
+                    );
+
+                foreach (RoleRig npcRole in importedRoles)
+                {
+                    int targetRoleIndex = roles.Count;
+
+                    if (targetRoleIndex >= maxRoleCount)
+                    {
+                        Debug.LogWarning("[NPC Import] No free role slot left.");
+                        return;
+                    }
+
+                    string slotId = DefaultRoleId(targetRoleIndex);
+
+                    npcRole.slotId = slotId;
+                    npcRole.sourceRoleIndex = npcRole.sourceRoleIndex;
+                    npcRole.roleIndex = targetRoleIndex;
+                    
+                    npcRole.sourceSessionId = import.sessionId;
+                    npcRole.sourceWorkshopFolderName = import.workshopFolderName;
+                    npcRole.sourceSessionFolderName = import.sessionFolderName;
+                    npcRole.isActiveConversationPartner =false;
+
+                    BindRoleToSlot(npcRole, slotId);
+
+                    roles.Add(npcRole);
+
+                    _playbackSourcesByRoleIndex[targetRoleIndex] =
+                        new RolePlaybackSource
+                        {
+                            store = sourceStore,
+                            session = sourceSession,
+                            takeIndex = sourceTakeIndex,
+
+                            sessionId =import.sessionId,
+
+                            targetRoleIndex = targetRoleIndex,
+                            sourceRoleIndex = npcRole.sourceRoleIndex,
+
+                            isPreRecordedSource = true
+                        };
+                }
+            }
+
+            roleCount = roles.Count;
+        }
+
+        private void BindRoleToSlot(RoleRig role, string slotId)
+        {
+            if (role == null)
+                return;
+
+            if (rolesRoot == null)
+            {
+                Debug.LogError("[ConversationStage] rolesRoot is null.");
+                return;
+            }
+
+            role.slotId = slotId;
+
+            string roleRootName = $"Role{slotId}";
+            role.roleRoot = rolesRoot.Find(roleRootName);
+
+            if (role.roleRoot == null)
+            {
+                Debug.LogWarning($"RoleRoot not found: {roleRootName}");
+                return;
+            }
+
+            role.AutoResolveReferences();
+            role.ResolveAvatarName(false);
+        }
+
+        private bool TryCreatePreRecordedSource(
+            PreRecordedSceneImport import,
+            out SessionStore sourceStore,
+            out SessionModel sourceSession,
+            out SessionTakeIndex sourceTakeIndex)
+        {
+            sourceStore = null;
+            sourceSession = null;
+            sourceTakeIndex = null;
+
+            if (import == null || !import.enabled)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(import.sessionId))
+            {
+                Debug.LogWarning("[NPC Source] Missing sessionId.");
+                return false;
+            }
+
+            sourceStore = new SessionStore(
+                _storageFolderName,
+                import.workshopFolderName,
+                import.sessionFolderName
+            );
+
+            sourceSession = sourceStore.LoadSessionModel(import.sessionId);
+
+            if (sourceSession == null)
+            {
+                Debug.LogError($"[NPC Source] Could not load session: {import.sessionId}");
+                return false;
+            }
+
+            sourceTakeIndex = new SessionTakeIndex();
+            sourceTakeIndex.RebuildFromSession(sourceSession);
+
+            return true;
         }
 
         public IInputTransformsProvider _input;
@@ -369,17 +621,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             
             _store = new SessionStore(_storageFolderName, _workshopFolderName, _personalFolderName);
-
             
+            _takeIndex = new SessionTakeIndex();
+
+            //BuildDefaultPlaybackSources();
+
             BuildImportedNpcRoles(_store);
 
-            AddImportedNpcRolesToFreeSlots(_store);
+            AddImportedNpcRolesToFreeSlots();
             BuildAllRoleRoots();
             
             ApplyRoleCount();
             
 
-            _takeIndex = new SessionTakeIndex();
+            
+
+            
 
             // das Playback-Objekt wird mit einer RoleRig-Liste und dem Ordnernamen initiiert
             _playbackController = new PlaybackController();
@@ -485,13 +742,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
             BuildAllRoleRoots();
             //BuildActiveRoles();
             //ApplyRoleCount();
+            BuildDefaultPlaybackSources();
             
         }
 
         public void ApplyRoleCountFromSession(int count)
         {
             roleCount = count;
-            BuildActiveRoles();
+            //BuildActiveRoles();
             ApplyRoleCount();
         }
 
@@ -666,8 +924,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         }
 
-        
-
+        /*
+        // Diese Version wird ersetzt durch eine Version, welche mit unterschiedlichen Sources für die Takes umgehen kann.
         public List<int> PlaybackStart(List<int> roleIndices, int sceneCount)
         //Die Funktion gibt eine Liste zurück mit Rollen, für welche keine Takes gefunden wurden. In den States (PlaybackFullConversationState / RecordListenerState)
         // wird diese Liste genutzt, um die ReactiveIdles zu starten.
@@ -714,6 +972,53 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             return noTakesFoundIndices;
         }
+        */
+
+        public List<int> PlaybackStart(List<int> roleIndices, int sceneCount)
+        {
+ 
+            List<int> noTakesFoundIndices = new();
+
+            if (roleIndices == null)
+                return noTakesFoundIndices;
+
+            foreach (int targetRoleIndex in roleIndices)
+            {
+                Debug.Log($"[PlaybackStart] jajaja target={targetRoleIndex} ");
+
+                RolePlaybackSource source = GetOrCreatePlaybackSourceForRole(targetRoleIndex);
+
+                if (source == null)
+                {
+                    noTakesFoundIndices.Add(targetRoleIndex);
+                    continue;
+                }
+
+   
+                if (source.takeIndex.TryGetTakeForScene(
+                        source.sourceRoleIndex,
+                        sceneCount,
+                        out TakeMeta takeMeta))
+                {
+                    _playbackController.PlaybackForIndexBeginFromTake(
+                        targetRoleIndex,
+                        takeMeta,
+                        source.store,
+                        source.sessionId,
+                        heightOfPlayerCm
+                    );
+                }
+                else
+                {
+                    if (sceneCount == 0)
+                        ApplyRoleStartPose(targetRoleIndex);
+
+                    noTakesFoundIndices.Add(targetRoleIndex);
+                }
+            }
+
+            return noTakesFoundIndices;
+        }
       
         public void PlaybackTick(List<int> roleIndices){
             _playbackController.TickForIndexList(roleIndices);
@@ -749,22 +1054,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             return _playbackController.HasAnyTakeForScene(sceneCount);
         }
-/*
-        //damit avatar im Sitting Idle ist, während der Aufnahme, das wird hier im conversationStage von RecordingBegin gerufen. 
-        public void ApplyRecordingAvatarPoseForRole(int roleIndex)
-        {
-            if (roleIndex < 0 || roleIndex >= roles.Count)
-                return;
 
-            var role = roles[roleIndex];
 
-            if (role.avatar == null)
-                return;
-
-            //role.avatar.SetRigModeRecordPlayback();
-            _reactiveIdleController.SetRoleToRecordPlayback(roleIndex, SeatedMode);
-        }
-*/
 
         //Das wird für PlaybackFullConversation gebraucht, falls einige Rollen in der ersten Szene keinen Take haben.
         // dann muss aus den ConversationRoleMeta von SessionModel die StartPosition geholt werden.

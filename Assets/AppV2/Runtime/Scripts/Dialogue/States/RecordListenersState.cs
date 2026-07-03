@@ -76,12 +76,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             reactiveIdles = _flow._data.ReactiveIdles;
             playbacks = _flow._data.Playbacks;
-            
+
+
+
             _flow.Stage.PlaybackStart(playbacks, sceneCount);
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
-           
             PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
             UnityEngine.Debug.Log("[RecordListenersState] Enter End");
 
@@ -96,7 +97,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
                 //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 _flow.Stage.PlaybackTick(playbacks);
-                _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3 );
+                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
+                {
+                    
+                    _waitingForRecordingSave = true;
+                    reactiveIdles = _flow._data.ReactiveIdles;
+                }
                 
             }
 

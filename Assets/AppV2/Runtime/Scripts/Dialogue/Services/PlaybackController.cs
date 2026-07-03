@@ -130,6 +130,32 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 }
         }
 
+        //das ist jetzt neu für das Abspielen der PreRecorded Takes ersetzt vermutlich PlaybackForIndexBegin
+        public void PlaybackForIndexBeginFromTake(
+            int targetRoleIndex,
+            TakeMeta takeMeta,
+            SessionStore store,
+            string sessionId,
+            float playerHeightCM)
+        {
+            TakeData take = store.LoadTakeData(takeMeta, sessionId);
+
+            float roleScale = 1f;
+
+            if (playerHeightCM > 0.01f)
+                roleScale = (float)roles[targetRoleIndex].heightOfRoleCm / playerHeightCM;
+
+            players[targetRoleIndex].SetRoleScale(roleScale);
+            players[targetRoleIndex].Begin(take);
+
+            if (roles[targetRoleIndex].sittingIdle)
+            {
+                roles[targetRoleIndex].avatar.SetRigModeRecordPlayback();
+                roles[targetRoleIndex].avatar.PlayIdleAnimation(true);
+                roles[targetRoleIndex].avatar.SetLowerBodyIKWeight(0.0f);
+            }
+        }
+
         public void TickForIndexList(List<int> roleIndices){
 
             

@@ -12,17 +12,25 @@ namespace AppV2.Runtime.Scripts.DataStructures
     {
         public string avatarId; 
         public string avatarSpawnId= "";
-        public string roleId;                 // z.B. "A", "B", "C" oder "Role 1"
+        public string roleId;                 // z.B. "A", "B", "C" oder "Role 1" das sollte in Zukunft entfernt werden, weil es sich mit slotId deckt.
 
+        public string slotId;        // z.B. "A"
+        
+        public string sourceRoleId;        // z.B. "A"
         public int roleIndex;
+        public int sourceRoleIndex;
 
         [Header("Pre-Recorded Inputs")]
-        public string sourceRoleId;        // z.B. "A"
-        public string slotId;        // z.B. "A"
+        
+        
         public string npcGroupId;           // z.B. "NpcGroup1"
         public bool hasPreRecordedTakes = false;
         public bool isActiveConversationPartner = true;
         public string takeSource; // Pfad zur importierten Session / Take-Datei
+
+        public string sourceSessionId;
+        public string sourceWorkshopFolderName;
+        public string sourceSessionFolderName;
 
         public AvatarLoader avatarLoader;
 
@@ -34,6 +42,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public Transform leftFoot;
         public Transform rightFoot;
         public Transform hip;
+
+        
+
 
         public ProceduralHipSolver hipSolver;
         public ProceduralFootSolver leftFootSolver;

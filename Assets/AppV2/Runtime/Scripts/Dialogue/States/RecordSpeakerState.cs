@@ -145,7 +145,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
                 //IsPlayerNearNpc(int roleIndex, Transform player, float radius)
-                _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3 );
+                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
+                {
+                    UnityEngine.Debug.Log("[RecordSpeakerState] [PlayerCameNearNpc] ");
+                    _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
+                    _isRecording = false;
+                    _waitingForRecordingSave = true;
+                    
+                }
                 
             }
 
@@ -156,10 +163,17 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
            
             if (!_isRecording && _flow.Stage.RecordingSaveCompleted())
             {
+                UnityEngine.Debug.Log($"[RecordSpeakerState] !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} ");
                 _waitingForRecordingSave = false;
                 // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
                 if(!_startWaitingToSwitchToFullPlayback){
-                    if(selectableNext)
+                    UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
+                    if(_flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, toBeRecorded, 3))
+                    {
+                        UnityEngine.Debug.Log($"[RecordSpeakerState] _flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, toBeRecorded, 3): true ");
+                        _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
+                    }
+                    else if(selectableNext)
                     {
                         _flow.SetState(new ChooseSpeakerState(_flow));
                     }

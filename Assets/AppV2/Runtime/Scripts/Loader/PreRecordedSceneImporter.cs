@@ -81,12 +81,14 @@ namespace AppV2.Runtime.Scripts.Loader
                     RoleRig role = new RoleRig
                     {
                         roleId = importedRoleId,
+                        roleIndex = meta.RoleIndex,
 
                         hasPreRecordedTakes = true,
                         isActiveConversationPartner = false,
 
                         npcGroupId = import.npcGroupId,
                         sourceRoleId = meta.RoleId,
+                        sourceRoleIndex = meta.RoleIndex,
 
                         takeSource = import.sessionSourcePath,
 
