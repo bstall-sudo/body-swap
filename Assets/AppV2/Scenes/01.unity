@@ -10816,16 +10816,8 @@ MonoBehaviour:
   sceneLoader: {fileID: 793401280}
   environmentId: Insel_01
   stageSpawnId: 02
-  preRecordedSceneCount: 1
-  preRecordedScenes:
-  - enabled: 1
-    npcGroupId: NpcGroup_
-    sessionSourcePath: PreRecordedScene/wasmachstduhier/2026-07-02-UTC-13-53-41_54
-    workshopFolderName: PreRecordedScene
-    sessionFolderName: wasmachstduhier
-    sessionId: 2026-07-02-UTC-13-53-41_54
-    spawnPoint: {fileID: 0}
-    spawnId: default
+  preRecordedSceneCount: 0
+  preRecordedScenes: []
   importedNpcRoles:
   - avatarId: 
     avatarSpawnId: 
@@ -11105,7 +11097,7 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 0
+  StartInPlaybackFullConversationMode: 1
   _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
@@ -25692,6 +25684,8 @@ MonoBehaviour:
     prefab: {fileID: 9020045677751861695, guid: 9107ca18d17a1f848972a9b69e3e8856, type: 3}
   - environmentId: default
     prefab: {fileID: 1690158042345764391, guid: 82374c4b7c2e2bb488a5ff3ff1a1385a, type: 3}
+  - environmentId: K_01
+    prefab: {fileID: 1616553772516772163, guid: 315e06b72a93a9e4fa7b2fb966e23647, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0
