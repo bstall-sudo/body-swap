@@ -84,7 +84,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             _reactiveIdles = _flow._data.ReactiveIdles;
 
-            _roleCount = _flow._data.RoleCount;
+            _roleCount = _flow._data.ActiveRoleCount;
 
 
             if (_reactiveIdles == null)

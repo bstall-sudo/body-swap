@@ -13,6 +13,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         FinalizeConversation,
         PlaybackFullConversation,
 
+        RecordRemainingIdlesAfterPreRecordedEncounterState,
+
         PlaybackFullPreRecordedScenes,
         Idle,
         Test

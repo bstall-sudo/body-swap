@@ -8,6 +8,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
     {
         private readonly FlowController _flow;
         private int _roleToAlignTo;
+        private int _sceneCount;
         private List<int> _reactiveIdles;
         private List<int> _playbacks;
         private float _smoothAlignSeconds;
@@ -23,6 +24,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _reactiveIdles = _flow._data.ReactiveIdles;
             _playbacks = _flow._data.Playbacks;
+
+            _sceneCount = _flow._data.SceneCount;
             
             _smoothAlignSeconds = _flow.Stage.SmoothAlignSeconds;
 
@@ -51,14 +54,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                         
                 //private void PrintRoleLists(string text, List<int> playbacks, List<int> reactiveIdles, int toBeRecorded)
 
-                if(_flow._data.GoToSpeakerState){
+                if (_flow._data.GoToRecordRemainingState)
+                {
+                    PrintRoleLists("[PlayerAlignState] GoTo RecordRemainingState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
+                    _flow.SetState(new RecordRemainingIdlesAfterPreRecordedEncounterState(_flow)); 
+                }
+                else if(_flow._data.GoToSpeakerState){
                     UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordSpeakerState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
                     
-                    PrintRoleLists("[PlayerAlignState] GoTo RecordSpeakerState", _playbacks, _reactiveIdles, _roleToAlignTo );
+                    PrintRoleLists("[PlayerAlignState] GoTo RecordSpeakerState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordSpeakerState(_flow)); 
                 }else{
                     UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordListenersState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
-                    PrintRoleLists("[PlayerAlignState] GoTo RecordListenersState", _playbacks, _reactiveIdles, _roleToAlignTo );
+                    PrintRoleLists("[PlayerAlignState] GoTo RecordListenersState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordListenersState(_flow));
                 }
                 
@@ -94,7 +102,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             string text, 
             List<int> playbacks,
             List<int> reactiveIdles,
-            int toBeRecorded
+            int toBeRecorded,
+            int sceneCount
             )
         {
             string playbacksString =
@@ -112,7 +121,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"[RoleLists] " +
                 $"playbacks={playbacksString} | " +
                 $"reactiveIdles={reactiveIdlesString} | " +
-                $"toBeRecorded={toBeRecorded} " 
+                $"toBeRecorded={toBeRecorded} | " +
+                $"sceneCount={sceneCount} " 
             );
         }
     }

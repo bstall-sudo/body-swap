@@ -27,6 +27,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public bool IsPlaying => _playing;
 
+        // die beiden Variablen sind nötig, um den Bezugspunkt für die PreRecorded Animations zu setzen von StageRoot auf Spawnpoint
+        private Transform _playbackOrigin;
+        private bool _usePlaybackOrigin;
+
         public TakePlayer(Transform actorRoot, Transform head, Transform left, Transform right, Transform hip, Transform leftFoot, Transform rightFoot, AudioSource audio, GroundHeightProvider groundHeightProvider)
         {
             _actorRoot = actorRoot;
@@ -41,6 +45,20 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             
             _roleScale = Mathf.Max(0.0001f, roleScale);
             //UnityEngine.Debug.Log($"roleScale is: {roleScale}");
+        }
+
+        // die Funktion ist nötig, um den Bezugspunkt für die PreRecorded Animations zu setzen von StageRoot auf Spawnpoint
+        public void SetPlaybackOrigin(Transform origin)
+        {
+            _playbackOrigin = origin;
+            _usePlaybackOrigin = origin != null;
+        }
+
+        // die Funktion ist nötig, um den Bezugspunkt für die PreRecorded Animations zu setzen von StageRoot auf Spawnpoint
+        public void ClearPlaybackOrigin()
+        {
+            _playbackOrigin = null;
+            _usePlaybackOrigin = false;
         }
 
         public void Begin(TakeData take)
@@ -124,12 +142,25 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             float u = (dt > 0.0001f) ? Mathf.Clamp01((t - a.T) / dt) : 0f;
 
             Vector3 bodyPos = Vector3.Lerp(a.Body.Pos, b.Body.Pos, u);
-            if (_groundHeightProvider != null) bodyPos.y = _groundHeightProvider.GetGroundYStageLocal(bodyPos);
-
             float bodyYaw = Mathf.LerpAngle(a.Body.YawDeg, b.Body.YawDeg, u);
 
-            _actorRoot.localPosition = bodyPos;
-            _actorRoot.localRotation = Quaternion.Euler(0f, bodyYaw, 0f);
+            if (_usePlaybackOrigin)
+            {
+                Vector3 worldPos = _playbackOrigin.TransformPoint(bodyPos);
+                Quaternion worldRot =
+                    _playbackOrigin.rotation * Quaternion.Euler(0f, bodyYaw, 0f);
+
+                _actorRoot.position = worldPos;
+                _actorRoot.rotation = worldRot;
+            }
+            else
+            {
+                if (_groundHeightProvider != null)
+                    bodyPos.y = _groundHeightProvider.GetGroundYStageLocal(bodyPos);
+
+                _actorRoot.localPosition = bodyPos;
+                _actorRoot.localRotation = Quaternion.Euler(0f, bodyYaw, 0f);
+            }
 
             if (_headT)
             {
@@ -172,12 +203,28 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         //hier ist jetzt auch roleScale dabei, um die positionsdaten entsprechend anpassen zu können.
         private void ApplyFrame(Frame f)
         {
-            _actorRoot.localPosition = f.Body.Pos;
             /*
+            _actorRoot.localPosition = f.Body.Pos;
+            
             if (_groundHeightProvider != null) _actorRoot.y = _groundHeightProvider.GetGroundYStageLocal(bodyPos);
             _actorRoot.localRotation = Quaternion.Euler(0f, f.Body.YawDeg, 0f);
 
             */
+
+            if (_usePlaybackOrigin)
+            {
+                Vector3 worldPos = _playbackOrigin.TransformPoint(f.Body.Pos);
+                Quaternion worldRot =
+                    _playbackOrigin.rotation * Quaternion.Euler(0f, f.Body.YawDeg, 0f);
+
+                _actorRoot.position = worldPos;
+                _actorRoot.rotation = worldRot;
+            }
+            else
+            {
+                _actorRoot.localPosition = f.Body.Pos;
+                _actorRoot.localRotation = Quaternion.Euler(0f, f.Body.YawDeg, 0f);
+            }
             
             if (_headT)
             {

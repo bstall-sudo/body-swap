@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Input;
 using AppV2.Runtime.Scripts.Loader;
@@ -994,6 +995,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     continue;
                 }
 
+                if (source.isPreRecordedSource)
+                {
+                    StageSpawnPoint spawn =
+                        environmentLoader.GetSpawnPoint(roles[targetRoleIndex].avatarSpawnId);
+
+                    _playbackController.SetPlaybackOriginForIndex(
+                        targetRoleIndex,
+                        spawn.transform
+                    );
+                }
+                else
+                {
+                    _playbackController.SetPlaybackOriginForIndex(
+                        targetRoleIndex,
+                        null
+                    );
+                }
+
    
                 if (source.takeIndex.TryGetTakeForScene(
                         source.sourceRoleIndex,
@@ -1045,14 +1064,66 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }  
         }
 
-        public bool PlaybacksAreAllStopped(){
-            return _playbackController.ArePlaybacksStopped();
+        public bool PlaybacksAreAllStopped(List<int> roleIndices)
+        {
+            return _playbackController.ArePlaybacksStoppedForIndices(roleIndices);
         }
+        
 
         //wird im PlaybackFullConversationState benötigt, damit Playback enden kann, wenn keine Takes vorhanden sind.
         public bool PlaybackHasAnyTakeForScene(int sceneCount)
         {
             return _playbackController.HasAnyTakeForScene(sceneCount);
+        }
+
+        //wird im PlaybackPreRecordedScenes benötigt, damit Playback enden kann, wenn keine Takes vorhanden sind.
+        public bool PlaybackHasAnyTakeForSceneWithSource(int sceneCount)
+        {
+            if (roles == null || _playbackSourcesByRoleIndex == null)
+                return false;
+
+            for (int targetRoleIndex = 0; targetRoleIndex < roles.Count; targetRoleIndex++)
+            {
+                RolePlaybackSource source =
+                    GetOrCreatePlaybackSourceForRole(targetRoleIndex);
+
+                if (source == null || source.takeIndex == null)
+                    continue;
+
+                if (source.takeIndex.HasTakeForScene(
+                        source.sourceRoleIndex,
+                        sceneCount))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        public bool PlaybackHasAnyTakeForSceneForIndexList(
+            List<int> roleIndices,
+            int sceneCount)
+        {
+            if (roleIndices == null)
+                return false;
+
+            foreach (int targetRoleIndex in roleIndices)
+            {
+                RolePlaybackSource source =
+                    GetOrCreatePlaybackSourceForRole(targetRoleIndex);
+
+                if (source == null || source.takeIndex == null)
+                    continue;
+
+                if (source.takeIndex.HasTakeForScene(
+                        source.sourceRoleIndex,
+                        sceneCount))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 
@@ -1268,6 +1339,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void DriveActiveRoleFromInput(int roleIndex, float dt)
         {
+            //UnityEngine.Debug.Log($"Out of range Index is: roleIndex: {roleIndex}");
             bool seated = SeatedMode || roles[roleIndex].sittingIdle;
 
             if (seated)
@@ -2013,54 +2085,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
             embodimentOffsetRoot.localPosition = p;
         }
 
-        /*
-        //Das wird im ChooseSpeakerState gerufen, damit man den nächsten Speaker von oben auswählen kann. 
-        public void PlaceConversationStageInFrontOfPlayer()
+        //Coroutine, damit man in den States ein Bool nach einer definierte Weile umschalten kann. 
+        public void Delay(float seconds, System.Action callback)
         {
-            float distanceFromPlayer = 3.0f;
-            float heightOffset = 0.0f;
-
-            Vector3 playerPos;
-            Quaternion playerRot;
-
-            if (XrHead != null)
-            {
-                playerPos = XrHead.position;
-                playerRot = Quaternion.Euler(0f, XrHead.eulerAngles.y, 0f);
-            }
-            else
-            {
-                playerPos = Vector3.zero;
-                playerRot = Quaternion.identity;
-                Debug.LogError("[PlaceConversationStageInFrontOfPlayer] XrHead is null.");
-            }
-
-            Vector3 forward = playerRot * Vector3.forward;
-
-            Vector3 stagePos = playerPos + forward * distanceFromPlayer;
-            stagePos.y = transform.position.y + heightOffset;
-
-            transform.position = stagePos;
-
-            Vector3 lookTarget = playerPos;
-            lookTarget.y = transform.position.y;
-
-            transform.LookAt(lookTarget);
-
-            // Falls die Stage danach falsch herum steht:
-            transform.Rotate(0f, 180f, 0f);
+            StartCoroutine(DelayRoutine(seconds, callback));
         }
 
-        public void PutConversationStageBackToPriorPosition(Transform priorPosRot)
+        private IEnumerator DelayRoutine(float seconds, System.Action callback)
         {
-            
-            if (_stageRoot == null)
-            {
-                Debug.LogError("[PutConversationStageBackToPriorPosition] _stageRoot is null.");
-            }
-            _stageRoot = priorPosRot;
+            yield return new WaitForSeconds(seconds);
+
+            callback?.Invoke();
         }
-        */
+     
 
 
 

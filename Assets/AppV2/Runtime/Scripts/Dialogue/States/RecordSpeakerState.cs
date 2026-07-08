@@ -15,6 +15,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
         private bool selectableNext;
+
+        private bool goingToPlaybackPreRecordedScenesState = false;
         private bool _waitingForRecordingSave = false;
         private bool _isRecording;
         private List<int> reactiveIdles;
@@ -151,6 +153,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
                     _waitingForRecordingSave = true;
+                    goingToPlaybackPreRecordedScenesState = true;
                     
                 }
                 
@@ -168,7 +171,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
                 if(!_startWaitingToSwitchToFullPlayback){
                     UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
-                    if(_flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, toBeRecorded, 3))
+                    if(_flow.PlayerNearNpcs(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3))
                     {
                         UnityEngine.Debug.Log($"[RecordSpeakerState] _flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, toBeRecorded, 3): true ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
@@ -238,8 +241,17 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
             else
             {
-                UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitAutoSelection() was called selectableNext: {selectableNext}");
-                _flow.SpeakerStateExitAutoSelection();
+                if (goingToPlaybackPreRecordedScenesState)
+                {   
+                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3);
+                    _flow.SpeakerStateExitAutoSelectionGoingToPlaybackPreRecordedScenesState();
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitAutoSelection() was called selectableNext: {selectableNext}");
+                    _flow.SpeakerStateExitAutoSelection();
+                }
+                
                 
             }
             

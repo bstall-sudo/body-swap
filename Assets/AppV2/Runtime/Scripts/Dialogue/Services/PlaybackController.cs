@@ -85,6 +85,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
         }
 
+        //Um die Bezugspunkte für die PreRecordedScenes anzupassen
+        public void SetPlaybackOriginForIndex(int roleIndex, Transform origin)
+        {
+            if (players == null || roleIndex < 0 || roleIndex >= players.Count)
+                return;
+
+            players[roleIndex].SetPlaybackOrigin(origin);
+        }
+
         public void PlaybackForIndexListBegin(List<int> roleIndices, float playerHeightCM, int sceneCount, string sessionId){
 
             foreach (var roleIndex in roleIndices){
@@ -176,11 +185,29 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
             
         }
-
+/*
         // wird vom ConversationStage gerufen, um zu wissen, ob alle gestopped sind.. 
         public bool ArePlaybacksStopped()
         {
             return allStoppedPlaying;
+        }
+    */    
+// wird vom ConversationStage gerufen, um zu wissen, ob alle gestopped sind.. 
+        public bool ArePlaybacksStoppedForIndices(List<int> roleIndices)
+        {
+            if (roleIndices == null || players == null)
+                return true;
+
+            foreach (int roleIndex in roleIndices)
+            {
+                if (roleIndex < 0 || roleIndex >= players.Count)
+                    continue;
+
+                if (players[roleIndex].IsPlaying)
+                    return false;
+            }
+
+            return true;
         }
 
         public bool HasTakeForScene(int roleIndex, int sceneCount)

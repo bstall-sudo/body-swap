@@ -32,7 +32,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            _roleCount =  _flow._data.RoleCount;
+            _roleCount =  _flow._data.AllRoleCount;
             _seatedMode = _flow.Stage.SeatedMode;
 
             if (_seatedMode)
@@ -85,7 +85,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 _flow.Stage.PlaybackTick(_playbacks);
                 _flow.Stage.ReactiveIdleStart(_reactiveIdles, _playbacks[0]);
-                _allplaybaksStopped = _flow.Stage.PlaybacksAreAllStopped();
+                _allplaybaksStopped = _flow.Stage.PlaybacksAreAllStopped(_playbacks);
             }
             if(_allplaybaksStopped)
             {   
