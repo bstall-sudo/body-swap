@@ -32,6 +32,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private int _pendingFinalizeTicksRemaining;
         private string _pendingRoleId;
         private int _pendingRoleIndex;
+
+        private int _pendingSceneCount;
         private TakeData _pendingTake;
 
         private (
@@ -123,55 +125,69 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
         // Transform roleRoot, string roleId
-        public void BeginRecording(Transform stageRoot, float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
+        public void BeginRecording(
+            Transform stageRoot,
+            float roleScale,
+            int roleIndex,
+            int sceneCount,
+            IInputTransformsProvider input)
         {
-            //Anpassung weil jetzt RoleRig role als Argument übergeben wird. 
+            if (roleIndex < 0 || roleIndex >= _roles.Count)
+            {
+                Debug.LogError(
+                    $"BeginRecording: invalid roleIndex {roleIndex}, roles.Count={_roles.Count}");
+                return;
+            }
+
+            if (roleIndex >= _hasLastFrameList.Count)
+            {
+                Debug.LogError(
+                    $"BeginRecording: roleIndex {roleIndex} exceeds _hasLastFrameList.Count={_hasLastFrameList.Count}");
+                return;
+            }
+
             Transform roleRoot = _roles[roleIndex].root;
             string roleId = _roles[roleIndex].roleId;
-            
 
             if (stageRoot == null)
             {
-                UnityEngine.Debug.LogError("BeginRecording: stageRoot is null.");
+                Debug.LogError("BeginRecording: stageRoot is null.");
                 return;
             }
 
             if (roleRoot == null)
             {
-                UnityEngine.Debug.LogError($"BeginRecording: roleRoot is null for role {roleId}.");
+                Debug.LogError($"BeginRecording: roleRoot is null for role {roleId}.");
                 return;
             }
 
             if (input == null)
             {
-                UnityEngine.Debug.LogError("BeginRecording: input is null.");
+                Debug.LogError("BeginRecording: input is null.");
                 return;
             }
 
-            if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
-            {
-                UnityEngine.Debug.LogError($"BeginRecording: invalid roleIndex {roleIndex}.");
-                return;
-            }
-
-
-       
-            
             _currentSceneCount = sceneCount;
-       
-            _takeRecorder = new TakeRecorder(stageRoot, _roles[roleIndex], roleIndex);
 
-            // set roleScale im RoleRecorder damit der die AufnahmeDaten vor dem Abspeichern wieder auf normal Grösse Skalieren kann. 
-            //Sonst vervielfacht sich der Offset mit der Zeit und man versinkt mit jedem Rollenwechsel tiefer im Boden.
+            Debug.Log(
+                $"[xx] [RecordingController.BeginRecording] CREATE recorder " +
+                $"role={roleIndex}, scene={sceneCount}");
+
+            _takeRecorder =
+                new TakeRecorder(stageRoot, _roles[roleIndex], roleIndex);
+
             _takeRecorder.SetRoleScale(roleScale);
 
-
             ApplyDesiredStartPoseForRole(roleIndex);
-            _takeRecorder.Begin();
-            _isRecording = true;
-            //UnityEngine.Debug.Log($"BeginRecording: roleId={roleId}, roleIndex={roleIndex}");
-      
 
+            _takeRecorder.Begin();
+
+            _isRecording = true;
+
+            Debug.Log(
+                $"[xx] [RecordingController.BeginRecording] DONE " +
+                $"role={roleIndex}, scene={sceneCount}, " +
+                $"recorderNull={_takeRecorder == null}");
         }
 
         //hier wird entweder auf die Pos/Rot Daten aus _lastEndPosList/_lastEndYawList zurückgegriffen, oder InitialStartPose verwendet. 
@@ -226,74 +242,69 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         public void EndRecording(int roleIndex, string roleId, int sceneCount)
         {
-            if (!_isRecording)
-            {
-                UnityEngine.Debug.LogError("EndRecording: _isReorcing is false");
-                return;
-            }
             if (_takeRecorder == null)
             {
-                UnityEngine.Debug.LogError("EndRecording: there is no _takeRecorder.");
+                Debug.LogError($"EndRecording: no recorder for scene={sceneCount}");
+                return;
+            }
+
+            if (!_isRecording)
+            {
+                Debug.LogError("EndRecording: _isRecording is false");
                 return;
             }
 
             if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
             {
-                UnityEngine.Debug.LogError($"EndRecording: invalid roleIndex {roleIndex}.");
+                Debug.LogError($"EndRecording: invalid roleIndex {roleIndex}");
                 return;
             }
-                
 
             _isRecording = false;
 
-            var info = _takeRecorder.EndAndGetTrimInfo();
+            var recorder = _takeRecorder;
 
-            // Frames sind sofort verfügbar:
-            var take = _takeRecorder.Current;
+            var info = recorder.EndAndGetTrimInfo();
+            var take = recorder.Current;
 
-            
+            // Wichtig: globale Referenz sofort freigeben.
+            _takeRecorder = null;
+
             if (take == null)
             {
-                UnityEngine.Debug.LogError("EndRecording: take is null.");
+                Debug.LogError("EndRecording: take is null.");
                 return;
             }
-         
 
-            if (take != null && take.Frames.Count > 0)
+            if (take.Frames != null && take.Frames.Count > 0)
             {
-                var lastFrame = take.Frames[take.Frames.Count - 1];
-                _lastEndPosList[roleIndex] = lastFrame.Body.Pos;
-                _lastEndYawList[roleIndex]  = lastFrame.Body.YawDeg;
-                _lastHeadEndPosList[roleIndex] = lastFrame.Head.Pos;
-                _lastHeadEndYawList[roleIndex] = lastFrame.Head.Rot.eulerAngles.y;
+                var lastFrame = take.Frames[^1];
 
-                _hasLastFrameList[roleIndex]  = true;
+                _lastEndPosList[roleIndex] = lastFrame.Body.Pos;
+                _lastEndYawList[roleIndex] = lastFrame.Body.YawDeg;
+                _lastHeadEndPosList[roleIndex] = lastFrame.Head.Pos;
+                _lastHeadEndYawList[roleIndex] =
+                    lastFrame.Head.Rot.eulerAngles.y;
+
+                _hasLastFrameList[roleIndex] = true;
             }
 
-
-            //_lastTakeList[roleIndex] = take;
-
-            // Falls es Trim-Info gibt, um 2 Ticks verzögert finalisieren
             if (info.HasValue)
             {
                 _pendingTrimInfo = info.Value;
                 _pendingRoleId = roleId;
                 _pendingRoleIndex = roleIndex;
+                _pendingSceneCount = sceneCount;
                 _pendingTake = take;
+
                 _pendingFinalizeTicksRemaining = 2;
                 _hasPendingFinalize = true;
-
-                //UnityEngine.Debug.Log($"EndRecording: pending finalize started for roleId={roleId}");
             }
             else
             {
-                
-                // Kein Trim nötig -> direkt speichern
                 PersistTake(roleIndex, roleId, sceneCount, take);
             }
-
-
-        }                    
+        }                   
 
         private void FinalizePendingTrim(int roleIndex, string roleId,  int sceneCount)
         {
@@ -320,7 +331,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
        
             //_lastTakeList[_pendingRoleIndex] = _pendingTake;
 
-            PersistTake(_pendingRoleIndex, _pendingRoleId,  sceneCount, _pendingTake);
+            PersistTake(_pendingRoleIndex, _pendingRoleId,  _pendingSceneCount, _pendingTake);
 
             //UnityEngine.Debug.Log($"FinalizePendingTrim: persisted roleId={_pendingRoleId}");
         }
@@ -396,7 +407,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         }
 
         _pendingTake = null;
-        _takeRecorder = null;
+        
     }
 
     // das wird im ConversationStage gebraucht, damit man an die richtige Stelle Lerpen kann.

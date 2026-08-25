@@ -140,7 +140,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
             if (sceneCount > -1 && _playbacks.Count>0)
             {
-                _flow.Stage.PlaybackStart(_playbacks, sceneCount);
+                //hier zweimal sceneCount, weil es den SceneCount für die aktuelle Session und SceneCount PreRecorded gibt. 
+                _flow.Stage.PlaybackStart(_playbacks, sceneCount, sceneCount);
                 
             }
             

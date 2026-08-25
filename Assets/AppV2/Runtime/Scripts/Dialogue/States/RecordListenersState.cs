@@ -81,8 +81,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             playbacks = _flow._data.Playbacks;
 
 
-
-            _flow.Stage.PlaybackStart(playbacks, sceneCount);
+            //hier zweimal sceneCount, weil es den SceneCount für die aktuelle Session und SceneCount PreRecorded gibt. 
+            _flow.Stage.PlaybackStart(playbacks, sceneCount, sceneCount);
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 

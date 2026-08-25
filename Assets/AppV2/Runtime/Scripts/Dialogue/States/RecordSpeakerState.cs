@@ -38,10 +38,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Enter()
 
         {
+            foreach (var role in _flow.Stage.roles)
+            {
+                Debug.Log(
+                    $"[NPC Position] [STATE ENTER] {role.roleId}: " +
+                    $"local={role.root.localPosition}, " +
+                    $"world={role.root.position}"
+                );
+            }
+
             UnityEngine.Debug.Log("[RecordSpeakerState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
-        
-            
+
             // im ersten Durchgang müssen die Variablen des FlowStateData-Objektes im Enter State gerufen werden, 
             // in den späteren Scenen werden die Variablen dann im Exit neu gesetzt, damit sie für die Align szenen schon stimmen.
             // allerdings gibt es jetzt ein Problem mit den Selectables.
@@ -149,7 +157,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //IsPlayerNearNpc(int roleIndex, Transform player, float radius)
                 if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
                 {
-                    UnityEngine.Debug.Log("[RecordSpeakerState] [PlayerCameNearNpc] ");
+                    
+                    UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} ");
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
                     _waitingForRecordingSave = true;
@@ -173,7 +182,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
                     if(_flow.PlayerNearNpcs(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3))
                     {
-                        UnityEngine.Debug.Log($"[RecordSpeakerState] _flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, toBeRecorded, 3): true ");
+                        UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
                     }
                     else if(selectableNext)
@@ -243,6 +252,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 if (goingToPlaybackPreRecordedScenesState)
                 {   
+                    
                     _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3);
                     _flow.SpeakerStateExitAutoSelectionGoingToPlaybackPreRecordedScenesState();
                 }

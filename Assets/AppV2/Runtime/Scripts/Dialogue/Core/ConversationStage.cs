@@ -136,6 +136,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public RoleCalibrationDataProvider _calibrationDataProvider;
         public RoleCalibrationDataApplier _calibrationDataApplier;
 
+        //für das Kopieren der PreRecordedTakes zur aktuellen Session, während sie abgespielt wird.
+        private PreRecordedTakeImporter _preRecordedTakeImporter;
+        private void BuildPreRecordedTakeImporter()
+        {
+            _preRecordedTakeImporter =
+                new PreRecordedTakeImporter(
+                    _store,
+                    _session,
+                    _takeIndex
+                );
+        }
+
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.
         [SerializeField] private Transform embodimentOffsetRoot;
@@ -270,12 +282,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     isPreRecordedSource = false
                 };
 
-                Debug.Log(
-                    $"[PlaybackStart] jajaja target={_playbackSourcesByRoleIndex[i].targetRoleIndex}, " +
-                    $"[PlaybackStart] jajaja sourceRoleIndex={_playbackSourcesByRoleIndex[i].sourceRoleIndex}, " +
-                    $"[PlaybackStart] jajaja sessionId={_playbackSourcesByRoleIndex[i].sessionId}, " +
-                    $"[PlaybackStart] jajaja isPreRecorded={_playbackSourcesByRoleIndex[i].isPreRecordedSource}"
-                );
+                
             }
 
             
@@ -350,17 +357,51 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SwitchRoleToCurrentSession(int roleIndex)
         {
-            _playbackSourcesByRoleIndex[roleIndex] = new RolePlaybackSource
+            if (_session == null)
             {
-                store = _store,
-                session = _session,
-                takeIndex = _takeIndex,
+                Debug.LogError(
+                    $"[SwitchRoleToCurrentSession] _session is null for role {roleIndex}"
+                );
+                return;
+            }
 
-                targetRoleIndex = roleIndex,
-                sourceRoleIndex = roleIndex,
+            if (_store == null)
+            {
+                Debug.LogError(
+                    $"[SwitchRoleToCurrentSession] _store is null for role {roleIndex}"
+                );
+                return;
+            }
 
-                isPreRecordedSource = false
-            };
+            if (_takeIndex == null)
+            {
+                Debug.LogError(
+                    $"[SwitchRoleToCurrentSession] _takeIndex is null for role {roleIndex}"
+                );
+                return;
+            }
+
+            _playbackSourcesByRoleIndex[roleIndex] =
+                new RolePlaybackSource
+                {
+                    // aktuelle Session
+                    store = _store,
+                    session = _session,
+                    takeIndex = _takeIndex,
+
+                    // DAS HAT GEFEHLT
+                    sessionId = _session.SessionId,
+
+                    targetRoleIndex = roleIndex,
+                    sourceRoleIndex = roleIndex,
+
+                    isPreRecordedSource = false
+                };
+
+            Debug.Log(
+                $"[SwitchRoleToCurrentSession] role={roleIndex}, " +
+                $"sessionId={_session.SessionId}"
+            );
         }
         //nicht benötigte Rollen werden deaktiviert.
         public void ApplyRoleCount()
@@ -456,6 +497,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     npcRole.slotId = slotId;
                     npcRole.sourceRoleIndex = npcRole.sourceRoleIndex;
                     npcRole.roleIndex = targetRoleIndex;
+
+                    
                     
                     npcRole.sourceSessionId = import.sessionId;
                     npcRole.sourceWorkshopFolderName = import.workshopFolderName;
@@ -463,6 +506,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     npcRole.isActiveConversationPartner =false;
 
                     BindRoleToSlot(npcRole, slotId);
+
+                    
 
                     roles.Add(npcRole);
 
@@ -485,6 +530,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             roleCount = roles.Count;
         }
+
 
         private void BindRoleToSlot(RoleRig role, string slotId)
         {
@@ -550,6 +596,112 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             return true;
         }
+
+/*
+        public void ApplyPreRecordedNpcStartPoses()
+        {
+            if (roles == null)
+                return;
+
+            foreach (RoleRig role in roles)
+            {
+                if (role == null || !role.hasPreRecordedTakes)
+                    continue;
+
+                if (role.root == null)
+                    continue;
+
+                if (!_playbackSourcesByRoleIndex.TryGetValue(
+                        role.roleIndex,
+                        out RolePlaybackSource source))
+                {
+                    Debug.LogWarning(
+                        $"[NPC StartPose] No PlaybackSource for {role.roleId}"
+                    );
+                    continue;
+                }
+
+                if (source.session == null ||
+                    source.session.Roles == null)
+                    continue;
+
+                ConversationRoleMeta sourceMeta =
+                    source.session.Roles.Find(
+                        r => r.RoleIndex == source.sourceRoleIndex
+                    );
+
+                if (sourceMeta?.StartRootPose == null)
+                {
+                    Debug.LogWarning(
+                        $"[NPC StartPose] No source StartRootPose for {role.roleId}"
+                    );
+                    continue;
+                }
+
+                StageSpawnPoint spawn =
+                    environmentLoader.GetSpawnPoint(role.roleSpawnId);
+
+                if (spawn == null)
+                {
+                    Debug.LogWarning(
+                        $"[NPC StartPose] Spawn '{role.roleSpawnId}' " +
+                        $"not found for {role.roleId}"
+                    );
+                    continue;
+                }
+
+                TransformData transformedPose =
+                    TransformStartPoseToCurrentStage(
+                        sourceMeta.StartRootPose,
+                        _stageRoot,
+                        spawn.transform
+                    );
+
+                role.root.localPosition =
+                    transformedPose.LocalPosition;
+
+                role.root.localRotation =
+                    transformedPose.LocalRotation;
+
+                Debug.Log(
+                    $"[NPC StartPose] {role.roleId}: " +
+                    $"source={sourceMeta.StartRootPose.LocalPosition}, " +
+                    $"spawn={role.roleSpawnId}, " +
+                    $"target={transformedPose.LocalPosition}"
+                );
+            }
+        }
+        private TransformData TransformStartPoseToCurrentStage(
+            TransformData sourcePose,
+            Transform stageRoot,
+            Transform roleSpawn)
+        {
+            if (sourcePose == null ||
+                stageRoot == null ||
+                roleSpawn == null)
+                return null;
+
+            Vector3 worldPos =
+                roleSpawn.TransformPoint(
+                    sourcePose.LocalPosition
+                );
+
+            Quaternion worldRot =
+                roleSpawn.rotation *
+                sourcePose.LocalRotation;
+
+            return new TransformData
+            {
+                LocalPosition =
+                    stageRoot.InverseTransformPoint(worldPos),
+
+                LocalRotation =
+                    Quaternion.Inverse(stageRoot.rotation) *
+                    worldRot
+            };
+        }
+
+        */
 
         public IInputTransformsProvider _input;
         private XRInputTransforms _xrInput;
@@ -671,6 +823,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _calibrationDataApplier = new RoleCalibrationDataApplier();
                 _calibrationDataApplier.Initialize(roles);
                 _calibrationDataApplier.ApplyRoleMetasToScene(roles, _playbackController._session);
+                
+
                 MirrorSetVisibility.ActivateMirror(false);
                 TurnOffVisibilityOfVisualRig();
                 
@@ -697,8 +851,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     RoleCount = roleCount,
                     SessionVersion = 1
                 };
+
+                //damit die abgespielten Szenen von den PreRecorded Figuren in den Aktuellen Session Ordner kopiert werden können.
+                BuildPreRecordedTakeImporter();
+
+                _preRecordedTakeImporter = new PreRecordedTakeImporter(
+                        _store,
+                        _session,
+                        _takeIndex
+                    );
                 sceneLoader.LoadSceneForRecordingMode(environmentId,stageSpawnId,roles);
                 UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
+                //ApplyPreRecordedNpcStartPoses();
 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
@@ -707,6 +871,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 // Das passiert im Exit von CalibrationState.
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
                 _calibrationDataProvider.Initialize(roles); 
+                
 
                 
                 
@@ -724,6 +889,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
 
+            foreach (RoleRig role in roles)
+            {
+                Debug.Log(
+                    $"[NPC Import] [AWAKE END] {role.roleId}: " +
+                    $"local={role.root?.localPosition}, " +
+                    $"world={role.root?.position}"
+                );
+            }
+
 
             
         }
@@ -736,6 +910,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
 /// <param name="session"></param>
         public void SetSession(SessionModel session)
         {
+            Debug.Log(
+                $"[ConversationStage][SetSession] CALLED! " +
+                $"session={session?.SessionId}"
+            );
             _session = session;
             environmentId = session.EnvironmentId;
             stageSpawnId = session.StageSpawnId;
@@ -744,6 +922,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //BuildActiveRoles();
             //ApplyRoleCount();
             BuildDefaultPlaybackSources();
+
+
             
         }
 
@@ -783,57 +963,84 @@ namespace AppV2.Runtime.Scripts.Dialogue
             XrOrigin.rotation = _stageRoot.rotation;
             UnityEngine.Debug.Log($"StageRootPosition is: {_stageRoot.position}");
         }
+
+        //nur zum debuggen 24.08.2026
+        public void DebugRolePositions(string label)
+        {
+            foreach (var role in roles)
+            {
+                if (role?.root == null)
+                    continue;
+
+                Debug.Log(
+                    $"[NPC Position] [{label}] {role.roleId}: " +
+                    $"local={role.root.localPosition}, " +
+                    $"world={role.root.position}"
+                );
+            }
+        }
             
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            if(roles.Count == 0) {
-                UnityEngine.Debug.LogError("No Roles assigned in ConversationStage.");
+            DebugRolePositions("START BEGIN");
+
+            if (roles.Count == 0)
+            {
+                Debug.LogError("No Roles assigned in ConversationStage.");
                 return;
             }
 
             if (UseXR)
             {
-                _input = new XRInputTransforms(XrHead, XrLeftHand, XrRightHand, XrHip, XrLeftFoot, XrRightFoot);
+                _input = new XRInputTransforms(
+                    XrHead,
+                    XrLeftHand,
+                    XrRightHand,
+                    XrHip,
+                    XrLeftFoot,
+                    XrRightFoot
+                );
 
-                //UnityEngine.Debug.Log($"new _input was created");
+                DebugRolePositions("AFTER INPUT CREATE");
 
-                //Anpassung von XR-Rig an Bodenhöhe
+
                 SnapXrOriginToGround();
-                //Das setzt den Anker für die Transforms siehe XRInputTransforms
+
+                DebugRolePositions("AFTER SnapXrOriginToGround");
+
+
                 _input.SetAnchorFromTakeRoot(_stageRoot);
-                //Für die Höhenanpassung der MainCamera bei Rollen mit unterschiedlichen Grössen
+
+                DebugRolePositions("AFTER SetAnchorFromTakeRoot");
+
+
                 if (embodimentOffsetRoot != null)
                 {
                     _baseCameraOffsetY = 0.0f;
-                    //_baseCameraOffsetY = embodimentOffsetRoot.localPosition.y;
-                    //UnityEngine.Debug.Log($"Base CameraOffset Y = {_baseCameraOffsetY}");
                 }
-                if (allowTeleportation)
-                {
-                    xRLocomotionToggle.SetLocomotionEnabled(true);
-                }
-                else
-                {
-                    xRLocomotionToggle.SetLocomotionEnabled(false);
-                }
-                    
 
+                if (allowTeleportation)
+                    xRLocomotionToggle.SetLocomotionEnabled(true);
+                else
+                    xRLocomotionToggle.SetLocomotionEnabled(false);
+
+                DebugRolePositions("AFTER LOCOMOTION");
             }
             else
             {
-              
                 _input = new KeyboardInputTransforms();
             }
 
-            
 
-            //Avatare Grösse anpassen
             ApplyAllRoleVisualScales();
 
-            //used in ChooseSpeakerState to select next speaker
+            DebugRolePositions("AFTER ApplyAllRoleVisualScales");
+
+
             chooseSpeakerController.Initialize(roles);
 
+            DebugRolePositions("AFTER ChooseSpeaker Initialize");
         }
         public void SetEnvironmentId(string id)
         {
@@ -975,7 +1182,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
         */
 
-        public List<int> PlaybackStart(List<int> roleIndices, int sceneCount)
+        public List<int> PlaybackStart(List<int> roleIndices, int targetSceneCount, int sourceSceneCount)
         {
  
             List<int> noTakesFoundIndices = new();
@@ -985,7 +1192,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             foreach (int targetRoleIndex in roleIndices)
             {
-                Debug.Log($"[PlaybackStart] jajaja target={targetRoleIndex} ");
+                //Debug.Log($"[PlaybackStart] jajaja target={targetRoleIndex} ");
 
                 RolePlaybackSource source = GetOrCreatePlaybackSourceForRole(targetRoleIndex);
 
@@ -998,7 +1205,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (source.isPreRecordedSource)
                 {
                     StageSpawnPoint spawn =
-                        environmentLoader.GetSpawnPoint(roles[targetRoleIndex].avatarSpawnId);
+                        environmentLoader.GetSpawnPoint(roles[targetRoleIndex].roleSpawnId);
 
                     _playbackController.SetPlaybackOriginForIndex(
                         targetRoleIndex,
@@ -1016,9 +1223,41 @@ namespace AppV2.Runtime.Scripts.Dialogue
    
                 if (source.takeIndex.TryGetTakeForScene(
                         source.sourceRoleIndex,
-                        sceneCount,
+                        sourceSceneCount,
                         out TakeMeta takeMeta))
                 {
+                    //Debug.Log($"[ConversationStage][PlaybackStart] jajaja source.sourceRoleIndex={source.sourceRoleIndex} found take in takeIndex ");
+                    if (source.isPreRecordedSource)
+                    {
+                        if (_preRecordedTakeImporter == null)
+                        {
+                            Debug.LogError(
+                                "[ConversationStage][PlaybackStart] _preRecordedTakeImporter is NULL!"
+                            );
+                        }
+                        else
+                        {
+                            StageSpawnPoint spawn =
+                                environmentLoader.GetSpawnPoint(
+                                    roles[targetRoleIndex].roleSpawnId
+                                );
+
+
+                            bool imported = _preRecordedTakeImporter.ImportTake(
+                                roles[targetRoleIndex],
+                                targetRoleIndex,
+                                targetSceneCount,
+                                takeMeta,
+                                source,
+                                _stageRoot,
+                                spawn.transform
+                            );
+
+                            Debug.Log(
+                                $"[ConversationStage][PlaybackStart] ImportTake result={imported}"
+                            );
+                        }
+                    }
                     _playbackController.PlaybackForIndexBeginFromTake(
                         targetRoleIndex,
                         takeMeta,
@@ -1029,7 +1268,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 }
                 else
                 {
-                    if (sceneCount == 0)
+                    if (targetSceneCount == 0)
                         ApplyRoleStartPose(targetRoleIndex);
 
                     noTakesFoundIndices.Add(targetRoleIndex);
@@ -1124,6 +1363,34 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
 
             return false;
+        }
+
+        public List<int> PlaybackIndicesWithTakeForScene(
+            List<int> roleIndices,
+            int sceneCount)
+        {
+            List<int> indicesWithTake = new List<int>();
+
+            if (roleIndices == null)
+                return indicesWithTake;
+
+            foreach (int targetRoleIndex in roleIndices)
+            {
+                RolePlaybackSource source =
+                    GetOrCreatePlaybackSourceForRole(targetRoleIndex);
+
+                if (source == null || source.takeIndex == null)
+                    continue;
+
+                if (source.takeIndex.HasTakeForScene(
+                        source.sourceRoleIndex,
+                        sceneCount))
+                {
+                    indicesWithTake.Add(targetRoleIndex);
+                }
+            }
+
+            return indicesWithTake;
         }
 
 
@@ -2063,7 +2330,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             Vector3 p = embodimentOffsetRoot.localPosition;
             p.y = _baseCameraOffsetY + deltaM;
             embodimentOffsetRoot.localPosition = p;
-
+/*
             Debug.Log(
                 $"ApplyActiveRoleEmbodimentHeight: role={role.roleId}, " +
                 $"seated={useSeatedHeight}, " +
@@ -2071,6 +2338,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 $"roleEyeHeightCm={roleEyeHeightCm}, " +
                 $"deltaM={deltaM}, newY={p.y}"
             );
+            */
         }
 
         // höhenanpassung der Kamera, damit man als kleine Rolle aus der Perspektive des kopfes der kleinere Figur schaut.

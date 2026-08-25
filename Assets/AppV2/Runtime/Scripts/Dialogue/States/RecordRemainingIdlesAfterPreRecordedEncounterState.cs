@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -8,18 +8,30 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
     {
         private readonly FlowController _flow;
 
-        private int toBeRecorded;
-        private int sceneCount;
-        private List<int> reactiveIdles;
-        private List<int> indicesOfPassiveRoles;
-        private List<int> playbacks;
+        private int _toBeRecorded;
+        private int _sceneCount;
+        private List<int> _activeRoles;
+
+        
+        private int _sceneCountWhilePlaybackPreRecorded;
+
+        private int _sceneCountBeforePlaybackPreRecorded;
+        private List<int> _reactiveIdles;
+        
+        private List<int> _preRecordedRolesIndices;
+        private List<int> _playbacks;
 
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
-        private bool selectableNext;
+        private bool _selectableNext;
 
         private bool _allplaybaksStoped = false;
 
+        private bool _goToPlaybackPreRecordedScenes = false;
+
+        public bool _goToSpeakerState = false;
+        private bool _allplaybaksStopped = false;
+        private bool _goToRecordRemainingIdles = true;
         private bool _waitingForRecordingSave = false;
         private bool _startWaitingToSwitchToFullPlayback = false;
 
@@ -39,13 +51,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow == null)
             {
-                UnityEngine.Debug.LogError("RecordRemainingIdlesAfterPreRecordedEncounterState: _flow is null");
+                UnityEngine.Debug.LogError("RecordListenersState: _flow is null");
                 return;
             }
 
             if (_flow.Stage == null)
             {
-                UnityEngine.Debug.LogError("RecordRemainingIdlesAfterPreRecordedEncounterState: _flow.Stage is null");
+                UnityEngine.Debug.LogError("RecordListenersState: _flow.Stage is null");
                 return;
             }
 
@@ -53,129 +65,96 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 _flow.StatusUI.ShowListenerState();
                 _flow.StatusUI.ShowCustomCue(
-                    "Zuhörer",
+                    "Zuhörer verbliebene Rollen",
                     new Vector2(0f, 180f),
                     new Vector2(500f, 0f),
                     Color.red
                 );
             }
             
-            selectableNext = _flow.Stage.selectableNext;
-            sceneCount = _flow._data.SceneCount;
+
+            _sceneCountWhilePlaybackPreRecorded = _flow._data.SceneCountWhilePlaybackPreRecorded;
+            _sceneCountBeforePlaybackPreRecorded = _flow._data.SceneCountBeforePlaybackPreRecorded;
+
+            _selectableNext = _flow.Stage.selectableNext;
+            _preRecordedRolesIndices = _flow._data.CurrentPreRecordedPlaybacks;
+            _sceneCount = _flow._data.SceneCountWhilePlaybackPreRecorded;
             
+            //CheckFlowCondition();
 
-            toBeRecorded = _flow._data.ToBeRecorded;
-
-            indicesOfPassiveRoles = _flow._data.CurrentPreRecordedPlaybacks;
+            _toBeRecorded = _flow._data.ToBeRecorded;
+            _activeRoles = GetActiveRoleIndices(_toBeRecorded); 
             
             if(_isUsingXr){
                 //HöhenAnpassung der XR-Kamera.
-                _flow.Stage.ApplyActiveRoleEmbodimentHeight(toBeRecorded);
+                _flow.Stage.ApplyActiveRoleEmbodimentHeight(_toBeRecorded);
                 //Anpassung Grösse der Welt an Rollengrösse anpassen.
                 //_flow.Stage.ApplyVisualScaleToConversationStage(toBeRecorded);
-                _flow.Stage.ValidateFootSolver(toBeRecorded);
+                _flow.Stage.ValidateFootSolver(_toBeRecorded);
             }
             
-            reactiveIdles = _flow._data.ReactiveIdles;
-            
-            playbacks = _flow._data.Playbacks;
+            PrepareStartPlaybacksReactiveIdlesForScene(_sceneCount, _toBeRecorded);
+            _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
 
-
-
-            _flow.Stage.PlaybackStart(playbacks, sceneCount);
-            _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
-            _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
-
-            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter", playbacks, reactiveIdles, toBeRecorded, sceneCount);
-            UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter End");
+            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] at End", _playbacks, _reactiveIdles,_toBeRecorded);
+            //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter End");
 
         }
 
         public void Tick(float dt)
         {
-            _flow.Stage.ReactiveIdleTick(reactiveIdles, playbacks, toBeRecorded, dt);
-            // Solange noch nicht beendet wird: normales Verhalten
-            if (!_waitingForRecordingSave)
+            if (!_allplaybaksStopped)
             {
-                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
-                //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
-                _flow.Stage.PlaybackTick(playbacks);
-                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3) || _flow.Stage.PlaybacksAreAllStopped(playbacks) )
-                {
-                    
-                    _waitingForRecordingSave = true;
-                    
-                }
-                
+                _flow.Stage.DriveAndRecordTickActiveRole(_toBeRecorded, _sceneCount, dt);
+                _flow.Stage.PlaybackTick(_playbacks);
+                //_flow.Stage.ReactiveIdleStart(_reactiveIdles, _playbacks[0]);
+                //
+                _allplaybaksStopped = _flow.Stage.PlaybacksAreAllStopped(_playbacks);
             }
-
-            
-
-            if (!_waitingForRecordingSave && _flow.Stage.PlaybacksAreAllStopped(playbacks) )
-                {
-                    UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] All playbacks are stopped, stopping recording now.");
-
-                    _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
-                    
-                    _allplaybaksStoped = true;
-                   
-                    _waitingForRecordingSave = true;
-                }
-           if (_waitingForRecordingSave)
+            if (_allplaybaksStopped)
             {
-                _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
-                //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
-                // Wir warten nur noch auf das fertige Speichern
-                
-                if (_flow.Stage.RecordingSaveCompleted())
+                _flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
+                _sceneCount++;
+                PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update before Update", _playbacks, _reactiveIdles,_toBeRecorded);
+                _playbacks = _flow.Stage.PlaybackIndicesWithTakeForScene(_activeRoles, _sceneCount);
+                _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
+                _reactiveIdles = GetIdles(_sceneCount, _toBeRecorded);
+                PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update after Update", _playbacks, _reactiveIdles,_toBeRecorded);
+                if (_playbacks.Count > 0)
                 {
-                    //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Recording was fully saved, switching to next state.");
-
-                    // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
-                    if(!_startWaitingToSwitchToFullPlayback){
-                        //hier false, weil die FlowStateData sollen nicht nochmal angepasst werden.
-                        
-                        if (selectableNext)
-                        {
-                            _flow.SetState(new ChooseSpeakerState(_flow));
-                        }
-                        else
-                        {   // wenn XR Modus -> dann Align zu neuer Position und wenn es keine aufzunehmenden Figuren 
-                            // (reactiveIdles.Count = 0) mehr
-                            // gibt, dann in den Align Modus zu neuem Record Speaker State.
-                            if(_isUsingXr){
-                                // GoToSpeakerState wird hier schon gesetzt, weil im RecordListenerState Exit die reactiveIdles schon neu gesetzt werden
-                                // basierend auf den Reactive Idles muss der PlayerAlignState den Ziel State bestimmen.
-                                if(_flow._data.TimesPreRecordedPlaybacksWerePlayed > 0){
-                                    UnityEngine.Debug.Log($"[RecordRemainingIdlesAfterPreRecordedEncounterState] _flow._data.TimesPreRecordedPlaybacksWerePlayed > 0 _flow._data.TimesPreRecordedPlaybacksWerePlayed: {_flow._data.TimesPreRecordedPlaybacksWerePlayed}.");
-                                    _flow._data.GoToSpeakerState = false;
-                                    _flow._data.GoToPlaybackPreRecordedState = false;
-                                    _flow._data.GoToRecordRemainingState = true;
-                                    
-                                }else{
-                                    UnityEngine.Debug.Log($"[RecordRemainingIdlesAfterPreRecordedEncounterState] _flow._data.TimesPreRecordedPlaybacksWerePlayed <= 0_flow._data.TimesPreRecordedPlaybacksWerePlayed: {_flow._data.TimesPreRecordedPlaybacksWerePlayed}.");
-                                    _flow._data.GoToSpeakerState = false;
-                                    _flow._data.GoToPlaybackPreRecordedState = false;
-                                    _flow._data.GoToSpeakerState = false;
-                                    _flow._data.GoToRecordRemainingState = false;
-                                    _flow._data.SceneCount ++;
-                                    _flow._data.GoToPlaybackPreRecordedState = true;
-                                    
-                                }
-                                _flow.SetState(new PlayerAlignState(_flow));
-                }else
-                    {
-                                
-                    }
-                            
-                        }
-                    // wenn _startWaitingToSwitchToFullPlayback == true -> dann geht es nach dem Save zu PlaybackFullConversationState.
-                    } else{
-                        _flow.SetState(new PlaybackFullConversationState(_flow));
-
-                    }
-                    return;
+                    //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] after update: SceneCount for Prerecorded Scenes is: {_sceneCountForPreRecordedScenes}");
+                    
+                    
+                    PrepareStartPlaybacksReactiveIdlesForScene(_sceneCount, _toBeRecorded);
+                    _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
+                    _allplaybaksStopped = false;
                 }
+                else
+                {
+                    //UnityEngine.Debug.Log("[PlaybackFullPreRecordedScenes] No more scenes found. Restart PlaybackFullConversation.");
+                    
+                    _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
+                    //_flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
+                    //_flow._data.TimesPreRecordedPlaybacksWerePlayed --;
+
+                    //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] TimesPreRecordedPlaybacksWerePlayed: {_flow._data.TimesPreRecordedPlaybacksWerePlayed}.");
+                    /*
+                    if(_flow._data.TimesPreRecordedPlaybacksWerePlayed <= 0)
+                    {
+                        _flow._data.GoToSpeakerState = true;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = false;
+                    } */
+                    SetFutureFlowDirection();
+                    //_flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
+                    PrintRoleLists(
+                            "[RecordRemainingIdlesAfterPreRecordedEncounterState] -> before PlayerAlignState", 
+                            _flow._data.Playbacks,
+                            _flow._data.ReactiveIdles,
+                            _flow._data.ToBeRecorded
+                            );
+                    _flow.SetState(new PlayerAlignState(_flow));
+                }  
             }
 
 
@@ -187,7 +166,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumeSecondaryAction())
             {
-                _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
+                //_flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
                 UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed SecondaryAction");
                 _startWaitingToSwitchToFullPlayback = true;
                 
@@ -213,9 +192,94 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
-            _flow.Stage.ReactiveIdleEnd(reactiveIdles);
+            _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
+
+            _flow._data.GoToPlaybackPreRecordedState = _goToPlaybackPreRecordedScenes;
+            _flow._data.GoToRecordRemainingState = _goToRecordRemainingIdles;
+            _flow._data.GoToSpeakerState = _goToSpeakerState;
             
-            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Exit", playbacks, reactiveIdles, toBeRecorded, sceneCount);
+            //hier muss noch eine _flow.RecordRemainingToEnd_DataAdjustments(); hin
+            //
+            
+            /*
+            if(_isUsingXr){
+                // Augenhöhe / MainCamera wieder auf neutral setzen.
+                _flow.Stage.ResetEmbodimentHeight();
+                //Grösse der Welt wieder zurücksetzen
+                _flow.Stage.ResetVisualScaleOfConversationStage(toBeRecorded);
+            }*/
+           
+            //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Exit");
+            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Exit", _playbacks, _reactiveIdles,_toBeRecorded);
+        }
+
+        private void PrepareStartPlaybacksReactiveIdlesForScene(int sceneCount, int toBeRecorded)
+        {
+            
+            
+            //hier werden alle existierenden Rollen in die Liste der Playbacks aufgenommen
+            _playbacks = _flow.Stage.PlaybackIndicesWithTakeForScene(_activeRoles, sceneCount);
+            
+            
+            //_playbacks = _flow._data.Playbacks;
+            //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] SceneCount is: {_playbacks.Count} playbacks: [" + string.Join(", ", _playbacks) + "]");
+            _flow.Stage.PlaybackStart(_playbacks, sceneCount, sceneCount);
+
+            //alle Rollen ohne Take sind in ReactiveIdles
+            _reactiveIdles = GetIdles(sceneCount, toBeRecorded);
+
+            //---------- Das muss ev. noch geändert werden
+            _flow.Stage.ReactiveIdleStart(_reactiveIdles, toBeRecorded);
+
+        }
+
+        private List<int> GetIdles(int sceneCount, int toBeRecorded)
+        {
+            List<int> playbacks  = new List<int>();
+            playbacks = _flow.Stage.PlaybackIndicesWithTakeForScene(_activeRoles, sceneCount);
+            List<int> idles  = new List<int>();
+            foreach(RoleRig role in _flow._data.Roles)
+            {
+                if (!playbacks.Contains(role.roleIndex))
+                {
+                    idles.Add(role.roleIndex);
+                }
+                
+            }
+            idles.Remove(toBeRecorded);
+
+            return idles;
+        }
+
+        private List<int> GetActiveRoleIndices(int toBeRecorded)
+        {
+            List<int> activeRoles  = new List<int>();
+            foreach(RoleRig role in _flow._data.Roles)
+            {
+                
+                activeRoles.Add(role.roleIndex);
+                
+                
+            }
+            activeRoles.Remove(toBeRecorded);
+            return activeRoles;
+        }
+
+        private void SetFutureFlowDirection()
+        {
+            
+            if (_flow._data.ReactiveIdles.Count > 0)
+            {
+                _goToRecordRemainingIdles = true;
+                _goToPlaybackPreRecordedScenes = false;
+                _goToSpeakerState = false;  
+            }
+            else
+            {
+                _goToRecordRemainingIdles = false;
+                _goToPlaybackPreRecordedScenes = false;
+                _goToSpeakerState = true;              
+            }
         }
 
         //für das Debugging
@@ -223,8 +287,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             string text, 
             List<int> playbacks,
             List<int> reactiveIdles,
-            int toBeRecorded,
-            int sceneCount
+            int toBeRecorded
             )
         {
             string playbacksString =
@@ -242,8 +305,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"[RoleLists] " +
                 $"playbacks={playbacksString} | " +
                 $"reactiveIdles={reactiveIdlesString} | " +
-                $"toBeRecorded={toBeRecorded} | " +
-                $"sceneCount={sceneCount} | "
+                $"sceneCount={_sceneCount} | " +
+                $"toBeRecorded={toBeRecorded} " 
             );
         }
 

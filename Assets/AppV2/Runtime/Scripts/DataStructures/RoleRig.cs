@@ -12,6 +12,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
     {
         public string avatarId; 
         public string avatarSpawnId= "";
+
+        //roleSpawnId ist die Position der Figur
+        public string roleSpawnId= "";
         public string roleId;                 // z.B. "A", "B", "C" oder "Role 1" das sollte in Zukunft entfernt werden, weil es sich mit slotId deckt.
 
         public string slotId;        // z.B. "A"
@@ -69,6 +72,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public bool hasInitialStartPose = false;
         public Vector3 initialStartPos;
         public float initialStartYawDeg;
+
+        public TransformData preRecordedStartRootPose;
+        
 
 
     

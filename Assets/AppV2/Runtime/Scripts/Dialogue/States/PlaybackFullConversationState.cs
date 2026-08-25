@@ -113,7 +113,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //hier werden alle existierenden Rollen in die Liste der Playbacks aufgenommen
             _playbacks = PlaybackCandidates(_roleCount);
             //UnityEngine.Debug.Log($"[PlaybackFullConversationState] SceneCount is: {_playbacks.Count}");
-            _noTakes = _flow.Stage.PlaybackStart(_playbacks, _sceneCount);
+            //hier zweimal sceneCount, weil es den SceneCount für die aktuelle Session und SceneCount PreRecorded gibt. 
+            _noTakes = _flow.Stage.PlaybackStart(_playbacks, _sceneCount,_sceneCount);
 
             //alle Rollen ohne Take sind in ReactiveIdles
             _reactiveIdles = _noTakes;

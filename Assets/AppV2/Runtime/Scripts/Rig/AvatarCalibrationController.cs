@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Loader;
-
+using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -147,7 +147,7 @@ namespace AppV2.Runtime.Scripts.Rig
         }
 
 
-        public void PlaceRoleAt(int roleIndex, Vector3 localFloorPosition, Quaternion localRotation)
+        public void PlaceRoleAt(int roleIndex, Vector3 localFloorPosition, Quaternion localRotation, Transform stageRoot)
         {
             if (!IsValidIndex(roleIndex)) return;
 
@@ -183,35 +183,103 @@ namespace AppV2.Runtime.Scripts.Rig
             }
             else
             {
-                PlaceImportedNpcRoleAtSpawnPoint(roleIndex);   
+                PlaceImportedNpcRoleAtSpawnPoint(roleIndex, stageRoot);   
             }
             
         }
 
-        public void PlaceImportedNpcRoleAtSpawnPoint(int roleIndex)
+        public void PlaceImportedNpcRoleAtSpawnPoint(int roleIndex, Transform stageRoot)
         {
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+                return;
+
             RoleRig role = roles[roleIndex];
 
             if (role == null || !role.hasPreRecordedTakes)
                 return;
 
+            if (role.root == null)
+            {
+                Debug.LogWarning(
+                    $"[PlaceImportedNpcRoleAtSpawnPoint] root missing: {role.roleId}"
+                );
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(role.roleSpawnId))
+            {
+                Debug.LogWarning(
+                    $"[PlaceImportedNpcRoleAtSpawnPoint] roleSpawnId missing for {role.roleId}"
+                );
+                return;
+            }
+
             StageSpawnPoint spawn =
-                environmentLoader.GetSpawnPoint(role.avatarSpawnId);
+                environmentLoader.GetSpawnPoint(role.roleSpawnId);
 
             if (spawn == null)
             {
-                Debug.LogWarning($"[PlaceImportedNpcRoleAtSpawnPoint] Spawn not found: {role.avatarSpawnId}");
+                Debug.LogWarning(
+                    $"[PlaceImportedNpcRoleAtSpawnPoint] Spawn not found: {role.roleSpawnId}"
+                );
                 return;
             }
 
-            if (role.roleRoot == null)
+            TransformData sourceStartPose = role.preRecordedStartRootPose;
+
+            if (sourceStartPose != null)
             {
-                Debug.LogWarning($"[PlaceImportedNpcRoleAtSpawnPoint] roleRoot missing: {role.roleId}");
-                return;
+                TransformData transformedPose =
+                    TransformStartPoseToCurrentStage(
+                        sourceStartPose,
+                        stageRoot,
+                        spawn.transform
+                    );
+
+                role.root.localPosition = transformedPose.LocalPosition;
+                role.root.localRotation = transformedPose.LocalRotation;
+            }
+            else
+            {
+                // Fallback: direkt auf SpawnPoint
+                role.root.position = spawn.transform.position;
+                role.root.rotation = spawn.transform.rotation;
             }
 
-            role.root.position = spawn.transform.position;
-            role.root.rotation = spawn.transform.rotation;
+            Debug.Log(
+                $"[PlaceImportedNpcRoleAtSpawnPoint] {role.roleId} " +
+                $"spawn={role.roleSpawnId}, local={role.root.localPosition}"
+            );
+        }
+
+        private TransformData TransformStartPoseToCurrentStage(
+            TransformData sourcePose,
+            Transform stageRoot,
+            Transform roleSpawn)
+        {
+            if (sourcePose == null ||
+                stageRoot == null ||
+                roleSpawn == null)
+                return null;
+
+            Vector3 worldPos =
+                roleSpawn.TransformPoint(
+                    sourcePose.LocalPosition
+                );
+
+            Quaternion worldRot =
+                roleSpawn.rotation *
+                sourcePose.LocalRotation;
+
+            return new TransformData
+            {
+                LocalPosition =
+                    stageRoot.InverseTransformPoint(worldPos),
+
+                LocalRotation =
+                    Quaternion.Inverse(stageRoot.rotation) *
+                    worldRot
+            };
         }
 
 

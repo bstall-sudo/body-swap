@@ -82,6 +82,15 @@ namespace AppV2.Runtime.Scripts.Loader
                     {
                         roleId = importedRoleId,
                         roleIndex = meta.RoleIndex,
+                        roleSpawnId = import.spawnId,
+
+                        preRecordedStartRootPose = meta.StartRootPose != null
+                            ? new TransformData
+                            {
+                                LocalPosition = meta.StartRootPose.LocalPosition,
+                                LocalRotation = meta.StartRootPose.LocalRotation
+                            }
+                            : null,
 
                         hasPreRecordedTakes = true,
                         isActiveConversationPartner = false,

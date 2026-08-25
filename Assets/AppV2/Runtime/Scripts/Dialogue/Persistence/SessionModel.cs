@@ -27,6 +27,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public string AvatarId;
         public string AvatarSpawnId = "default";
+        //RoleSpwanId ist der Ort, wo die Figur steht. StageSpawnId
+        public string RoleSpawnId = "default";
         public int RoleIndex;
         public string RoleName;
 

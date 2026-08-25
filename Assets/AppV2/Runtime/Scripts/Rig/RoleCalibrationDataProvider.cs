@@ -25,6 +25,7 @@ namespace AppV2.Runtime.Scripts.Rig
             _roles = roles;
         }
 
+
         public List<ConversationRoleMeta> CreateRoleMetas()
         {
             var result = new List<ConversationRoleMeta>();
@@ -37,8 +38,29 @@ namespace AppV2.Runtime.Scripts.Rig
 
                 var startRootPose = new TransformData();
 
-                startRootPose.LocalPosition = RolePlacementUtility.GetCirclePlacementPosition(i, _roles.Count);
-                startRootPose.LocalRotation = RolePlacementUtility.GetCirclePlacementRotation(startRootPose.LocalPosition);
+                if (role.hasPreRecordedTakes)
+                {
+                    startRootPose = new TransformData
+                    {
+                        LocalPosition = role.root.localPosition,
+                        LocalRotation = role.root.localRotation
+                    };
+                }
+                else
+                {
+                    Vector3 pos =
+                        RolePlacementUtility.GetCirclePlacementPosition(
+                            i,
+                            _roles.Count
+                        );
+
+                    startRootPose = new TransformData
+                    {
+                        LocalPosition = pos,
+                        LocalRotation =
+                            RolePlacementUtility.GetCirclePlacementRotation(pos)
+                    };
+                }
 
                
                 result.Add(new ConversationRoleMeta
@@ -46,6 +68,7 @@ namespace AppV2.Runtime.Scripts.Rig
                     RoleId = role.roleId,
                     AvatarId = role.avatarId,
                     AvatarSpawnId = role.avatarSpawnId,
+                    RoleSpawnId = role.roleSpawnId,
                     RoleIndex = i,
                     RoleName = role.avatarName,
                     HeightOfRoleCm = role.heightOfRoleCm,
@@ -57,6 +80,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
             return result;
         }
+
 
         private RoleCalibrationData CaptureCalibration(RoleRig role)
         {

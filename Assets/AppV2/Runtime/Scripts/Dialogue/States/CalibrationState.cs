@@ -55,7 +55,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.AvatarCalibration.PlaceRoleAt(
                     i,
                     placement,
-                    rotation
+                    rotation,
+                    _flow.Stage._stageRoot
                 );
 
             }

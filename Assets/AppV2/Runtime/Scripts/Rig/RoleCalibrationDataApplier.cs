@@ -17,6 +17,7 @@ namespace AppV2.Runtime.Scripts.Rig
         }
      
 
+
         public void ApplyRoleMetasToScene(List<RoleRig> roles, SessionModel session)
         {
             if (roles == null || session == null || session.Roles == null) return;
@@ -45,8 +46,12 @@ namespace AppV2.Runtime.Scripts.Rig
                 role.sittingIdle = meta.SittingIdle;
 
                 role.rigFollower?.BuildMapAndEnableFollow();
+
+                role.roleSpawnId = meta.RoleSpawnId;
+                role.avatarSpawnId = meta.AvatarSpawnId;
             }
         }
+
 
         private void ApplyCalibration(RoleRig role, RoleCalibrationData calibration)
         {

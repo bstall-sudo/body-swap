@@ -368,6 +368,7 @@ MonoBehaviour:
   roles:
   - avatarId: 
     avatarSpawnId: 
+    roleSpawnId: 
     roleId: A
     slotId: A
     sourceRoleId: 
@@ -398,6 +399,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 1783727431}
     visualRolesVisibility: {fileID: 1106390901}
     sittingIdle: 0
@@ -429,6 +433,7 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: 
     avatarSpawnId: 
+    roleSpawnId: 
     roleId: B
     slotId: B
     sourceRoleId: 
@@ -459,6 +464,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 1551468717}
     visualRolesVisibility: {fileID: 1358925940}
     sittingIdle: 0
@@ -490,6 +498,7 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: 
     avatarSpawnId: 
+    roleSpawnId: 
     roleId: C
     slotId: C
     sourceRoleId: 
@@ -520,6 +529,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 1428482367}
     visualRolesVisibility: {fileID: 1692814851}
     sittingIdle: 0
@@ -3272,6 +3284,10 @@ MonoBehaviour:
     isExternal: 0
   - avatarId: default
     prefab: {fileID: 7595365677747182099, guid: 1fad5b4caf371fe40a1d58f5922d9200, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: kaktus_001
+    prefab: {fileID: 7071930958604385571, guid: 33b12bdee92fe0b43962cb477159da61, type: 3}
     sourcePath: 
     isExternal: 0
 --- !u!1 &241298607
@@ -10814,13 +10830,22 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: K_01
-  stageSpawnId: 04
-  preRecordedSceneCount: 0
-  preRecordedScenes: []
+  environmentId: Insel_01
+  stageSpawnId: 02
+  preRecordedSceneCount: 1
+  preRecordedScenes:
+  - enabled: 1
+    npcGroupId: NpcGroup1_
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\PreRecordedScene\wasmachstduhier\2026-07-02-UTC-13-53-41_54
+    workshopFolderName: PreRecordedScene
+    sessionFolderName: wasmachstduhier
+    sessionId: 2026-07-02-UTC-13-53-41_54
+    spawnPoint: {fileID: 0}
+    spawnId: 05
   importedNpcRoles:
   - avatarId: 
     avatarSpawnId: 
+    roleSpawnId: 
     roleId: NpcGroup1_A
     slotId: 
     sourceRoleId: 
@@ -10851,6 +10876,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 0}
     visualRolesVisibility: {fileID: 0}
     sittingIdle: 0
@@ -10882,6 +10910,7 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: 
     avatarSpawnId: 
+    roleSpawnId: 
     roleId: NpcGroup1_B
     slotId: 
     sourceRoleId: 
@@ -10912,6 +10941,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 0}
     visualRolesVisibility: {fileID: 0}
     sittingIdle: 0
@@ -10968,8 +11000,9 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: baer_001
+  - avatarId: kaktus_001
     avatarSpawnId: 
+    roleSpawnId: 02
     roleId: A
     slotId: A
     sourceRoleId: 
@@ -11000,6 +11033,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 1435041172}
     visualRolesVisibility: {fileID: 2041661046}
     sittingIdle: 0
@@ -11031,6 +11067,7 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: esel_001
     avatarSpawnId: 
+    roleSpawnId: 02
     roleId: B
     slotId: B
     sourceRoleId: 
@@ -11061,6 +11098,9 @@ MonoBehaviour:
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
     initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
     visualRigRoot: {fileID: 689874910}
     visualRolesVisibility: {fileID: 1899071022}
     sittingIdle: 0
@@ -11097,7 +11137,7 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 1
+  StartInPlaybackFullConversationMode: 0
   _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}

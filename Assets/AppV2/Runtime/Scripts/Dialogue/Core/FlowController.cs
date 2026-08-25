@@ -50,6 +50,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public ConversationStatusUI StatusUI => statusUI;
         public bool _xrMode;
 
+        string _currentNpcGroupId = "";
+
         private void Awake()
         {
             _data = new FlowStateData();
@@ -66,6 +68,17 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void Start()
         {
+            foreach (var role in _data.AllRoles)
+            {
+                if (role?.root == null)
+                    continue;
+
+                UnityEngine.Debug.Log(
+                    $"[NPC Position] [FLOW START BEGIN] {role.roleId}: " +
+                    $"local={role.root.localPosition}, " +
+                    $"world={role.root.position}"
+                );
+            }
             selectableNext = Stage.selectableNext;
             if(_startInPlaybackFullConversationMode){
                 SetState(new PlaybackFullConversationState(this));
@@ -94,12 +107,31 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SetState(IState next)
         {
-            _state?.Exit();
-            _state = next;
-            //UnityEngine.Debug.Log($"[Flow] State -> {_state.Mode}");
-            _state.Enter();
-        }
+            string oldStateName = _state?.GetType().Name ?? "null";
+            string newStateName = next?.GetType().Name ?? "null";
 
+            Stage.DebugRolePositions(
+                $"SetState BEGIN | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
+            );
+
+            _state?.Exit();
+
+            Stage.DebugRolePositions(
+                $"SetState AFTER EXIT | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
+            );
+
+            _state = next;
+
+            Stage.DebugRolePositions(
+                $"SetState BEFORE ENTER | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
+            );
+
+            _state?.Enter();
+
+            Stage.DebugRolePositions(
+                $"SetState AFTER ENTER | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
+            );
+        }
 
         //Funktionen, die von den States gerufen werden
         public void IncrementSceneCount()
@@ -390,6 +422,29 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
             return true;
         }
+
+        public void RecordRemainingExitAutoSelection()
+        {
+            _data.SceneCountWhilePlaybackPreRecorded ++;
+
+            
+        }
+
+        public void RecordRemainingNextToBeRecorded()
+        {
+            if(_data.ReactiveIdles.Count > 0)
+            {
+                _data.ToBeRecorded = _data.ReactiveIdles[0];
+                _data.ReactiveIdles.RemoveAt(0);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("ReactiveIdles has no Elements, so ToBeRecorded can't get selected from there");
+            }
+            
+            
+            
+        }
         
 
         
@@ -527,7 +582,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             float radius)
         {
             
-            string currentNpcGroupId = "";
+            _currentNpcGroupId = "";
 
             foreach (int passiveIndex in roleIndicesOfPassiveRoles)
             {
@@ -537,18 +592,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         radius))
                 {
                     RoleRig npc = _data.AllRoles[passiveIndex];
-                    currentNpcGroupId = npc.npcGroupId;
+                    _currentNpcGroupId = npc.npcGroupId;
                     break;
                 }
             }
                 
-            if(currentNpcGroupId != "")
+            if(_currentNpcGroupId != "")
             {
                 foreach (int i in roleIndicesOfPassiveRoles)
                 {
                     RoleRig role = _data.AllRoles[i];
 
-                    if (role.npcGroupId != currentNpcGroupId)
+                    if (role.npcGroupId != _currentNpcGroupId)
                     {
                        continue;
                     }
@@ -559,11 +614,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         
                     UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]: npcGroupId: {role.npcGroupId} roleIndex: {role.roleIndex}, sourceRoleIndex: {role.sourceRoleIndex}");
                     
-                    _data.CurrentPreRecordedPlaybacks.Add(role.roleIndex);
+                    //_data.CurrentPreRecordedPlaybacks.Add(role.roleIndex);
                     
                 }
                 _data.TimesPreRecordedPlaybacksWerePlayed = _data.ActiveRoleCount;
                 _data.SceneCountBeforePlaybackPreRecorded = _data.SceneCount;
+                _data.CurrentNpcGroupId = _currentNpcGroupId;
             }
                
                 
@@ -576,14 +632,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
                 _data.SceneCount++;
                 UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {currentNpcGroupId}");
+                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {_currentNpcGroupId}");
             }
         
 
         public void PlaybackPreRecordedToRecordRemaining_DataAdjustments()
         {
-            _data.SceneCount = _data.SceneCountBeforePlaybackPreRecorded;
+            //_data.SceneCount = _data.SceneCountBeforePlaybackPreRecorded;
             _data.Playbacks.Add(_data.ToBeRecorded);
+
+            foreach (int i in _data.CurrentPreRecordedPlaybacks)
+            {
+                _data.Playbacks.Add(i);
+            }
             if(_data.ReactiveIdles.Count == 0)
             {
                 UnityEngine.Debug.LogWarning($"[FlowController] No Reactive Idle found");
@@ -592,6 +653,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 _data.ToBeRecorded = _data.ReactiveIdles[0];
                 _data.ReactiveIdles.RemoveAt(0);
+            }
+            foreach (RoleRig role in _data.AllRoles)
+            {
+                if (!_data.Roles.Contains(role))
+                {
+                    _data.Roles.Add(role);
+                    _data.IndicesOfPassiveRoles.Remove(role.roleIndex);
+                }
             }
         }
 
@@ -628,7 +697,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 playbackPreRecordedScene = true;
                 RoleRig npc = _data.AllRoles[passiveIndex];
-                string currentNpcGroupId = npc.npcGroupId;
+                string _currentNpcGroupId = npc.npcGroupId;
 
                 List<int> activatedIndices = new List<int>();
                 
@@ -636,7 +705,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     RoleRig role = _data.AllRoles[i];
 
-                    if (role.npcGroupId != currentNpcGroupId)
+                    if (role.npcGroupId != _currentNpcGroupId)
                         continue;
                     UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]: npcGroupId: {role.npcGroupId} roleIndex: {role.roleIndex}, sourceRoleIndex: {role.sourceRoleIndex}");
                     _data.Roles.Add(role);
@@ -653,7 +722,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _data.ActiveRoleCount = _data.Roles.Count;
                 _data.SceneCount++;
                 UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {currentNpcGroupId}");
+                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {_currentNpcGroupId}");
 
                 
                 return playbackPreRecordedScene;

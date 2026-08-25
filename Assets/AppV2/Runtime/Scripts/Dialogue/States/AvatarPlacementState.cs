@@ -103,7 +103,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 _currentRoleIndexForPlacement,
                 placement,
-                rotation
+                rotation,
+                _flow.Stage._stageRoot
             );
 
             _currentRoleIndexForPlacement++;

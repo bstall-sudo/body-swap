@@ -12,11 +12,15 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         public List<int> CurrentPreRecordedPlaybacks;
 
+        public string CurrentNpcGroupId;
+
         public int TimesPreRecordedPlaybacksWerePlayed;
         public int AllRoleCount;
 
         public int ActiveRoleCount;
         public int SceneCount;
+    
+        public int SceneCountWhilePlaybackPreRecorded;
         public int SceneCountBeforePlaybackPreRecorded;
         public int ToBeRecorded;
         public int SelectedNext;
