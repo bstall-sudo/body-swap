@@ -65,16 +65,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.StatusUI != null)
             {
-                //_flow.StatusUI.ShowPlaybackFullConversationState();
+                _flow.StatusUI.ShowPlaybackFullConversationState();
                 _flow.StatusUI.ShowCustomCue(
-                    "PlaybackPreRecordedScenes\n \n PlaybackMode ON",
+                    "Hör zu!\n \nAufnahme\n \n wird abgespielt",
                     new Vector2(0f, 180f),
                     new Vector2(500f, 0f),
                     Color.red
                 );
             }
             
-            Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: roleCount is: {_roleCount}, SceneCountForPreRecordedScenes is: {_sceneCountForPreRecordedScenes} activeRoles: {_flow._data.IndicesOfPassiveRoles}");
+            //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: roleCount is: {_roleCount}, SceneCountForPreRecordedScenes is: {_sceneCountForPreRecordedScenes} activeRoles: {_flow._data.IndicesOfPassiveRoles}");
             PrepareStartPlaybacksReactiveIdlesForScene();
         }
 
@@ -90,7 +90,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.ConsumeSecondaryAction())
             {
                 //UnityEngine.Debug.Log("[PlaybackFullPreRecordedScenes] Consumed SecondaryAction");
-                _flow.SetState(new IdleState(_flow));
+                //_flow.SetState(new IdleState(_flow));
             }
 
             if (_flow.ConsumeResetAction())
@@ -155,12 +155,24 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                         _flow._data.GoToPlaybackPreRecordedState = false;
                         _flow._data.GoToRecordRemainingState = false;
                     } */
-                    _flow._data.GoToSpeakerState = false;
-                    _flow._data.GoToPlaybackPreRecordedState = false;
-                    _flow._data.GoToRecordRemainingState = true;
+                    if(_flow._data.Roles.Count == 1)
+                    {
+                        
+                        _flow._data.GoToSpeakerState = true;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = false;
+                        _flow.SetState(new RecordSpeakerState(_flow));
+                        
+                    }else
+                    {
+                        _flow._data.GoToSpeakerState = false;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = true;
+                        _flow.SetState(new PlayerAlignState(_flow));
+                    }
                     
                     
-                    _flow.SetState(new PlayerAlignState(_flow));
+                    
                 }       
                      /*   
                     else
@@ -219,7 +231,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Indices of IndicesOfPassiveRoles has length (before update): {_flow._data.IndicesOfPassiveRoles.Count}");
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Active Roles have length (before update): {_flow._data.Roles.Count}");
             // preRecordedPlaybacks zu aktiven Rollen zufügen
-            _flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
+
+            if (_flow._data.GoToRecordRemainingState)
+            {
+                _flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
+            }
+            else
+            {
+                _flow.PlaybackPreRecordedToSpeaker_DataAdjustments();
+            }
+            
             
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Indices of IndicesOfPassiveRoles has length (after update): {_flow._data.IndicesOfPassiveRoles.Count}");
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Active Roles have length (after update): {_flow._data.Roles.Count}");

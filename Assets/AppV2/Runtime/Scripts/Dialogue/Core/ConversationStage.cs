@@ -1623,6 +1623,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if (!_input.TryGetHeadPose(out var headPos, out var headRot))
                 return;
 
+
             var rig = roles[roleIndex];
 
             if (_input is KeyboardInputTransforms)
@@ -1681,6 +1682,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 yaw = headRotStage.eulerAngles.y;
             }
+
+
 
             Transform actor = rig.root;
             actor.localPosition = bodyPos;
@@ -1889,6 +1892,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void StartPlayerAlignToActor(int roleIndex, float duration)
         {
+            RoleRig targetRole = roles[roleIndex];
+
+            Debug.Log(
+                $"[StartPlayerAlignToActor] qwert roleIndex as Argument={roleIndex}, " +
+                $"roleId={targetRole.roleId}, " +
+                $"roleIndexRolesinConversationStage={targetRole.roleIndex}, " +
+                $"localPos={targetRole.root.localPosition}, " +
+                $"worldPos={targetRole.root.position}"
+            );
             if (SeatedMode || roles[roleIndex].sittingIdle)
             {
                 StartPlayerAlignToActorSeated(roleIndex, duration);
@@ -1930,6 +1942,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.LogWarning($"No last Head end pose found for roleIndex {roleIndex}");
                 return;
             }
+
+            Debug.Log(
+                $"[StartPlayerAlignToActorStanding] [NpcIntegration Debug] requestedRole={roleIndex}\n" +
+                $"targetBodyPosLocal={targetBodyPosLocal}\n" +
+                $"role0.root={roles[0].root.localPosition}\n" +
+                $"role1.root={roles[1].root.localPosition}\n" +
+                $"hasLast0={_recordingController.HasLastFrame(0)}\n" +
+                $"hasLast1={_recordingController.HasLastFrame(1)}"
+            );
 
             if (roles[roleIndex].visualRigRoot == null)
             {
@@ -2005,7 +2026,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // hier wird jetzt gesetzt, dass TickPlayerAlignStanding verwendet wird.
             _playerAlignUseHeadOffset = true;
 
-            /*
+
+
+                        /*
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH ROOT SCALE role {roleIndex}: {roles[roleIndex].root.lossyScale}");
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} TECH HEAD SCALE role {roleIndex}: {roles[roleIndex].head.lossyScale}");
             UnityEngine.Debug.Log($"[StartAlignEnd] RoleIndex: {roleIndex} STAGE ROOT SCALE: {_stageRoot.lossyScale}");
@@ -2129,11 +2152,34 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // Y bewusst unverändert lassen
             pos.y = currentOriginPos.y;
 
+            // DEBUG
+            if (Time.frameCount % 1 == 0 || u >= 1f)
+            {
+                Debug.Log(
+                    $"[PLAYER ALIGN TICK] [NpcIntegration Debug] " +
+                    $"frame={Time.frameCount} | " +
+                    $"u={u:F3} | " +
+                    $"XR before={XrOrigin.position} | " +
+                    $"XR target={desiredOriginPos} | " +
+                    $"XR next={pos} | " +
+                    $"headWorld={XrHead.position} | " +
+                    $"role0={roles[0].root.localPosition} | " +
+                    $"role1={roles[1].root.localPosition} | " +
+                    $"targetHeadWorld={_playerAlignTargetHeadPosWorld}"
+                );
+            }
             XrOrigin.position = pos;
             XrOrigin.rotation = targetOriginRotation;
 
             if (u >= 1f)
             {
+                Debug.Log(
+                    $"[PLAYER ALIGN FINISHED] [NpcIntegration Debug] " +
+                    $"XR final={XrOrigin.position} | " +
+                    $"headFinal={XrHead.position} | " +
+                    $"targetHead={_playerAlignTargetHeadPosWorld}"
+                );
+
                 _playerAlignActive = false;
             }
         }

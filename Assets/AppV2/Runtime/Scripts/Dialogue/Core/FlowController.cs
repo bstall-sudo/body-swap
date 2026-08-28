@@ -110,27 +110,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
             string oldStateName = _state?.GetType().Name ?? "null";
             string newStateName = next?.GetType().Name ?? "null";
 
-            Stage.DebugRolePositions(
-                $"SetState BEGIN | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
-            );
+           
+            PrintRoleLists("FlowController PreRecorded Debug | SetState BEGIN |", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
+                   
 
             _state?.Exit();
 
-            Stage.DebugRolePositions(
-                $"SetState AFTER EXIT | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
-            );
+            PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER EXIT |", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
+                   
 
             _state = next;
 
-            Stage.DebugRolePositions(
-                $"SetState BEFORE ENTER | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
-            );
-
+            PrintRoleLists("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
             _state?.Enter();
 
-            Stage.DebugRolePositions(
-                $"SetState AFTER ENTER | {oldStateName} -> {newStateName} | frame={Time.frameCount}"
-            );
+            PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
+
         }
 
         //Funktionen, die von den States gerufen werden
@@ -142,6 +137,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         //Das wird am Anfang von RecordListenerState gerufen, um Speaker und 
         // reactiveIdles zu setzen
+        /*
         public int RecSpeakStateSetSpeaker()
         {
             int nextSpeaker;
@@ -172,7 +168,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 }
             }
         }
-
+*/
         //Das wird in RecSpeakStateSetSpeaker gerufen updated das FlowStateData-Object
         public void RecSpeakStateSetReactiveIdles(int nextSpeaker)
         {
@@ -327,7 +323,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
 
+
+
         public bool SpeakerStateExitAutoSelection(){
+            if(_data.Roles.Count == 1)
+            {
+                UnityEngine.Debug.Log($"[FlowController] [SpeakerStateExitAutoSelection()] SceneCount={_data.SceneCount} still in reactive Idles: [" + string.Join(", ", _data.ReactiveIdles) + $"] toBeRecoreded={_data.ToBeRecorded}");
+                _data.ToBeRecorded = 0;
+                _data.GoToSpeakerState = true;
+                SpeakerStateEnterSetLists(_data.ToBeRecorded);
+                _data.SceneCount ++;
+                return true;
+                
+            }
             if (_data.ReactiveIdles.Count == 0){
                 UnityEngine.Debug.LogError($"[RecordSpeakerState] Exit: ReactiveIdle List is empty");
                 
@@ -379,6 +387,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
        
 
         public bool SpeakerStateExitManualSelection(){
+            //das braucht man eigentlich nicht, weil manualSelection wird bei nur einer Rolle eigentlich nicht 
+            // gebraucht. Aber sicher ist sicher.
+            if(_data.Roles.Count == 1)
+            {
+                _data.GoToSpeakerState = true;
+                _data.SceneCount ++;
+                return true;
+                
+            }
             if (_data.ReactiveIdles.Count == 0){
                 UnityEngine.Debug.LogError($"[RecordSpeakerState] Exit: ReactiveIdle List is empty");
                 return false;
@@ -634,12 +651,102 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
                 UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {_currentNpcGroupId}");
             }
-        
+
+        public void SetPreRecordedToActiveConversationPartner(string npcGroupId)
+        {
+            if (string.IsNullOrWhiteSpace(npcGroupId))
+                return;
+
+            foreach (RoleRig role in _data.AllRoles)
+            {
+                if (role == null)
+                    continue;
+
+                if (role.npcGroupId == npcGroupId)
+                {
+                    role.isActiveConversationPartner = true;
+                }
+            }
+        }
+
+
+        public void PlaybackPreRecordedToSpeaker_DataAdjustments()
+        {
+            // NPC-Gruppe aktivieren
+            SetPreRecordedToActiveConversationPartner(
+                _data.CurrentNpcGroupId
+            );
+            //_data.FromPreRecordedToSpeaker = true;
+
+            for (int i = 0; i < _data.AllRoles.Count; i++)
+            {
+                RoleRig role = _data.AllRoles[i];
+
+                if (role == null)
+                    continue;
+
+                int roleIndex = role.roleIndex;
+
+                // -----------------------------------
+                // Nur aktive Gesprächspartner behandeln
+                // -----------------------------------
+
+                if (!role.isActiveConversationPartner)
+                    continue;
+
+
+                // -----------------------------------
+                // In aktive Roles übernehmen
+                // -----------------------------------
+
+                if (!_data.Roles.Contains(role))
+                {
+                    _data.Roles.Add(role);
+                }
+
+
+                // -----------------------------------
+                // Nicht mehr passiv
+                // -----------------------------------
+
+                _data.IndicesOfPassiveRoles.Remove(roleIndex);
+
+
+                // -----------------------------------
+                // ReactiveIdle:
+                // alle aktiven Rollen außer der,
+                // die gerade aufgenommen werden soll
+                // -----------------------------------
+
+                if (roleIndex != _data.ToBeRecorded)
+                {
+                    if (!_data.ReactiveIdles.Contains(roleIndex))
+                    {
+                        _data.ReactiveIdles.Add(roleIndex);
+                    }
+                }
+                else
+                {
+                    // Sicherheitshalber entfernen,
+                    // falls der Index vorher schon drin war.
+                    _data.ReactiveIdles.Remove(roleIndex);
+                }
+            }
+
+            _data.ActiveRoleCount = _data.Roles.Count;
+
+            // Beim Wechsel zum Speaker gibt es zunächst
+            // keine laufenden Playbacks.
+            _data.Playbacks.Clear();
+            _data.CurrentPreRecordedPlaybacks.Clear();
+            //_data.CurrentNpcGroupId = "";
+        }
 
         public void PlaybackPreRecordedToRecordRemaining_DataAdjustments()
         {
             //_data.SceneCount = _data.SceneCountBeforePlaybackPreRecorded;
             _data.Playbacks.Add(_data.ToBeRecorded);
+            
 
             foreach (int i in _data.CurrentPreRecordedPlaybacks)
             {
@@ -669,68 +776,36 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _data.SceneCount ++;
         
         }
-/*
-        public bool PlayerNearNpcs(
-            List<int> roleIndicesOfPassiveRoles,
-            int playerIndex,
-            float radius,
-            )
+
+        private void PrintRoleLists(
+            string text, 
+            string oldStateName,
+            string newStateName,
+            List<int> playbacks,
+            List<int> reactiveIdles,
+            int sceneCount,
+            int toBeRecorded)
         {
-            bool playbackPreRecordedScene = false; 
+            string playbacksString =
+                playbacks == null || playbacks.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", playbacks) + "]";
 
-            if (roleIndicesOfPassiveRoles == null)
-                return playbackPreRecordedScene;
+            string reactiveIdlesString =
+                reactiveIdles == null || reactiveIdles.Count == 0
+                    ? "[]"
+                    : "[" + string.Join(", ", reactiveIdles) + "]";
 
-            List<int> passiveSnapshot =
-                new List<int>(roleIndicesOfPassiveRoles);
-
-            
-            foreach (int passiveIndex in passiveSnapshot)
-            {
-                if (!IsPlayerNearNpc(
-                        passiveIndex,
-                        _data.AllRoles[playerIndex].root,
-                        radius))
-                {
-                    continue;
-                }
-
-                playbackPreRecordedScene = true;
-                RoleRig npc = _data.AllRoles[passiveIndex];
-                string _currentNpcGroupId = npc.npcGroupId;
-
-                List<int> activatedIndices = new List<int>();
-                
-                for (int i = 0; i < _data.AllRoles.Count; i++)
-                {
-                    RoleRig role = _data.AllRoles[i];
-
-                    if (role.npcGroupId != _currentNpcGroupId)
-                        continue;
-                    UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]: npcGroupId: {role.npcGroupId} roleIndex: {role.roleIndex}, sourceRoleIndex: {role.sourceRoleIndex}");
-                    _data.Roles.Add(role);
-                    //_data.ReactiveIdles.Add(role.roleIndex);
-                    _data.CurrentPreRecordedPlaybacks.Add(role.roleIndex);
-                    activatedIndices.Add(role.roleIndex);
-                }
-
-                foreach (int index in activatedIndices)
-                {
-                    _data.IndicesOfPassiveRoles.Remove(index);
-                }
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] before update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                _data.ActiveRoleCount = _data.Roles.Count;
-                _data.SceneCount++;
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {_currentNpcGroupId}");
-
-                
-                return playbackPreRecordedScene;
-            }
-            return playbackPreRecordedScene;
+            UnityEngine.Debug.Log(
+                $"[{text}] " +
+                $"{oldStateName} -> {newStateName} | frame={Time.frameCount}| " +
+                $"[RoleLists] " +
+                $"playbacks={playbacksString} | " +
+                $"reactiveIdles={reactiveIdlesString} | " +
+                $"sceneCount={sceneCount} | " +
+                $"toBeRecorded={toBeRecorded}"
+            );
         }
-        */
-        
 
     }
 }

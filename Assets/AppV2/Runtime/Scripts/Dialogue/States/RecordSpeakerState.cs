@@ -69,26 +69,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             playbacks = _flow._data.Playbacks;
             indicesOfPassiveRoles = _flow._data.IndicesOfPassiveRoles;
 
-            /*
-            if(_isUsingXr){
-                // im XR-Modus wird _flow.RecSpeakStateSetSpeaker() in Scene 0 wird im PlayerAlignToSpeakerState gesetzt.
-                
-                if(sceneCount == 0){
-                    toBeRecorded = _flow.RecSpeakStateSetSpeaker();
-                    
-                }else{
-                    toBeRecorded = _flow._data.ToBeRecorded;
-                }
-            }else{
-                // im KeyboardMode gibt es keinen PlayerAlignToSpeakerState, daher muss _flow.RecSpeakStateSetSpeaker() hier gesetzt werden.
-                 // diese Funktion gibt einen Default oder einen Selected Sprecher zurück, je nachdem ob selectable Next im ConversationStage true ist oder nicht
-                // und setzt ReactiveIdles auf alle, ausser Sprecher und Playbacks = [] 
-                toBeRecorded = _flow.RecSpeakStateSetSpeaker();
-            }
-            */
-            
-            
-
             selectableNext = _flow.Stage.selectableNext;
             reactiveIdles = _flow._data.ReactiveIdles;
             UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {sceneCount}, Speaker Index: {toBeRecorded}, reactive Idles: ");
@@ -134,7 +114,17 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren
             _flow.Stage.ValidateFootSolver(toBeRecorded);
 
+            Debug.Log(
+                $"[BEFORE RECORD BEGIN] [NpcIntegration Debug] role={toBeRecorded} " +
+                $"root={_flow.Stage.roles[toBeRecorded].root.localPosition}"
+            );
+
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
+
+            Debug.Log(
+                $"[AFTER RECORD BEGIN] [NpcIntegration Debug] role={toBeRecorded} " +
+                $"root={_flow.Stage.roles[toBeRecorded].root.localPosition}"
+            );
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;
 
@@ -192,7 +182,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     else
                     {
                         if(_isUsingXr){
-                            _flow.SetState(new PlayerAlignState(_flow));
+                            if(_flow._data.Roles.Count == 1)
+                            {
+                                _flow.SetState(new RecordSpeakerState(_flow));
+                            }
+                            else
+                            {
+                                _flow.SetState(new PlayerAlignState(_flow));
+                            }
+                            
                         }else{
                             _flow.SetState(new RecordListenersState(_flow));
                         }
@@ -303,6 +301,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             Debug.Log(
                 $"[{text}] " +
                 $"[RoleLists] " +
+    
+                $"sceneCount={sceneCount} | " +
                 $"playbacks={playbacksString} | " +
                 $"reactiveIdles={reactiveIdlesString} | " +
                 $"toBeRecorded={toBeRecorded}"

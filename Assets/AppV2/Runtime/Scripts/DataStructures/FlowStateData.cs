@@ -32,6 +32,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         public bool GoToPlaybackPreRecordedState;
 
+        //work around zum testen, vermutlich keine gute Idee
+        //public bool FromPreRecordedToSpeaker;
+
         
      
         public void Initialize(List<RoleRig> roles)
@@ -50,6 +53,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             GoToSpeakerState = false;
             GoToRecordRemainingState = false;
             GoToPlaybackPreRecordedState = false;
+            //FromPreRecordedToSpeaker = false;
         }
 
         public List<RoleRig> GetActiveRoles()

@@ -10830,159 +10830,29 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: Insel_01
-  stageSpawnId: 02
+  environmentId: Lobby_01
+  stageSpawnId: 01
   preRecordedSceneCount: 1
   preRecordedScenes:
   - enabled: 1
-    npcGroupId: NpcGroup1_
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\PreRecordedScene\wasmachstduhier\2026-07-02-UTC-13-53-41_54
+    npcGroupId: NpcGroup01
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\PreRecordedScene\hotellobby\2026-08-27-UTC-12-11-37_87
     workshopFolderName: PreRecordedScene
-    sessionFolderName: wasmachstduhier
-    sessionId: 2026-07-02-UTC-13-53-41_54
+    sessionFolderName: hotellobby
+    sessionId: 2026-08-27-UTC-12-11-37_87
     spawnPoint: {fileID: 0}
-    spawnId: 05
-  importedNpcRoles:
-  - avatarId: 
-    avatarSpawnId: 
-    roleSpawnId: 
-    roleId: NpcGroup1_A
-    slotId: 
-    sourceRoleId: 
-    roleIndex: 0
-    sourceRoleIndex: 0
-    npcGroupId: 
-    hasPreRecordedTakes: 1
-    isActiveConversationPartner: 0
-    takeSource: C:/Users/berto/AppData/LocalLow/DefaultCompany/bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-15-UTC-12-53-35_14
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 0}
-    roleRoot: {fileID: 0}
-    root: {fileID: 0}
-    head: {fileID: 0}
-    leftHand: {fileID: 0}
-    rightHand: {fileID: 0}
-    leftFoot: {fileID: 0}
-    rightFoot: {fileID: 0}
-    hip: {fileID: 0}
-    hipSolver: {fileID: 0}
-    leftFootSolver: {fileID: 0}
-    rightFootSolver: {fileID: 0}
-    audioSource: {fileID: 0}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 0}
-    visualRolesVisibility: {fileID: 0}
-    sittingIdle: 0
-    avatarRoot: {fileID: 0}
-    avatarName: 
-    avatar: {fileID: 0}
-    rigFollower: {fileID: 0}
-    visualRigFollower: {fileID: 0}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: 
-    avatarSpawnId: 
-    roleSpawnId: 
-    roleId: NpcGroup1_B
-    slotId: 
-    sourceRoleId: 
-    roleIndex: 0
-    sourceRoleIndex: 0
-    npcGroupId: 
-    hasPreRecordedTakes: 1
-    isActiveConversationPartner: 0
-    takeSource: C:/Users/berto/AppData/LocalLow/DefaultCompany/bodyswapRECOVERY\SessionRecordingData\Sessions\2026-06-15-UTC-12-53-35_14
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 0}
-    roleRoot: {fileID: 0}
-    root: {fileID: 0}
-    head: {fileID: 0}
-    leftHand: {fileID: 0}
-    rightHand: {fileID: 0}
-    leftFoot: {fileID: 0}
-    rightFoot: {fileID: 0}
-    hip: {fileID: 0}
-    hipSolver: {fileID: 0}
-    leftFootSolver: {fileID: 0}
-    rightFootSolver: {fileID: 0}
-    audioSource: {fileID: 0}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 0}
-    visualRolesVisibility: {fileID: 0}
-    sittingIdle: 0
-    avatarRoot: {fileID: 0}
-    avatarName: 
-    avatar: {fileID: 0}
-    rigFollower: {fileID: 0}
-    visualRigFollower: {fileID: 0}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+    spawnId: default
+  importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: Test_Prerecorded
+  _workshopFolderName: Lobby_test
   _personalFolderName: 01
   roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 180
+  heightOfPlayerCm: 190
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -10995,14 +10865,14 @@ MonoBehaviour:
     SessionVersion: 1
     EnvironmentId: default
     RoleCount: 2
-    StageSpawnId: default
+    StageSpawnId: 01
     Roles: []
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: kaktus_001
-    avatarSpawnId: 
-    roleSpawnId: 02
+  - avatarId: baer_001
+    avatarSpawnId: 01
+    roleSpawnId: 
     roleId: A
     slotId: A
     sourceRoleId: 
@@ -11065,9 +10935,9 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: esel_001
+  - avatarId: blaumann_001
     avatarSpawnId: 
-    roleSpawnId: 02
+    roleSpawnId: 
     roleId: B
     slotId: B
     sourceRoleId: 
@@ -11135,10 +11005,10 @@ MonoBehaviour:
   FullBodyTrackers: 0
   SeatedMode: 0
   allowTeleportation: 1
-  ProceduralHipAndFeetMove: 1
+  ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 0
-  _sessionFolder: 
+  StartInPlaybackFullConversationMode: 1
+  _sessionFolder: 2026-08-28-UTC-13-50-56_01
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
@@ -25726,6 +25596,8 @@ MonoBehaviour:
     prefab: {fileID: 1690158042345764391, guid: 82374c4b7c2e2bb488a5ff3ff1a1385a, type: 3}
   - environmentId: K_01
     prefab: {fileID: 1616553772516772163, guid: 315e06b72a93a9e4fa7b2fb966e23647, type: 3}
+  - environmentId: Lobby_01
+    prefab: {fileID: 1690158042345764391, guid: ebdc7bcb152d9734d9f48f0cfb3a00d7, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0

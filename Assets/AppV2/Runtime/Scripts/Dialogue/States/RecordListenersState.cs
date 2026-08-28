@@ -269,6 +269,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"[{text}] " +
                 $"[RoleLists] " +
                 $"playbacks={playbacksString} | " +
+                $"sceneCount={sceneCount} | " +
                 $"reactiveIdles={reactiveIdlesString} | " +
                 $"toBeRecorded={toBeRecorded} " 
             );

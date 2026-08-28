@@ -32,7 +32,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             _roleToAlignTo = _flow._data.ToBeRecorded;
 
-            UnityEngine.Debug.Log($"[PlayerAlignState] Enter || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} ");
+            UnityEngine.Debug.Log($"[PlayerAlignState] Enter qwert || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} RoleID is: {_flow._data.Roles[_roleToAlignTo].roleId}");
             
 
             
@@ -69,7 +69,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     PrintRoleLists("[PlayerAlignState] GoTo RecordListenersState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordListenersState(_flow));
                 }
-                
+                /*
+                if (_flow._data.FromPreRecordedToSpeaker)
+                {
+                    _flow._data.FromPreRecordedToSpeaker = false;
+                    _flow._data.GoToSpeakerState=false;
+                }
+                */
                  
             }
 

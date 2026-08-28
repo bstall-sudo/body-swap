@@ -26,12 +26,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowSpeakerState()
         {
-            SetStatusText("SPEAKER");
+            SetStatusText("Sprecher");
         }
 
         public void ShowListenerState()
         {
-            SetStatusText("LISTENER");
+            SetStatusText("Zuhörer");
         }
 
         public void ShowChooseSpeakerState()
@@ -49,7 +49,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowPlaybackFullConversationState()
         {
-            SetStatusText("Playback full conversation. No recording.");
+            SetStatusText("Aufnahme beendet. Playback läuft");
         }
 
         public void ShowIdleState()
@@ -59,12 +59,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowTransitionToSpeaker()
         {
-            ShowCue("NOW SPEAK", defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);
+            ShowCue("Sprich", defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);
         }
 
         public void ShowTransitionToListener()
         {
-            ShowCue("NOW LISTEN", defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);
+            ShowCue("Hör zu", defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);
         }
 
         public void ShowCustomCue(string message)

@@ -195,10 +195,21 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         {
             _takeRecorder.ClearDesiredStartPose();
 
-            
+            Debug.Log(
+                $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} | " +
+                $"rootNow={_roles[roleIndex].root.localPosition} | " +
+                $"hasLast={_hasLastFrameList[roleIndex]} | " +
+                $"hasInitial={_roles[roleIndex].hasInitialStartPose} | " +
+                $"initial={_roles[roleIndex].initialStartPos}"
+            );
 
             if (_hasLastFrameList[roleIndex])
             {
+                Debug.Log(
+                    $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} USING LAST END " +
+                    $"{_lastEndPosList[roleIndex]}"
+                );
+
                 _takeRecorder.SetDesiredStartPose(
                     _lastEndPosList[roleIndex],
                     _lastEndYawList[roleIndex]
@@ -209,9 +220,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             if (_roles[roleIndex].hasInitialStartPose)
             {
+                Debug.Log(
+                    $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} USING INITIAL " +
+                    $"{_roles[roleIndex].initialStartPos}"
+                );
+
                 _takeRecorder.SetDesiredStartPose(
                     _roles[roleIndex].initialStartPos,
                     _roles[roleIndex].initialStartYawDeg
+                );
+
+                Debug.Log(
+                    $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} NO REBASE"
                 );
 
                 return;
@@ -283,8 +303,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 _lastEndPosList[roleIndex] = lastFrame.Body.Pos;
                 _lastEndYawList[roleIndex] = lastFrame.Body.YawDeg;
                 _lastHeadEndPosList[roleIndex] = lastFrame.Head.Pos;
-                _lastHeadEndYawList[roleIndex] =
-                    lastFrame.Head.Rot.eulerAngles.y;
+                _lastHeadEndYawList[roleIndex] = lastFrame.Head.Rot.eulerAngles.y;
 
                 _hasLastFrameList[roleIndex] = true;
             }
@@ -420,7 +439,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
             return false;
 
-
+        // 1. Letzte aufgenommene Endposition
         if (_hasLastFrameList[roleIndex])
         {
             pos = _lastEndPosList[roleIndex];
@@ -430,10 +449,25 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         RoleRig role = _roles[roleIndex];
 
+        // 2. Definierte Initialposition
         if (role.hasInitialStartPose)
         {
             pos = role.initialStartPos;
             yaw = role.initialStartYawDeg;
+            return true;
+        }
+
+        // 3. Fallback: aktuelle Position der Rolle
+        if (role.root != null)
+        {
+            pos = role.root.localPosition;
+            yaw = role.root.localEulerAngles.y;
+
+            Debug.Log(
+                $"[TryGetLastEndPose] [NpcIntegration Debug] No last/initial pose for role {roleIndex}. " +
+                $"Using current root pose of role with ID: {_roles[roleIndex].roleId} and Index: {_roles[roleIndex].roleIndex} : pos={pos}, yaw={yaw:F1}"
+            );
+
             return true;
         }
 
@@ -450,34 +484,65 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         if (roleIndex < 0 || roleIndex >= _hasLastFrameList.Count)
             return false;
 
-        // 1. Wenn es schon eine letzte Head-EndPose gibt:
-        //    Diese ist die beste StartPose.
+        // 1. Letzte aufgezeichnete Head-EndPose
         if (_hasLastFrameList[roleIndex])
         {
-            
             pos = _lastHeadEndPosList[roleIndex];
             yaw = _lastHeadEndYawList[roleIndex];
-            //UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos}  und Rotation: {yaw}");
             return true;
         }
 
-        // 2. Sonst: InitialPlacement aus RoleRig benutzen.
         if (roleIndex < 0 || roleIndex >= _roles.Count)
+        {
+            UnityEngine.Debug.LogError("RoleIndex out of Range");
             return false;
+        }
 
         RoleRig role = _roles[roleIndex];
 
-        if (role == null || !role.hasInitialStartPose)
+        if (role == null)
             return false;
 
-        float estimatedHeadHeightMeters = role.heightOfRoleCm * 0.01f * 0.9f;
-        
+        // 2. InitialPlacement benutzen
+        if (role.hasInitialStartPose)
+        {
+            float estimatedHeadHeightMeters =
+                role.heightOfRoleCm * 0.01f * 0.9f;
 
-        pos = Vector3.up * estimatedHeadHeightMeters;
-        yaw = 0f;
-        //UnityEngine.Debug.Log($"[TryGetLastHeadEndPose] RoleIndex: {roleIndex} last Head endPose for{roleIndex}: position: {pos} und estimatedHeight: {estimatedHeadHeightMeters} und Rotation: {yaw}");
+            pos = Vector3.up * estimatedHeadHeightMeters;
+            yaw = 0f;
 
-        return true;
+            return true;
+        }
+
+        // 3. Fallback: aktuelle Head-Pose relativ zum Role-Root
+        if (role.root != null && role.head != null)
+        {
+            pos = role.root.InverseTransformPoint(role.head.position);
+
+            Quaternion headLocalRot =
+                Quaternion.Inverse(role.root.rotation) * role.head.rotation;
+
+            yaw = headLocalRot.eulerAngles.y;
+
+            Debug.Log(
+                $"[TryGetLastHeadEndPose] [NpcIntegration Debug] " +
+                $"role={roleIndex} USING CURRENT HEAD | " +
+                $"headBodyLocal={pos} | yaw={yaw:F1}"
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    //für das Debuggen von StartPlayerAlignStanding in conversationStage, weil die neu Integrierten NPC's nicht korrekt platziert werden.
+    public bool HasLastFrame(int roleIndex)
+    {
+        return roleIndex >= 0 &&
+            roleIndex < _hasLastFrameList.Count &&
+            _hasLastFrameList[roleIndex];
     }
 
     }
