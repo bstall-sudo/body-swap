@@ -90,7 +90,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             sessionFolderName ??= _sessionFolderName;
 
             string Root = RootPath(workshopFolderName:workshopFolderName, sessionFolderName:sessionFolderName);
-            UnityEngine.Debug.Log($"[GetCurrentSessionFolder] _currentSessionId={Path.Combine(Root, sessionId)}");
+            //UnityEngine.Debug.Log($"[GetCurrentSessionFolder] _currentSessionId={Path.Combine(Root, sessionId)}");
             return Path.Combine(Root, sessionId);
 
         }
@@ -151,7 +151,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             string latestDirectory = directories[^1];
             string latestSessionId = Path.GetFileName(latestDirectory);
 
-            UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
+            //UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
             return latestSessionId;
         }
 
@@ -162,10 +162,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
             string sessionFolder = GetSessionFolder(sessionId, workshopFolderName, sessionFolderName);
 
-            UnityEngine.Debug.Log($"[LoadTakeData] sessionId={sessionId}, sessionFolder={sessionFolder}, framesFile={meta.FramesFile}");
+            //UnityEngine.Debug.Log($"[LoadTakeData] sessionId={sessionId}, sessionFolder={sessionFolder}, framesFile={meta.FramesFile}");
 
             string framesPath = Path.Combine(sessionFolder, meta.FramesFile);
-            UnityEngine.Debug.Log($"[LoadTakeData] framesPath={framesPath}");
+            //UnityEngine.Debug.Log($"[LoadTakeData] framesPath={framesPath}");
             string audioPath  = Path.Combine(sessionFolder, meta.AudioFile);
 
             // Frames laden

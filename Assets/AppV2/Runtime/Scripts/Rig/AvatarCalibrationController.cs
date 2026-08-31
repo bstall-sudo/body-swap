@@ -71,25 +71,27 @@ namespace AppV2.Runtime.Scripts.Rig
 
             if (role.root == null)
             {
-                UnityEngine.Debug.LogWarning($"Role {roleIndex} has no root its RoleRig.");
+                UnityEngine.Debug.LogWarning($"Role {roleIndex} has no root for its RoleRig.");
                 return;
             }
 
+            /*
             Debug.Log(
                 $"[PlaceRoleAt AFTER ROOT] role={role.roleId}, " +
                 $"root.local={role.roleRoot.localPosition}, root.world={role.roleRoot.position}, " +
                 $"tech.local={role.root.localPosition}, tech.world={role.root.position}"
             );
-            
+            */
 
             role.root.localPosition = playerStagePose.Position;
             role.root.localRotation = playerStagePose.Rotation;
-
+            /*
             Debug.Log(
                 $"[PlaceRoleAt AFTER ROOT] role={role.roleId}, " +
                 $"root.local={role.roleRoot.localPosition}, root.world={role.roleRoot.position}, " +
                 $"tech.local={role.root.localPosition}, tech.world={role.root.position}"
             );
+            */
             /*
             role.visualRigRoot.localPosition = playerStagePose.Position;
             role.visualRigRoot.localRotation = playerStagePose.Rotation;
@@ -100,12 +102,12 @@ namespace AppV2.Runtime.Scripts.Rig
             // das wird jetzt durch die Zeilen oben erfüllt
             roles[roleIndex].visualRigFollower?.SetVisualRigToPlayerPosition();
             roles[roleIndex].rigFollower?.SetAvatarToPlayerPosition();
-            
+            /*
             UnityEngine.Debug.Log(
                 $"Role({roleIndex}) placed at localPosition: {playerStagePose.Position}, " +
                 $"localRotation: {playerStagePose.Rotation.eulerAngles}."
             );
-            
+            */
         }
 
         
@@ -245,11 +247,12 @@ namespace AppV2.Runtime.Scripts.Rig
                 role.root.position = spawn.transform.position;
                 role.root.rotation = spawn.transform.rotation;
             }
-
+            /*
             Debug.Log(
                 $"[PlaceImportedNpcRoleAtSpawnPoint] {role.roleId} " +
                 $"spawn={role.roleSpawnId}, local={role.root.localPosition}"
             );
+            */
         }
 
         private TransformData TransformStartPoseToCurrentStage(

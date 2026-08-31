@@ -82,7 +82,7 @@ namespace AppV2.Runtime.Scripts.Loader
                     {
                         roleId = importedRoleId,
                         roleIndex = meta.RoleIndex,
-                        roleSpawnId = import.spawnId,
+                        roleSpawnId = import.npcGroupSpawnId,
 
                         preRecordedStartRootPose = meta.StartRootPose != null
                             ? new TransformData
@@ -108,7 +108,7 @@ namespace AppV2.Runtime.Scripts.Loader
                         avatarName = meta.RoleName,
                         heightOfRoleCm = meta.HeightOfRoleCm,
                         sittingIdle = meta.SittingIdle,
-                        avatarSpawnId = import.spawnId
+                        
                     };
 
                     result.Add(role);

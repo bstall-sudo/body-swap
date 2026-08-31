@@ -67,7 +67,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 {
                     RoleId = role.roleId,
                     AvatarId = role.avatarId,
-                    AvatarSpawnId = role.avatarSpawnId,
+                    
                     RoleSpawnId = role.roleSpawnId,
                     RoleIndex = i,
                     RoleName = role.avatarName,

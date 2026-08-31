@@ -12,9 +12,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string workshopFolderName;
         public string sessionFolderName;
         public string sessionId;
-        public Transform spawnPoint;
+        
 
-        public string spawnId = "default";
+        public string npcGroupSpawnId = "default";
     }
     
 }

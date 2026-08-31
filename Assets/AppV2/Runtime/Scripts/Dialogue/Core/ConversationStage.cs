@@ -70,7 +70,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     sessionRootPath, store
                 );
 
-            Debug.Log($"[ConversationStage] Imported NPC roles: {importedNpcRoles.Count}");
+            //Debug.Log($"[ConversationStage] Imported NPC roles: {importedNpcRoles.Count}");
         }
         
 
@@ -234,7 +234,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     role.ResolveAvatarName(false);
                 }
 
-                UnityEngine.Debug.Log($"[BuildActiveRoles]:RoleCount is: {roleCount} | i is: {i}");
+                //UnityEngine.Debug.Log($"[BuildActiveRoles]:RoleCount is: {roleCount} | i is: {i}");
             }
         }
         
@@ -247,7 +247,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (child.name.StartsWith("Role"))
                 {
                     _allRoleRoots.Add(child);
-                    UnityEngine.Debug.Log($"[ApplyRoleCount] {child.name}");
+                    //UnityEngine.Debug.Log($"[ApplyRoleCount] {child.name}");
                 }
 
             }
@@ -316,7 +316,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             _playbackSourcesByRoleIndex[roleIndex] = source;
 
-            Debug.Log($"[PlaybackSource] Created default source for role {roleIndex}, session={_session.SessionId}");
+            //Debug.Log($"[PlaybackSource] Created default source for role {roleIndex}, session={_session.SessionId}");
 
             return source;
         }
@@ -397,11 +397,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                     isPreRecordedSource = false
                 };
-
+            /*
             Debug.Log(
                 $"[SwitchRoleToCurrentSession] role={roleIndex}, " +
                 $"sessionId={_session.SessionId}"
             );
+            */
         }
         //nicht benötigte Rollen werden deaktiviert.
         public void ApplyRoleCount()
@@ -415,7 +416,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
                 _allRoleRoots[i].gameObject.SetActive(active);
 
-                UnityEngine.Debug.Log($"[ApplyRoleCount] Role{_allRoleRoots[i].name} was SetActive= {active}");
+                //UnityEngine.Debug.Log($"[ApplyRoleCount] Role{_allRoleRoots[i].name} was SetActive= {active}");
             }
         }
 
@@ -861,7 +862,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         _takeIndex
                     );
                 sceneLoader.LoadSceneForRecordingMode(environmentId,stageSpawnId,roles);
-                UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
+                //UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
                 //ApplyPreRecordedNpcStartPoses();
 
                 _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
@@ -889,6 +890,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
 
+            /*
             foreach (RoleRig role in roles)
             {
                 Debug.Log(
@@ -897,7 +899,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     $"world={role.root?.position}"
                 );
             }
-
+            */
 
             
         }
@@ -910,10 +912,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
 /// <param name="session"></param>
         public void SetSession(SessionModel session)
         {
+            /*
             Debug.Log(
                 $"[ConversationStage][SetSession] CALLED! " +
                 $"session={session?.SessionId}"
             );
+            */
             _session = session;
             environmentId = session.EnvironmentId;
             stageSpawnId = session.StageSpawnId;
@@ -961,7 +965,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             XrOrigin.position = _stageRoot.position;
             XrOrigin.rotation = _stageRoot.rotation;
-            UnityEngine.Debug.Log($"StageRootPosition is: {_stageRoot.position}");
+            //UnityEngine.Debug.Log($"StageRootPosition is: {_stageRoot.position}");
         }
 
         //nur zum debuggen 24.08.2026
@@ -971,12 +975,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 if (role?.root == null)
                     continue;
-
+                /*
                 Debug.Log(
                     $"[NPC Position] [{label}] {role.roleId}: " +
                     $"local={role.root.localPosition}, " +
                     $"world={role.root.position}"
                 );
+                */
             }
         }
             
@@ -1252,10 +1257,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                 _stageRoot,
                                 spawn.transform
                             );
-
+                            /*
                             Debug.Log(
                                 $"[ConversationStage][PlaybackStart] ImportTake result={imported}"
                             );
+                            */
                         }
                     }
                     _playbackController.PlaybackForIndexBeginFromTake(
@@ -1500,7 +1506,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.LogError("ConversationStage.InitializePlaybackFromLatestSession: No latest session found.");
                 
             }
-            UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}");
+            //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}");
             InitializePlaybackFromSession(latestSessionId);
             //_playbackController.InitializeFromSession(roles, _store, _takeIndex, _session, groundHeightProvider);
             
@@ -1518,7 +1524,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return;
             }
 
-            Debug.Log($"[ConversationStage] InitializePlaybackFromSession RoleCount is: {loadedSession.RoleCount} session: {sessionId}");
+            //Debug.Log($"[ConversationStage] InitializePlaybackFromSession RoleCount is: {loadedSession.RoleCount} session: {sessionId}");
             _session = loadedSession;
 
             _playbackController.InitializeFromSession(
@@ -1893,7 +1899,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void StartPlayerAlignToActor(int roleIndex, float duration)
         {
             RoleRig targetRole = roles[roleIndex];
-
+            /*
             Debug.Log(
                 $"[StartPlayerAlignToActor] qwert roleIndex as Argument={roleIndex}, " +
                 $"roleId={targetRole.roleId}, " +
@@ -1901,6 +1907,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 $"localPos={targetRole.root.localPosition}, " +
                 $"worldPos={targetRole.root.position}"
             );
+            */
             if (SeatedMode || roles[roleIndex].sittingIdle)
             {
                 StartPlayerAlignToActorSeated(roleIndex, duration);
@@ -1942,7 +1949,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.LogWarning($"No last Head end pose found for roleIndex {roleIndex}");
                 return;
             }
-
+            /*
             Debug.Log(
                 $"[StartPlayerAlignToActorStanding] [NpcIntegration Debug] requestedRole={roleIndex}\n" +
                 $"targetBodyPosLocal={targetBodyPosLocal}\n" +
@@ -1951,7 +1958,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 $"hasLast0={_recordingController.HasLastFrame(0)}\n" +
                 $"hasLast1={_recordingController.HasLastFrame(1)}"
             );
-
+            */
             if (roles[roleIndex].visualRigRoot == null)
             {
                 UnityEngine.Debug.LogWarning($"visualRigRoot is null for roleIndex {roleIndex}");
@@ -2103,10 +2110,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // hier wird jetzt gesetzt, dass TickPlayerAlignSeated verwendet wird.
             _playerAlignUseHeadOffset = false;
 
+            /*
             Debug.Log(
                 $"[SeatedAlign] role={roles[roleIndex].roleId}, " +
                 $"targetRootWorld={targetRootWorld}, targetYaw={_playerAlignToYaw}"
             );
+            */
         }
                                 
         
@@ -2153,8 +2162,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
             pos.y = currentOriginPos.y;
 
             // DEBUG
+            /*
             if (Time.frameCount % 1 == 0 || u >= 1f)
             {
+                
                 Debug.Log(
                     $"[PLAYER ALIGN TICK] [NpcIntegration Debug] " +
                     $"frame={Time.frameCount} | " +
@@ -2168,20 +2179,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     $"targetHeadWorld={_playerAlignTargetHeadPosWorld}"
                 );
             }
+            */
             XrOrigin.position = pos;
             XrOrigin.rotation = targetOriginRotation;
-
+            
             if (u >= 1f)
             {
+                /*
                 Debug.Log(
                     $"[PLAYER ALIGN FINISHED] [NpcIntegration Debug] " +
                     $"XR final={XrOrigin.position} | " +
                     $"headFinal={XrHead.position} | " +
                     $"targetHead={_playerAlignTargetHeadPosWorld}"
                 );
-
+                */
                 _playerAlignActive = false;
             }
+            
+            
         }
 
         public void TickPlayerAlignSeated()

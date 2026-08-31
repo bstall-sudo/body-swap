@@ -11,7 +11,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
     public class RoleRig
     {
         public string avatarId; 
-        public string avatarSpawnId= "";
+        
 
         //roleSpawnId ist die Position der Figur
         public string roleSpawnId= "";

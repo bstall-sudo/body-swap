@@ -48,7 +48,7 @@ namespace AppV2.Runtime.Scripts.Rig
                 role.rigFollower?.BuildMapAndEnableFollow();
 
                 role.roleSpawnId = meta.RoleSpawnId;
-                role.avatarSpawnId = meta.AvatarSpawnId;
+                
             }
         }
 

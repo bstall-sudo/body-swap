@@ -367,7 +367,6 @@ MonoBehaviour:
   embodimentOffsetRoot: {fileID: 903465283}
   roles:
   - avatarId: 
-    avatarSpawnId: 
     roleSpawnId: 
     roleId: A
     slotId: A
@@ -432,7 +431,6 @@ MonoBehaviour:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: 
-    avatarSpawnId: 
     roleSpawnId: 
     roleId: B
     slotId: B
@@ -497,7 +495,6 @@ MonoBehaviour:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: 
-    avatarSpawnId: 
     roleSpawnId: 
     roleId: C
     slotId: C
@@ -10840,8 +10837,7 @@ MonoBehaviour:
     workshopFolderName: PreRecordedScene
     sessionFolderName: hotellobby
     sessionId: 2026-08-27-UTC-12-11-37_87
-    spawnPoint: {fileID: 0}
-    spawnId: default
+    npcGroupSpawnId: default
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
@@ -10871,8 +10867,7 @@ MonoBehaviour:
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
   - avatarId: baer_001
-    avatarSpawnId: 01
-    roleSpawnId: 
+    roleSpawnId: 01
     roleId: A
     slotId: A
     sourceRoleId: 
@@ -10936,8 +10931,7 @@ MonoBehaviour:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   - avatarId: blaumann_001
-    avatarSpawnId: 
-    roleSpawnId: 
+    roleSpawnId: 01
     roleId: B
     slotId: B
     sourceRoleId: 
@@ -11007,8 +11001,8 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 0
   AvatarPlacementAtStart: 1
-  StartInPlaybackFullConversationMode: 1
-  _sessionFolder: 2026-08-28-UTC-13-50-56_01
+  StartInPlaybackFullConversationMode: 0
+  _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}

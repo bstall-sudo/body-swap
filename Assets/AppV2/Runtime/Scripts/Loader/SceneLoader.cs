@@ -97,7 +97,7 @@ public class SceneLoader : MonoBehaviour
 
             role.roleId = roleMeta.RoleId;
             role.avatarId = roleMeta.AvatarId;
-            role.avatarSpawnId = roleMeta.AvatarSpawnId;
+            
             role.roleSpawnId = roleMeta.RoleSpawnId;
 
             // Avatar laden

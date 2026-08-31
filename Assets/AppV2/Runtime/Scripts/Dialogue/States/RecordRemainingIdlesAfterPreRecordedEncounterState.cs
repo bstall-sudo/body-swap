@@ -192,12 +192,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
+            _flow.PrintRoleListsAndFlowStateData("[RecordRemainingIdlesState][FlowStateData][Exit] At Start Exit:", _toBeRecorded, _sceneCount);
             _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
 
             _flow._data.GoToPlaybackPreRecordedState = _goToPlaybackPreRecordedScenes;
             _flow._data.GoToRecordRemainingState = _goToRecordRemainingIdles;
             _flow._data.GoToSpeakerState = _goToSpeakerState;
             
+            _flow.RecordRemainingToSpeaker_DataAdjustments();
             //hier muss noch eine _flow.RecordRemainingToEnd_DataAdjustments(); hin
             //
             
@@ -207,10 +209,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.ResetEmbodimentHeight();
                 //Grösse der Welt wieder zurücksetzen
                 _flow.Stage.ResetVisualScaleOfConversationStage(toBeRecorded);
-            }*/
-           
+            }
+           */
             //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Exit");
-            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Exit", _playbacks, _reactiveIdles,_toBeRecorded);
+            _flow.PrintRoleListsAndFlowStateData("[RecordRemainingIdlesState][FlowStateData][Exit] At End of Exit:", _sceneCount, _toBeRecorded);
         }
 
         private void PrepareStartPlaybacksReactiveIdlesForScene(int sceneCount, int toBeRecorded)
