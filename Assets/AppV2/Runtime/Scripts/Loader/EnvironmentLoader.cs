@@ -60,21 +60,62 @@ namespace AppV2.Runtime.Scripts.Loader
         public StageSpawnPoint GetSpawnPoint(string spawnId = "default")
         {
             if (_currentEnvironment == null)
+            {
+                Debug.LogWarning(
+                    "[EnvironmentLoader] No environment is currently loaded."
+                );
+
                 return null;
+            }
 
             StageSpawnPoint[] points =
                 _currentEnvironment.GetComponentsInChildren<StageSpawnPoint>(true);
 
             if (points == null || points.Length == 0)
-                return null;
+            {
+                Debug.LogWarning(
+                    "[EnvironmentLoader] Current environment contains no StageSpawnPoints."
+                );
 
-            foreach (var point in points)
+                return null;
+            }
+
+            // Gewünschten SpawnPoint suchen
+            foreach (StageSpawnPoint point in points)
             {
                 if (point.spawnId == spawnId)
                     return point;
             }
 
-            return points[0];
+            // Gewünschte ID existiert nicht -> default versuchen
+            foreach (StageSpawnPoint point in points)
+            {
+                if (point.spawnId == "default")
+                {
+                    Debug.LogWarning(
+                        $"[EnvironmentLoader] SpawnId '{spawnId}' not found. " +
+                        $"Using 'default' instead."
+                    );
+
+                    return point;
+                }
+            }
+
+            Debug.LogWarning(
+                $"[EnvironmentLoader] SpawnId '{spawnId}' not found " +
+                $"and no 'default' SpawnPoint exists."
+            );
+
+            return null;
+        }
+
+        public Transform GetTransformFromSpawnId(string spawnId = "default")
+        {
+            StageSpawnPoint spawnPoint = GetSpawnPoint(spawnId);
+
+            return spawnPoint != null
+                ? spawnPoint.transform
+                : null;
         }
     }
 

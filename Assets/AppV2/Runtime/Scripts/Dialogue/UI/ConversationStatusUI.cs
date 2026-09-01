@@ -52,6 +52,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             SetStatusText("Aufnahme beendet. Playback läuft");
         }
 
+        public void ShowPlaybackPreRecordedScene()
+        {
+            SetStatusText("Hör zu, bis die Figur fertig gesprochen hat.");
+        }
+
         public void ShowIdleState()
         {
             SetStatusText("IDLE");

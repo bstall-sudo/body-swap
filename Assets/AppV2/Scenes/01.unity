@@ -10828,7 +10828,7 @@ MonoBehaviour:
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
   environmentId: Lobby_01
-  stageSpawnId: 01
+  stageSpawnId: 03
   preRecordedSceneCount: 1
   preRecordedScenes:
   - enabled: 1
@@ -10843,7 +10843,7 @@ MonoBehaviour:
   _storageFolderName: SessionRecordingData
   _workshopFolderName: Lobby_test
   _personalFolderName: 01
-  roleCount: 2
+  roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
@@ -10909,70 +10909,6 @@ MonoBehaviour:
     avatar: {fileID: 1080217243}
     rigFollower: {fileID: 1080217244}
     visualRigFollower: {fileID: 2041661047}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: blaumann_001
-    roleSpawnId: 01
-    roleId: B
-    slotId: B
-    sourceRoleId: 
-    roleIndex: 1
-    sourceRoleIndex: 1
-    npcGroupId: 
-    hasPreRecordedTakes: 0
-    isActiveConversationPartner: 1
-    takeSource: 
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 780788515}
-    roleRoot: {fileID: 780788514}
-    root: {fileID: 1106718683}
-    head: {fileID: 1466196902}
-    leftHand: {fileID: 1396646244}
-    rightHand: {fileID: 632902929}
-    leftFoot: {fileID: 291678139}
-    rightFoot: {fileID: 1140240597}
-    hip: {fileID: 1822376785}
-    hipSolver: {fileID: 1822376786}
-    leftFootSolver: {fileID: 291678135}
-    rightFootSolver: {fileID: 1140240598}
-    audioSource: {fileID: 529194169}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 689874910}
-    visualRolesVisibility: {fileID: 1899071022}
-    sittingIdle: 0
-    avatarRoot: {fileID: 715581305}
-    avatarName: 
-    avatar: {fileID: 715581306}
-    rigFollower: {fileID: 715581307}
-    visualRigFollower: {fileID: 1899071023}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
     preRecordedCalibration:

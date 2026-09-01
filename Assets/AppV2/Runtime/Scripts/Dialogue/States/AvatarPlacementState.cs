@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AppV2.Runtime.Scripts.Dialogue.Services;
 using AppV2.Runtime.Scripts.Rig;
 using AppV2.Runtime.Scripts.DataStructures;
+using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
@@ -12,6 +13,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int _currentRoleIndexForPlacement;
         private bool selectableNext;
 
+        public Transform _stageRoot;
         private int _roleCount;
         private List<int> _allRolesIndices;
 
@@ -36,6 +38,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             selectableNext = _flow.Stage.selectableNext;
             _allRolesIndices = new List<int>();
             _currentRoleIndexForPlacement = 0;
+            _stageRoot = _flow.Stage._stageRoot;
 
             for (int i = 0; i < _flow.Stage.roleCount; i++){
                 _allRolesIndices.Add(i);
@@ -70,6 +73,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
         }
 
+/*
        private void PlaceCurrentRoleAndAdvance()
         {
             if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
@@ -115,6 +119,197 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 return;
             }
 
+        }
+        */
+
+        private void PlaceCurrentRoleAndAdvance()
+        {
+            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
+            {
+                GoToNextState();
+                return;
+            }
+
+            RoleRig role = _flow.Stage.roles[_currentRoleIndexForPlacement];
+
+            int activeRoleCount = 0;
+            int activePlacementIndex = 0;
+
+            for (int i = 0; i < _flow.Stage.roles.Count; i++)
+            {
+                RoleRig r = _flow.Stage.roles[i];
+
+                if (r.hasPreRecordedTakes)
+                    continue;
+
+                if (i < _currentRoleIndexForPlacement)
+                    activePlacementIndex++;
+
+                activeRoleCount++;
+            }
+
+            if (role.hasPreRecordedTakes)
+            {
+                PlacePreRecordedRole(_currentRoleIndexForPlacement);
+            }
+            else
+            {
+                Vector3 placement;
+                Quaternion rotation;
+
+                if (activeRoleCount == 1)
+                {
+                    placement = Vector3.zero;
+                    rotation = Quaternion.identity;
+                }
+                else
+                {
+                    placement = RolePlacementUtility.GetCirclePlacementPosition(
+                        activePlacementIndex,
+                        activeRoleCount
+                    );
+
+                    Vector3 flatPlacement = placement;
+                    flatPlacement.y = 0f;
+
+                    rotation =
+                        RolePlacementUtility.GetCirclePlacementRotation(flatPlacement);
+                }
+
+                placement.y =
+                    _flow.Stage.GetGroundYStageLocal(placement);
+
+                _flow.Stage.AvatarCalibration.PlaceRoleAt(
+                    _currentRoleIndexForPlacement,
+                    placement,
+                    rotation,
+                    _flow.Stage._stageRoot
+                );
+            }
+
+            // Immer weitergehen, egal ob normal oder prerecorded
+            _currentRoleIndexForPlacement++;
+
+            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
+            {
+                GoToNextState();
+            }
+        }
+
+        public void PlacePreRecordedRole(int roleIndex)
+        {
+            if (roleIndex < 0 || roleIndex >= _flow.Stage.roles.Count)
+            {
+                Debug.LogWarning(
+                    $"[PlacePreRecordedRole] Invalid roleIndex: {roleIndex}"
+                );
+                return;
+            }
+
+            RoleRig role = _flow.Stage.roles[roleIndex];
+
+            if (role == null || !role.hasPreRecordedTakes)
+                return;
+
+            if (_stageRoot == null)
+            {
+                Debug.LogError("[PlacePreRecordedRole] StageRoot is null.");
+                return;
+            }
+
+            // Spawnpunkt der NPC-Gruppe im Environment holen
+            Transform npcGroupSpawn =
+                _flow.Stage.environmentLoader.GetTransformFromSpawnId(role.roleSpawnId);
+
+            if (npcGroupSpawn == null)
+            {
+                Debug.LogWarning(
+                    $"[PlacePreRecordedRole] No spawn point found for " +
+                    $"role={role.roleId}, spawnId={role.roleSpawnId}"
+                );
+
+                // Letzter Fallback:
+                // aktuelle lokale Pose der Rolle beibehalten.
+                return;
+            }
+
+            Vector3 placement;
+            Quaternion rotation;
+
+            // ----------------------------------------------------
+            // 1. Bevorzugt:
+            // ursprüngliche StartRootPose relativ zum NPC-Spawn
+            // ----------------------------------------------------
+            if (role.preRecordedStartRootPose != null)
+            {
+                TransformData sourcePose = role.preRecordedStartRootPose;
+
+                // StartRootPose stammt aus dem lokalen Raum
+                // der ursprünglichen ConversationStage.
+                //
+                // Wir behandeln den neuen NPC-SpawnPoint jetzt als
+                // neuen Ursprung dieser ursprünglichen Stage.
+                Vector3 worldPos =
+                    npcGroupSpawn.TransformPoint(sourcePose.LocalPosition);
+
+                Quaternion worldRot =
+                    npcGroupSpawn.rotation * sourcePose.LocalRotation;
+
+                // In den lokalen Raum unserer aktuellen Stage umrechnen,
+                // da Role.root unter StageRoot hängt.
+                placement =
+                    _stageRoot.InverseTransformPoint(worldPos);
+
+                rotation =
+                    Quaternion.Inverse(_stageRoot.rotation) * worldRot;
+            }
+            else
+            {
+                // ----------------------------------------------------
+                // 2. Fallback:
+                // keine StartRootPose vorhanden.
+                //
+                // Rolle direkt auf den NPC-Group-SpawnPoint setzen.
+                // ----------------------------------------------------
+
+                placement =
+                    _stageRoot.InverseTransformPoint(npcGroupSpawn.position);
+
+                rotation =
+                    Quaternion.Inverse(_stageRoot.rotation) *
+                    npcGroupSpawn.rotation;
+
+                Debug.LogWarning(
+                    $"[PlacePreRecordedRole] " +
+                    $"role={role.roleId} has no preRecordedStartRootPose. " +
+                    $"Using NpcGroupSpawnPoint directly."
+                );
+            }
+
+            // ----------------------------------------------------
+            // 3. Bodenhöhe des AKTUELLEN Environments verwenden
+            // ----------------------------------------------------
+
+            placement.y = _flow.Stage.GetGroundYStageLocal(placement);
+
+            // ----------------------------------------------------
+            // 4. Rolle platzieren
+            // ----------------------------------------------------
+
+            _flow.Stage.AvatarCalibration.PlaceRoleAt(
+                roleIndex,
+                placement,
+                rotation,
+                _stageRoot
+            );
+
+            Debug.Log(
+                $"[PlacePreRecordedRole] " +
+                $"role={role.roleId} | " +
+                $"spawnId={role.roleSpawnId} | " +
+                $"placement={placement} | " +
+                $"hasStartPose={role.preRecordedStartRootPose != null}"
+            );
         }
 
         private Vector3 GetTestPlacementPosition(int roleIndex)

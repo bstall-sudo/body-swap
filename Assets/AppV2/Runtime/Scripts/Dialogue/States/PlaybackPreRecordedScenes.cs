@@ -65,9 +65,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.StatusUI != null)
             {
-                _flow.StatusUI.ShowPlaybackFullConversationState();
+                _flow.StatusUI.ShowPlaybackPreRecordedScene();
                 _flow.StatusUI.ShowCustomCue(
-                    "Hör zu!\n \nAufnahme\n \n wird abgespielt",
+                    "Hör zu!",
                     new Vector2(0f, 180f),
                     new Vector2(500f, 0f),
                     Color.red
