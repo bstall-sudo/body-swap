@@ -3284,7 +3284,15 @@ MonoBehaviour:
     sourcePath: 
     isExternal: 0
   - avatarId: kaktus_001
-    prefab: {fileID: 7071930958604385571, guid: 33b12bdee92fe0b43962cb477159da61, type: 3}
+    prefab: {fileID: 3736860395521719809, guid: 62d02c5dea62e6043b70d7edad36295c, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: langohr_001
+    prefab: {fileID: 8574812895086323981, guid: d5b3f16143667394f80d2d8f2c68093a, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: kueken_001
+    prefab: {fileID: 6172790800113131848, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
     sourcePath: 
     isExternal: 0
 --- !u!1 &241298607
@@ -10827,23 +10835,16 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: Lobby_01
+  environmentId: Lobby_02
   stageSpawnId: 03
-  preRecordedSceneCount: 1
-  preRecordedScenes:
-  - enabled: 1
-    npcGroupId: NpcGroup01
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\PreRecordedScene\hotellobby\2026-08-27-UTC-12-11-37_87
-    workshopFolderName: PreRecordedScene
-    sessionFolderName: hotellobby
-    sessionId: 2026-08-27-UTC-12-11-37_87
-    npcGroupSpawnId: default
+  preRecordedSceneCount: 0
+  preRecordedScenes: []
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
   _workshopFolderName: Lobby_test
   _personalFolderName: 01
-  roleCount: 1
+  roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
@@ -10866,7 +10867,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: baer_001
+  - avatarId: kueken_001
     roleSpawnId: 01
     roleId: A
     slotId: A
@@ -10909,6 +10910,70 @@ MonoBehaviour:
     avatar: {fileID: 1080217243}
     rigFollower: {fileID: 1080217244}
     visualRigFollower: {fileID: 2041661047}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 1
+    preRecordedCalibration:
+      headTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      hipTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+  - avatarId: langohr_001
+    roleSpawnId: 
+    roleId: B
+    slotId: B
+    sourceRoleId: 
+    roleIndex: 1
+    sourceRoleIndex: 1
+    npcGroupId: 
+    hasPreRecordedTakes: 0
+    isActiveConversationPartner: 1
+    takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
+    avatarLoader: {fileID: 780788515}
+    roleRoot: {fileID: 780788514}
+    root: {fileID: 1106718683}
+    head: {fileID: 1466196902}
+    leftHand: {fileID: 1396646244}
+    rightHand: {fileID: 632902929}
+    leftFoot: {fileID: 291678139}
+    rightFoot: {fileID: 1140240597}
+    hip: {fileID: 1822376785}
+    hipSolver: {fileID: 1822376786}
+    leftFootSolver: {fileID: 291678135}
+    rightFootSolver: {fileID: 1140240598}
+    audioSource: {fileID: 529194169}
+    heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 133
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+    visualRigRoot: {fileID: 689874910}
+    visualRolesVisibility: {fileID: 1899071022}
+    sittingIdle: 0
+    avatarRoot: {fileID: 715581305}
+    avatarName: 
+    avatar: {fileID: 715581306}
+    rigFollower: {fileID: 715581307}
+    visualRigFollower: {fileID: 1899071023}
     visualGroundOffsetY: 0
     usePlayerHeightAsDefault: 1
     preRecordedCalibration:
@@ -25528,6 +25593,8 @@ MonoBehaviour:
     prefab: {fileID: 1616553772516772163, guid: 315e06b72a93a9e4fa7b2fb966e23647, type: 3}
   - environmentId: Lobby_01
     prefab: {fileID: 1690158042345764391, guid: ebdc7bcb152d9734d9f48f0cfb3a00d7, type: 3}
+  - environmentId: Lobby_02
+    prefab: {fileID: 8827827258431270469, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0
