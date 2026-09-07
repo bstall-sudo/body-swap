@@ -2041,9 +2041,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 576976420006748552, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'spine'\n\tTransform 'head'\n\tTransform
+        'neck'\n\tTransform 'spine.001'\n\tTransform 'spine'\n\tTransform 'head'\n\tTransform
+        'neck'\n\tTransform 'spine.001'\n\tTransform 'spine'\n\tTransform 'head'\n\tand
+        more ..."
+      objectReference: {fileID: 0}
+    - target: {fileID: 3164902404358392813, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6172790800113131848, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
       propertyPath: m_Name
       value: kueken_001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6172790800113131848, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6837018576033594354, guid: d74d3971fa1ea454a814de20861ec483, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2269,6 +2286,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9110912952279826688, guid: 62d02c5dea62e6043b70d7edad36295c, type: 3}
   m_PrefabInstance: {fileID: 4557866718795593200}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6181778824109770817
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4803164278356551894, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5324262848975204972, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
+      propertyPath: m_Name
+      value: kuekenMitKopf_001
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
 --- !u!1001 &6486188708382697104
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2540,3 +2614,4 @@ SceneRoots:
   - {fileID: 6486188708382697104}
   - {fileID: 4557866718795593200}
   - {fileID: 4505256238875536525}
+  - {fileID: 6181778824109770817}
