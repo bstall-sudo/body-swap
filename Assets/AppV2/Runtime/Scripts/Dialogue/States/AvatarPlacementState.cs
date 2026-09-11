@@ -161,6 +161,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 {
                     placement = Vector3.zero;
                     rotation = Quaternion.identity;
+                    UnityEngine.Debug.Log($"[AvatarPlacementState] placement is: {placement.x}, {placement.y}, {placement.z}"); 
                 }
                 else
                 {

@@ -25,6 +25,7 @@ namespace AppV2.Runtime.Scripts.Rig
             _roles = roles;
         }
 
+/*
 
         public List<ConversationRoleMeta> CreateRoleMetas()
         {
@@ -80,7 +81,59 @@ namespace AppV2.Runtime.Scripts.Rig
 
             return result;
         }
+*/
+        public List<ConversationRoleMeta> CreateRoleMetas()
+        {
+            var result = new List<ConversationRoleMeta>();
 
+            if (_roles == null)
+                return result;
+
+            for (int i = 0; i < _roles.Count; i++)
+            {
+                RoleRig role = _roles[i];
+
+                TransformData startRootPose = null;
+                TransformData startRoleRootPose = null;
+
+                if (role.root != null)
+                {
+                    startRootPose = new TransformData
+                    {
+                        LocalPosition = role.root.localPosition,
+                        LocalRotation = role.root.localRotation
+                    };
+                }
+
+                if (role.roleRoot != null)
+                {
+                    startRoleRootPose = new TransformData
+                    {
+                        LocalPosition = role.roleRoot.localPosition,
+                        LocalRotation = role.roleRoot.localRotation
+                    };
+                }
+
+                result.Add(new ConversationRoleMeta
+                {
+                    RoleId = role.roleId,
+                    AvatarId = role.avatarId,
+
+                    RoleSpawnId = role.roleSpawnId,
+                    RoleIndex = i,
+                    RoleName = role.avatarName,
+                    HeightOfRoleCm = role.heightOfRoleCm,
+                    SittingIdle = role.sittingIdle,
+
+                    StartRootPose = startRootPose,
+                    StartRoleRootPose = startRoleRootPose,
+
+                    Calibration = CaptureCalibration(role)
+                });
+            }
+
+            return result;
+        }
 
         private RoleCalibrationData CaptureCalibration(RoleRig role)
         {

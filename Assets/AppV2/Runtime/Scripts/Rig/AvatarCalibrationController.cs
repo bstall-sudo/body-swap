@@ -3,6 +3,7 @@ using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Loader;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+//using System.Numerics;
 
 namespace AppV2.Runtime.Scripts.Rig
 {
@@ -179,6 +180,16 @@ namespace AppV2.Runtime.Scripts.Rig
                     Position = localPos,
                     Rotation = localRotation
                 };
+
+                /*
+                Vector3 testValuePos = new Vector3();
+                Quaternion tesValueRot = new Quaternion();
+
+                StagePose testStagePose = new StagePose
+                {
+                    Position = testValuePos,
+                    Rotation = tesValueRot
+                }; */
 
                 PlaceAvatarAtUserPosition(roleIndex, stagePose);
 
