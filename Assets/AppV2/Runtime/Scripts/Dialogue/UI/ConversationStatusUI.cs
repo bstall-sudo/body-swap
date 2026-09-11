@@ -62,6 +62,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             SetStatusText("IDLE");
         }
 
+        public void ShowCalibrationAlignHint()
+        {
+            SetStatusText("Schaue geradeaus und drücke den linken Trigger.");
+        }
+
         public void ShowTransitionToSpeaker()
         {
             ShowCue("Sprich", defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);

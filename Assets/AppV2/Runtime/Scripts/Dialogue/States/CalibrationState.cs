@@ -12,6 +12,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private bool _seatedMode;
 
+        //neu für ausrichtung an XR-Camera
+        private bool XrOriginIsPlacedSoThatCameraIsAtVectorZero;
+
         private bool _isCalibrationFinished = false;
 
         private bool _rolesSetToPlayerPosition =false;
@@ -81,11 +84,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             //Visual und TechnicalRig folgen hier sepparat, weil ja nicht recorded wird und auch proceduralMove noch nicht aktiv sein soll. 
             _flow.Stage.ApplyFollowerCalibrationState(_currentRoleIndexForCalibration);
+            if (!_rolesSetToPlayerPosition)
+            {
+                _flow.StatusUI.ShowCalibrationAlignHint();
+            }
+            
             if (_flow.ConsumePrimaryAction())
             {
-                if(_seatedMode && !_rolesSetToPlayerPosition)
+                if(!_rolesSetToPlayerPosition)
                 {
-                    _playerPosRot = _flow.Stage.GetPlayerPosRotForSeatedModeRigCalibration();
+                    _playerPosRot = _flow.Stage.GetPlayerGroundPoseInStage();
                     _flow.Stage.AvatarCalibration.PlaceAvatarsAtUserPosition(_playerPosRot);
                     _flow.Stage.PlaceMirrorInFrontOfPlayer();
                     _rolesSetToPlayerPosition = true;

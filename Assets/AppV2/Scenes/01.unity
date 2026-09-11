@@ -3295,6 +3295,10 @@ MonoBehaviour:
     prefab: {fileID: 5324262848975204972, guid: f2dc82f1fd2b3cf458e96ca7b5226748, type: 3}
     sourcePath: 
     isExternal: 0
+  - avatarId: bart_001
+    prefab: {fileID: 947755959019860125, guid: 57e093f73ac19df4a8ebc6548fb18ae1, type: 3}
+    sourcePath: 
+    isExternal: 0
 --- !u!1 &241298607
 GameObject:
   m_ObjectHideFlags: 0
@@ -10835,8 +10839,8 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: Lobby_02
-  stageSpawnId: 03
+  environmentId: FarbLandscahft_01
+  stageSpawnId: default
   preRecordedSceneCount: 0
   preRecordedScenes: []
   importedNpcRoles: []
@@ -10867,7 +10871,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: kueken_001
+  - avatarId: bart_001
     roleSpawnId: 01
     roleId: A
     slotId: A
@@ -10931,7 +10935,7 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: kaktus_001
+  - avatarId: esel_001
     roleSpawnId: 
     roleId: B
     slotId: B
@@ -20751,6 +20755,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EmbodimentCameraOffset
       objectReference: {fileID: 0}
+    - target: {fileID: 1767192439, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      propertyPath: far clip plane
+      value: 1000000
+      objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_Name
       value: XR Origin (XR Rig)
@@ -25595,6 +25603,10 @@ MonoBehaviour:
     prefab: {fileID: 1690158042345764391, guid: ebdc7bcb152d9734d9f48f0cfb3a00d7, type: 3}
   - environmentId: Lobby_02
     prefab: {fileID: 8827827258431270469, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+  - environmentId: Gletscher_01
+    prefab: {fileID: 8827827258431270469, guid: 0a40867bfb26f2d4db93d873a10cb029, type: 3}
+  - environmentId: FarbLandscahft_01
+    prefab: {fileID: 8827827258431270469, guid: c64a58ffcf535154082083934c4abf28, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0

@@ -2239,7 +2239,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
 
         //Das wird im CalibrationState(SeatedMode) gerufen, damit die Rollen am richtigen Ort platziert werden können.
-        public StagePose GetPlayerPosRotForSeatedModeRigCalibration()
+        public StagePose GetPlayerGroundPoseInStage()
         {
             if (XrHead == null)
             {
