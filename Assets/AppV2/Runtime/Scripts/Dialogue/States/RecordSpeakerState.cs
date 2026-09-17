@@ -12,6 +12,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private List<int> playbacks;
         private int sceneCount;
 
+        private float _radiusNpcStartTalking;
+
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
         private bool selectableNext;
@@ -68,6 +70,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             toBeRecorded = _flow._data.ToBeRecorded;
             playbacks = _flow._data.Playbacks;
             indicesOfPassiveRoles = _flow._data.IndicesOfPassiveRoles;
+
+            _radiusNpcStartTalking = _flow.Stage._radiusNpcStartTalking;
 
             selectableNext = _flow.Stage.selectableNext;
             reactiveIdles = _flow._data.ReactiveIdles;
@@ -145,7 +149,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
                 //IsPlayerNearNpc(int roleIndex, Transform player, float radius)
-                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
+                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
                     UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} ");
@@ -170,7 +174,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
                 if(!_startWaitingToSwitchToFullPlayback){
                     UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
-                    if(_flow.PlayerNearNpcs(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3))
+                    if(_flow.PlayerNearNpcs(_flow._data.IndicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                     {
                         UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
@@ -251,7 +255,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if (goingToPlaybackPreRecordedScenesState)
                 {   
                     
-                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, 3);
+                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
                     _flow.SpeakerStateExitAutoSelectionGoingToPlaybackPreRecordedScenesState();
                 }
                 else

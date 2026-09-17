@@ -33,6 +33,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Range(0,6)]
         public int preRecordedSceneCount = 0;
 
+        public float _radiusNpcStartTalking = 5;
+
         public List<PreRecordedSceneImport> preRecordedScenes =
             new List<PreRecordedSceneImport>();
 

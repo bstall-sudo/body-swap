@@ -17,6 +17,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
         private bool selectableNext;
 
+        private float _radiusNpcStartTalking;
+
         private bool _allplaybaksStoped = false;
 
         private bool goingToPlaybackPreRecordedScenes = false;
@@ -62,7 +64,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             selectableNext = _flow.Stage.selectableNext;
             sceneCount = _flow._data.SceneCount;
-            
+            _radiusNpcStartTalking = _flow.Stage._radiusNpcStartTalking;
 
             toBeRecorded = _flow._data.ToBeRecorded;
 
@@ -100,7 +102,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.DriveAndRecordTickActiveRole(toBeRecorded, sceneCount, dt);
                 //_flow.Stage.RecordingTick(toBeRecorded, sceneCount);
                 _flow.Stage.PlaybackTick(playbacks);
-                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
+                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
                     _waitingForRecordingSave = true;
@@ -221,9 +223,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //Das muss auch noch angepasst werden, damit das auch funktioniert mit selectable Next.
                 //hier true, weil die FlowStateData sollen ja noch angepasst werden, bevor man in den 
                 //PlaybackFullPreRecordedScenesState kommt.
-                if (goingToPlaybackPreRecordedScenes && _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3))
+                if (goingToPlaybackPreRecordedScenes && _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
-                    _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, 3);
+                    _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
                     _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
                 }
                 else
