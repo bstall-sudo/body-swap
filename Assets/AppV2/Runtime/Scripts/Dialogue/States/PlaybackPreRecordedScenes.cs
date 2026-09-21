@@ -40,14 +40,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _sceneCountForPreRecordedScenes = 0;
             _sceneCount = _flow._data.SceneCount;
-            Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: roleCount is: {_roleCount}, SceneCount is: {_sceneCount} SceneCount For PrerecordedScenes is: {_sceneCountForPreRecordedScenes} [checkSceneCount01]");
+            //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: roleCount is: {_roleCount}, SceneCount is: {_sceneCount} SceneCount For PrerecordedScenes is: {_sceneCountForPreRecordedScenes} [checkSceneCount01]");
             _roleCount =  _flow._data.CurrentPreRecordedPlaybacks.Count;
             _preRecordedRolesIndices = _flow._data.CurrentPreRecordedPlaybacks;
             _seatedMode = _flow.Stage.SeatedMode;
             _toBeRecorded = _flow._data.ToBeRecorded;
-            Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: _toBeRecorded index is: {_toBeRecorded}");
+            //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: _toBeRecorded index is: {_toBeRecorded}");
             _roleCount =  _flow._data.CurrentPreRecordedPlaybacks.Count;
-            Debug.Log($"[PlaybackFullPreRecordedScenes] Enter after RoleCountUpdate: roleCount is: {_roleCount}, SceneCount is: {_sceneCount} SceneCount For PrerecordedScenes is: {_sceneCountForPreRecordedScenes}");
+            //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter after RoleCountUpdate: roleCount is: {_roleCount}, SceneCount is: {_sceneCount} SceneCount For PrerecordedScenes is: {_sceneCountForPreRecordedScenes}");
 
             _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
 
@@ -199,7 +199,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private void PrepareStartPlaybacksReactiveIdlesForScene()
         {
             //hier werden alle existierenden Rollen in die Liste der Playbacks aufgenommen
-            _playbacks = PlaybackCandidates(_roleCount);
+            _playbacks = PlaybackCandidates();
             //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] SceneCount is: {_playbacks.Count} playbacks: [" + string.Join(", ", _playbacks) + "]");
             //hier wird das kopieren der PreRecoreded Data zum aktuellen Session Ordner gestartet.
             _noTakes = _flow.Stage.PlaybackStart(_playbacks,_sceneCount, _sceneCountForPreRecordedScenes);
@@ -244,7 +244,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Indices of IndicesOfPassiveRoles has length (after update): {_flow._data.IndicesOfPassiveRoles.Count}");
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Active Roles have length (after update): {_flow._data.Roles.Count}");
-            _flow.Stage.SwitchNpcGroupToCurrentSession(_flow._data.CurrentNpcGroupId);
+            //_flow.Stage.SwitchNpcGroupToCurrentSession(_flow._data.CurrentNpcGroupId);
 
             PrintRoleLists(
                             "[PlaybackPreRecorededScenes] At Exit -> before PlayerAlignState", 
@@ -255,12 +255,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                             );
         }
 
-        private List<int> PlaybackCandidates(int roleCount){
+        private List<int> PlaybackCandidates(){
             List<int> playbackCandidates =new List<int>();
 
-            foreach (int i in _preRecordedRolesIndices)
+            foreach (RoleRig role in _flow._data.AllRoles)
                 {
-                    playbackCandidates.Add(i);   
+                    if(role.npcGroupId == _flow._data.CurrentNpcGroupId)
+                    {
+                        playbackCandidates.Add(role.roleIndex);
+                    }
+                       
                 }
             
             return playbackCandidates;

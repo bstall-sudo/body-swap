@@ -148,13 +148,13 @@ namespace AppV2.Runtime.Scripts.Rig
         public void ValidateSetup(string roleName)
         {
             
-            UnityEngine.Debug.Log(
+            /*UnityEngine.Debug.Log(
                 $"[FootSolver Validate] role={roleName}, solver={name}, " +
                 $"bodyRoot={(bodyRoot ? bodyRoot.name : "NULL")}, " +
                 $"otherFoot={(otherFoot ? otherFoot.name : "NULL")}, " +
                 $"layerMask={groundLayer.value}, " +
                 $"position={transform.position}"
-            );
+            );*/
             
         }
     }

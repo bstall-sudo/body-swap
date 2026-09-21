@@ -55,7 +55,7 @@ namespace AppV2.Runtime.Scripts.Loader
                     Debug.LogWarning("[PreRecordedSceneImporter] Missing sessionSourcePath.");
                     return result;
                 }
-                UnityEngine.Debug.Log($"der SourcePath ist: {import.sessionId}");
+                //UnityEngine.Debug.Log($"der SourcePath ist: {import.sessionId}");
                 SessionModel sourceSession =
                     store.LoadSessionModel(import.sessionId, workshopFolderName: import.workshopFolderName, sessionFolderName: import.sessionFolderName);
 
@@ -114,7 +114,7 @@ namespace AppV2.Runtime.Scripts.Loader
                     result.Add(role);
                 }
 
-                Debug.Log($"[PreRecordedSceneImporter] Imported {result.Count} NPC roles from {sourceSession.SessionId}");
+                //Debug.Log($"[PreRecordedSceneImporter] Imported {result.Count} NPC roles from {sourceSession.SessionId}");
 
                 return result;
             }

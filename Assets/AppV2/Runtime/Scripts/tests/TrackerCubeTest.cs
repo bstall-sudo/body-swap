@@ -26,6 +26,6 @@ public class TrackerCubeTest : MonoBehaviour
         transform.localPosition = pos;
         transform.localRotation = rot;
 
-        Debug.Log($"Tracker pos: {pos}, rot: {rot.eulerAngles}");
+        //Debug.Log($"Tracker pos: {pos}, rot: {rot.eulerAngles}");
     }
 }

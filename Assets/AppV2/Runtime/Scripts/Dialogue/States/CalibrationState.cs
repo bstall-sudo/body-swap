@@ -39,7 +39,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             //um während der Kalibrierung eine neutrale Umgebung zu haben.
             _flow.Stage.sceneLoader.EnterCalibrationEnvironment("default", "default");
-            UnityEngine.Debug.Log($"[Enter CalibrationState] Loaded environmentId is: default | stageSpawnId is: default");
+            //UnityEngine.Debug.Log($"[Enter CalibrationState] Loaded environmentId is: default | stageSpawnId is: default");
             
             _flow.Stage.PlaceXrOriginAtStageOrigin();
 
@@ -50,7 +50,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 Vector3 placement = Vector3.zero;
                 placement.y = _flow.Stage.GetGroundYStageLocal(placement);
 
-                UnityEngine.Debug.Log($"[CalibrationState] placement is: {placement}");
+                //UnityEngine.Debug.Log($"[CalibrationState] placement is: {placement}");
                 
 
                 Quaternion rotation = Quaternion.identity;

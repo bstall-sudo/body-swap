@@ -46,7 +46,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter Start");
+            //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
 
             if (_flow == null)
@@ -160,14 +160,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumePrimaryAction())
             {
-                UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed PrimaryAction");
+                //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed PrimaryAction");
    
             }
 
             if (_flow.ConsumeSecondaryAction())
             {
                 //_flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
-                UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed SecondaryAction");
+                //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed SecondaryAction");
                 _startWaitingToSwitchToFullPlayback = true;
                 
             }
@@ -175,31 +175,39 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.ConsumeResetAction())
             {
                 
-                
+                /*
 
                 if (!_waitingForRecordingSave && _allplaybaksStoped)
                 {
-                    UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed ResetAction -> FinalizeConversationState ");
+                    //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed ResetAction -> FinalizeConversationState ");
                     
                 } else {
 
                     UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Consumed ResetAction -> has no effect when waiting for RecordingSave or playbacks still running");
 
                 }
+                */
               
             }
         }
 
         public void Exit()
         {
-            _flow.PrintRoleListsAndFlowStateData("[RecordRemainingIdlesState][FlowStateData][Exit] At Start Exit:", _toBeRecorded, _sceneCount);
+            _flow.PrintRoleListsAndFlowStateData("[RecordRemainingIdlesState][FlowStateData][Exit] At Start Exit:",  _sceneCount, _toBeRecorded);
             _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
 
             _flow._data.GoToPlaybackPreRecordedState = _goToPlaybackPreRecordedScenes;
             _flow._data.GoToRecordRemainingState = _goToRecordRemainingIdles;
             _flow._data.GoToSpeakerState = _goToSpeakerState;
             
-            _flow.RecordRemainingToSpeaker_DataAdjustments();
+            if(_goToSpeakerState)
+                {
+                    _flow.RecordRemainingToSpeaker_DataAdjustments();
+            }
+            else
+            {
+                _flow.RecordRemainingToRecordRemaining_DataAdjustments();
+            }
             //hier muss noch eine _flow.RecordRemainingToEnd_DataAdjustments(); hin
             //
             

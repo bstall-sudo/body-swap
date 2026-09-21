@@ -32,7 +32,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            Debug.Log("[AvatarPlacementState] Enter");
+            //Debug.Log("[AvatarPlacementState] Enter");
 
             _roleCount = _flow.Stage.roleCount;
             selectableNext = _flow.Stage.selectableNext;
@@ -161,7 +161,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 {
                     placement = Vector3.zero;
                     rotation = Quaternion.identity;
-                    UnityEngine.Debug.Log($"[AvatarPlacementState] placement is: {placement.x}, {placement.y}, {placement.z}"); 
+                    //UnityEngine.Debug.Log($"[AvatarPlacementState] placement is: {placement.x}, {placement.y}, {placement.z}"); 
                 }
                 else
                 {
@@ -304,13 +304,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _stageRoot
             );
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[PlacePreRecordedRole] " +
                 $"role={role.roleId} | " +
                 $"spawnId={role.roleSpawnId} | " +
                 $"placement={placement} | " +
                 $"hasStartPose={role.preRecordedStartRootPose != null}"
-            );
+            );*/
         }
 
         private Vector3 GetTestPlacementPosition(int roleIndex)

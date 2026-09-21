@@ -53,7 +53,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            UnityEngine.Debug.Log("[ChooseSpeakerState] Enter");
+            //UnityEngine.Debug.Log("[ChooseSpeakerState] Enter");
 
             _isUsingXr = _flow.Stage.UseXR;
 
@@ -109,7 +109,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     if (!_playbacks.Contains(i))
                     {
                         _selectableRoles.Add(i);
-                        Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is smaller than _roleCount.");
+                        //Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is smaller than _roleCount.");
                     }
                     
                     
@@ -121,7 +121,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 for (int i = 0; i < _roleCount; i++)
                 {
                     _selectableRoles.Add(i);
-                    Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is NOT smaller than _roleCount.");  
+                    //Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is NOT smaller than _roleCount.");  
                 }
 
                 
@@ -168,19 +168,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     
                 }
                 
-                UnityEngine.Debug.Log($"[ChooseSpeakerState] currentlySelected ={currentlySelected}, actionCounter={actionCounter}");
+                //UnityEngine.Debug.Log($"[ChooseSpeakerState] currentlySelected ={currentlySelected}, actionCounter={actionCounter}");
 
                 // order: string text, List<int> playbacks, List<int> reactiveIdles, List<int> currentlySelectable, int toBeRecorded, int currentlySelected)
                 PrintRoleLists("[ChooseSpeakerState] Enter", _playbacks, _reactiveIdles, _selectableRoles, _toBeRecorded, currentlySelected);
                 _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
-                UnityEngine.Debug.Log("[ChooseSpeakerState] Consumed PrimaryAction");
+                //UnityEngine.Debug.Log("[ChooseSpeakerState] Consumed PrimaryAction");
                 
             }
 
             if (_flow.ConsumeSecondaryAction())
             {
                 secondaryActionCount ++;
-                UnityEngine.Debug.Log($"[ChooseSpeakerState] Consumed SecondaryAction secondaryActionCount is: {secondaryActionCount}");
+                //UnityEngine.Debug.Log($"[ChooseSpeakerState] Consumed SecondaryAction secondaryActionCount is: {secondaryActionCount}");
                 _flow._data.SelectedNext = currentlySelected;
                 if (secondaryActionCount == 1)
                 {
@@ -225,7 +225,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         void OnSingleSecAction()
         {
-            Debug.Log("Single Click");
+            //Debug.Log("Single Click");
             ContinueConversationLogic();
             
         }
@@ -239,21 +239,21 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 // basierend auf den Reactive Idles muss der PlayerAlignState den Ziel State bestimmen.
                 if (sceneCount< 0)
                 {
-                    UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount<0 sceneCount = {sceneCount}");
+                    //UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount<0 sceneCount = {sceneCount}");
                     _flow._data.GoToSpeakerState = true;
                 }
                 else
                 {
                     if(_playbacks.Count > 0){
-                        UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount>=0 sceneCount = {sceneCount} _reactiveIdles.Count = {_reactiveIdles.Count}");
+                        //UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount>=0 sceneCount = {sceneCount} _reactiveIdles.Count = {_reactiveIdles.Count}");
                         _flow._data.GoToSpeakerState = false;
                     }else{
-                        UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount>=0 sceneCount = {sceneCount} reactiveIdlesCount<= 0  _reactiveIdles.Count = {_reactiveIdles.Count}");
+                        //UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount>=0 sceneCount = {sceneCount} reactiveIdlesCount<= 0  _reactiveIdles.Count = {_reactiveIdles.Count}");
                         _flow._data.GoToSpeakerState = true;
                     }
                         
                 }
-                UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount<0 sceneCount = {sceneCount}");
+                //UnityEngine.Debug.Log($"[ChooseSpeakerState] sceneCount<0 sceneCount = {sceneCount}");
                 _flow.SetState(new PlayerAlignState(_flow));
             }else
             {
@@ -271,14 +271,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             // wenn _playbacks == 0, dann gibt es für die Scene noch keine Aufnahmen
             if(_playbacks.Count != 0 )
             {
-                Debug.Log($"[ChooseSpeakerState] Double Secondary Action: Conversation is continued while skipping the takes for some roles | playbacks.Count= {_playbacks.Count}");
+                //Debug.Log($"[ChooseSpeakerState] Double Secondary Action: Conversation is continued while skipping the takes for some roles | playbacks.Count= {_playbacks.Count}");
                 ResetPlaybacksReactiveIdlesIncSceneCount();
                 //wenn man Takes überspringt, kommt ein neuer ChooseSpeakerState zum Auswählen des nächsten Sprechers.
                 _flow.SetState(new ChooseSpeakerState(_flow));
             }
             else
             {
-                Debug.Log($"[ChooseSpeakerState] Double Secondary Action: Conversation is continued while NOT skipping takes for any roles | playbacks.Count= {_playbacks.Count}");
+                //Debug.Log($"[ChooseSpeakerState] Double Secondary Action: Conversation is continued while NOT skipping takes for any roles | playbacks.Count= {_playbacks.Count}");
                 ContinueConversationLogic();
             }
             
@@ -312,7 +312,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow._data.SelectedNext = currentlySelected;
             _flow._data.ToBeRecorded = currentlySelected;
             _flow.Stage.ChooseSpeakerController.SelectNextCylinderVisible(false);
-            UnityEngine.Debug.Log("[ChooseSpeakerState] Exit");
+            //UnityEngine.Debug.Log("[ChooseSpeakerState] Exit");
         }
 
         private List<int> AllRoleIndices(int roleCount){

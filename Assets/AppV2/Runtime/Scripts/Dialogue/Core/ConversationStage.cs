@@ -12,6 +12,9 @@ using AppV2.Runtime.Scripts.Dialogue.Persistence;
 using AppV2.Runtime.Scripts.Dialogue.Services;
 using AppV2.Runtime.Scripts.Rig;
 
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Gravity;
+
+
 namespace AppV2.Runtime.Scripts.Dialogue
 {
        
@@ -157,6 +160,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         //das wird gebraucht für die StartPlayerAlignToActorSeated, damit das XR Rig auf den Role Root springen kann.
         private Vector3 _playerAlignTargetOriginPosWorld;
         // diese Variable entscheided, ob TickPlayerAlign den SeatedMode, oder den StandingMode verwendet.
+
+        private float _playerAlignTargetGroundWorldY;
         private bool _playerAlignUseHeadOffset = true;
 
         //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
@@ -740,6 +745,27 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public Transform XrLeftFoot;
         public Transform XrRightFoot;
 
+        [SerializeField] private CharacterController _xrCharacterController;
+
+        //gravityProvider und XrCharacterController sollen währen des Aligns ausgeschaltet werden, daher hier die Referenzen.
+        [SerializeField] private GravityProvider _gravityProvider;
+
+        public CharacterController XrCharacterController => _xrCharacterController;
+        public GravityProvider GravityProvider => _gravityProvider;
+
+        //gravityProvider und XrCharacterController sollen währen des Aligns ausgeschaltet werden, daher hier die Referenzen.
+        public void SetPlayerGravityEnabled(bool enabled)
+        {
+            if (_gravityProvider != null)
+                _gravityProvider.enabled = enabled;
+        }
+
+        public void SetPlayerCharacterControllerEnabled(bool enabled)
+        {
+            if (_xrCharacterController != null)
+                _xrCharacterController.enabled = enabled;
+        }
+
 
         [Header("XR Origin with")]
         // um locomotion und teleportation an und aus zu schalten.
@@ -789,7 +815,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
             ApplyRoleCount();
             
+            if (_xrCharacterController == null && XrOrigin != null)
+                _xrCharacterController = XrOrigin.GetComponent<CharacterController>();
 
+            if (_gravityProvider == null && XrOrigin != null)
+                XrOrigin.GetComponentInChildren<GravityProvider>(true);
             
 
             
@@ -1090,6 +1120,27 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             originWorld.y = groundWorld.y;
             XrOrigin.position = originWorld;
+        }
+
+        private void SnapXrOriginToGroundY(float targetGroundY)
+        {
+            if (XrOrigin == null)
+                return;
+
+            bool controllerWasEnabled =
+                _xrCharacterController != null &&
+                _xrCharacterController.enabled;
+
+            // Nur für das direkte Setzen der Position ausschalten
+            if (controllerWasEnabled)
+                _xrCharacterController.enabled = false;
+
+            Vector3 pos = XrOrigin.position;
+            pos.y = targetGroundY;
+            XrOrigin.position = pos;
+
+            if (controllerWasEnabled)
+                _xrCharacterController.enabled = true;
         }
 
         public void SaveTargetTransformsAfterCalibration(){
@@ -1943,8 +1994,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 UnityEngine.Debug.LogWarning($"No last Body end pose found for roleIndex {roleIndex}");
                 return;
             }
-            //das hier holt die aktuelle Bodenhöhe
+            // Bodenhöhe an der Zielposition bestimmen
             targetBodyPosLocal.y = GetGroundYStageLocal(targetBodyPosLocal);
+
+            // Stage-local Ground -> World
+            Vector3 targetGroundWorld = _stageRoot.TransformPoint(targetBodyPosLocal);
+
+            // Für den Ground-Snap NACH dem Align speichern
+            _playerAlignTargetGroundWorldY = targetGroundWorld.y;
 
             if (!_recordingController.TryGetLastHeadEndPose(roleIndex, out Vector3 targetHeadPosBodyLocal, out float targetHeadYawLocal))
             {
@@ -2025,7 +2082,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             // Rig so platzieren, dass XR-Head exakt auf targetHeadPosWorld landet
             _playerAlignToPos = targetHeadPosWorld - rotatedHeadOffsetWorld;
-            //hier die höhe wieder auf 0, bzw. auf die aktuelle y höhe setzen, denn diese wird im CameraOffset angewendet.
+            
+            // WICHTIG:
+            // PlayerAlign bewegt nur X/Z.
+            // Die Bodenhöhe wird nach dem Align separat gesetzt.
             _playerAlignToPos.y = _playerAlignFromPos.y;
 
             _playerAlignDur = Mathf.Max(0.05f, duration);
@@ -2195,6 +2255,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     $"targetHead={_playerAlignTargetHeadPosWorld}"
                 );
                 */
+                SnapXrOriginToGroundY(_playerAlignTargetGroundWorldY);
                 _playerAlignActive = false;
             }
             

@@ -26,7 +26,7 @@ public class SceneLoader : MonoBehaviour
 
         SessionModel session = store.LoadSessionModel(sessionId);
 
-        Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
+        //Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
 
 
         if (session == null)
@@ -35,7 +35,7 @@ public class SceneLoader : MonoBehaviour
             return null;
         }
 
-        Debug.Log($"[SceneLoader] Loading session: {session.SessionId}");
+        //Debug.Log($"[SceneLoader] Loading session: {session.SessionId}");
 
         // 1. Environment laden
         environmentLoader.LoadEnvironment(session.EnvironmentId);
@@ -57,7 +57,7 @@ public class SceneLoader : MonoBehaviour
             );
         }
 
-        Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
+        //Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
         // 3. RoleCount setzen
         stage.ApplyRoleCountFromSession(session.RoleCount);
 
@@ -82,8 +82,8 @@ public class SceneLoader : MonoBehaviour
         if (session.Roles == null)
             return;
 
-        Debug.Log($"[ApplyRolesFromSession] RoleCount: {session.RoleCount}");
-        Debug.Log($"[ApplyRolesFromSession] stage.Roles.Count: {stage.Roles.Count}");
+        //Debug.Log($"[ApplyRolesFromSession] RoleCount: {session.RoleCount}");
+        //Debug.Log($"[ApplyRolesFromSession] stage.Roles.Count: {stage.Roles.Count}");
 
         foreach (ConversationRoleMeta roleMeta in session.Roles)
         {
@@ -106,12 +106,12 @@ public class SceneLoader : MonoBehaviour
                 role.avatarLoader.LoadAvatar(role.avatarId);
             }
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[ApplyRolesFromSession] index={roleMeta.RoleIndex}, " +
                 $"roleId={role.roleId}, " +
                 $"roleSpawnId={role.roleSpawnId}, " +
                 $"stageRolesCount={stage.Roles.Count}"
-            );
+            );*/
 
             // RoleRoot platzieren
             PlaceRoleRoot(role);
@@ -155,9 +155,9 @@ public class SceneLoader : MonoBehaviour
 
             role.avatarLoader.LoadAvatar(role.avatarId);
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[SceneLoader] Loaded avatar '{role.avatarId}' for role {role.roleId}"
-            );
+            );*/
         }
     }
 
@@ -200,11 +200,11 @@ public class SceneLoader : MonoBehaviour
         role.root.localPosition = localPos;
         role.root.localRotation = localRot;
 
-        Debug.Log(
+        /*Debug.Log(
             $"[SceneLoader] Placed role {role.roleId} " +
             $"at RoleSpawnId={role.roleSpawnId}: " +
             $"localPos={localPos}, localRotY={localRot.eulerAngles.y}"
-        );
+        );*/
     }
     //das wird verwendet um das Environment im RecMode zu laden und die Stage am SpawnPoint zu platzieren.
     public void LoadEnvironmentForStageRecMode(

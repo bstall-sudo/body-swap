@@ -11,7 +11,7 @@ public class XRDeviceDebug : MonoBehaviour
 
         foreach (var d in devices)
         {
-            Debug.Log($"{d.name} | {d.characteristics}");
+            //Debug.Log($"{d.name} | {d.characteristics}");
         }
     }
 }

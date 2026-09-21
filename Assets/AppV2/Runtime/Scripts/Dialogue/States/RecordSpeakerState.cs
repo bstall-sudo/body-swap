@@ -13,6 +13,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int sceneCount;
 
         private float _radiusNpcStartTalking;
+        private string _npcGroupId;
 
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
@@ -40,6 +41,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         public void Enter()
 
         {
+            /*
             foreach (var role in _flow.Stage.roles)
             {
                 Debug.Log(
@@ -47,9 +49,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     $"local={role.root.localPosition}, " +
                     $"world={role.root.position}"
                 );
-            }
+            }*/
 
-            UnityEngine.Debug.Log("[RecordSpeakerState] Enter Start");
+            //UnityEngine.Debug.Log("[RecordSpeakerState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
 
             // im ersten Durchgang müssen die Variablen des FlowStateData-Objektes im Enter State gerufen werden, 
@@ -60,11 +62,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.IncrementSceneCount();
                 
                 _flow.SpeakerStateEnter();
-
+/*
                 UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {_flow._data.SceneCount}, Speaker Index: {_flow._data.ToBeRecorded}, reactive Idles: ");
                 foreach (int number in _flow._data.ReactiveIdles){
                     UnityEngine.Debug.Log($"[RecordSpeakerState] Index of ReactiveIdle: {number}");
                 }
+                */
             }
             sceneCount = _flow._data.SceneCount;
             toBeRecorded = _flow._data.ToBeRecorded;
@@ -75,10 +78,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             selectableNext = _flow.Stage.selectableNext;
             reactiveIdles = _flow._data.ReactiveIdles;
-            UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {sceneCount}, Speaker Index: {toBeRecorded}, reactive Idles: ");
+            /*UnityEngine.Debug.Log($"[RecordSpeakerState] Scene: {sceneCount}, Speaker Index: {toBeRecorded}, reactive Idles: ");
             foreach (int number in reactiveIdles){
                 UnityEngine.Debug.Log($"[RecordSpeakerState] Index in ReactiveIdle: {number}");
-            }
+            }*/
             
              if (_flow == null)
             {
@@ -118,24 +121,24 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //zum Debuggen, warum FootSolver nach FullBodyTracking nicht mehr funktionieren
             _flow.Stage.ValidateFootSolver(toBeRecorded);
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[BEFORE RECORD BEGIN] [NpcIntegration Debug] role={toBeRecorded} " +
                 $"root={_flow.Stage.roles[toBeRecorded].root.localPosition}"
-            );
+            );*/
 
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[AFTER RECORD BEGIN] [NpcIntegration Debug] role={toBeRecorded} " +
                 $"root={_flow.Stage.roles[toBeRecorded].root.localPosition}"
-            );
+            );*/
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _isRecording = true;
 
             
 
             PrintRoleLists("[RecordSpeakerState] Enter", playbacks, reactiveIdles, toBeRecorded);
-            UnityEngine.Debug.Log("[RecordSpeakerState] Enter End");
+            //UnityEngine.Debug.Log("[RecordSpeakerState] Enter End");
             
         }
 
@@ -152,7 +155,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
-                    UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} ");
+                    //UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} ");
+                    
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
                     _waitingForRecordingSave = true;
@@ -169,14 +173,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
            
             if (!_isRecording && _flow.Stage.RecordingSaveCompleted())
             {
-                UnityEngine.Debug.Log($"[RecordSpeakerState] !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} ");
+                //UnityEngine.Debug.Log($"[RecordSpeakerState] !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} ");
                 _waitingForRecordingSave = false;
                 // wenn _startWaithing... wird im ConsumeSecondaryAction auf true gesetzt.
                 if(!_startWaitingToSwitchToFullPlayback){
-                    UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
+                    //UnityEngine.Debug.Log($"[RecordSpeakerState] !_startWaitingToSwitchToFullPlayback: {!_startWaitingToSwitchToFullPlayback} ");
                     if(_flow.PlayerNearNpcs(_flow._data.IndicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                     {
-                        UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
+                        //UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
+                        _npcGroupId = _flow.GetNpcGroupId(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
+                        UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | CurrentNpcGroupId is: {_npcGroupId} ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
                     }
                     else if(selectableNext)
@@ -215,7 +221,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.ConsumePrimaryAction())
             {
                 if(_isRecording){
-                    UnityEngine.Debug.Log("[RecordSpeakerState] Consumed PrimaryAction");
+                    //UnityEngine.Debug.Log("[RecordSpeakerState] Consumed PrimaryAction");
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
                     _waitingForRecordingSave = true;
@@ -227,7 +233,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumeSecondaryAction())
             {
-                UnityEngine.Debug.Log("[RecordSpeakerState] Consumed SecondaryAction");
+                //UnityEngine.Debug.Log("[RecordSpeakerState] Consumed SecondaryAction");
                 _startWaitingToSwitchToFullPlayback = true;
                 
                 
@@ -235,18 +241,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumeResetAction())
             {
-                UnityEngine.Debug.Log("[RecordSpeakerState] Consumed ResetAction");
+                //UnityEngine.Debug.Log("[RecordSpeakerState] Consumed ResetAction");
             }
         }
 
         public void Exit()
         {
-            UnityEngine.Debug.Log("[RecordSpeakerState] Exit Start");
+            //UnityEngine.Debug.Log("[RecordSpeakerState] Exit Start");
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
 
             if (selectableNext)
             {
-                UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitManualSelection() was called selectableNext: {selectableNext}");
+                //UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitManualSelection() was called selectableNext: {selectableNext}");
                 _flow.SpeakerStateExitManualSelection();
                 
             }
@@ -255,12 +261,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if (goingToPlaybackPreRecordedScenesState)
                 {   
                     
-                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
-                    _flow.SpeakerStateExitAutoSelectionGoingToPlaybackPreRecordedScenesState();
+                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking, _npcGroupId);
+                    
                 }
                 else
                 {
-                    UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitAutoSelection() was called selectableNext: {selectableNext}");
+                    //UnityEngine.Debug.Log($"[RecordSpeakerState] Exit SpeakerStateExitAutoSelection() was called selectableNext: {selectableNext}");
                     _flow.SpeakerStateExitAutoSelection();
                 }
                 
@@ -282,7 +288,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
             */
            
-            UnityEngine.Debug.Log("[RecordSpeakerState] Exit End");
+            //UnityEngine.Debug.Log("[RecordSpeakerState] Exit End");
         }
 
         //für das Debugging

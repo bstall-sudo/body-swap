@@ -169,9 +169,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             _currentSceneCount = sceneCount;
 
+            /*
             Debug.Log(
                 $"[xx] [RecordingController.BeginRecording] CREATE recorder " +
                 $"role={roleIndex}, scene={sceneCount}");
+            */
 
             _takeRecorder =
                 new TakeRecorder(stageRoot, _roles[roleIndex], roleIndex);
@@ -183,11 +185,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             _takeRecorder.Begin();
 
             _isRecording = true;
-
+            /*
             Debug.Log(
                 $"[xx] [RecordingController.BeginRecording] DONE " +
                 $"role={roleIndex}, scene={sceneCount}, " +
                 $"recorderNull={_takeRecorder == null}");
+            */
         }
 
         //hier wird entweder auf die Pos/Rot Daten aus _lastEndPosList/_lastEndYawList zurückgegriffen, oder InitialStartPose verwendet. 
@@ -195,6 +198,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         {
             _takeRecorder.ClearDesiredStartPose();
 
+            /*
             Debug.Log(
                 $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} | " +
                 $"rootNow={_roles[roleIndex].root.localPosition} | " +
@@ -202,14 +206,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 $"hasInitial={_roles[roleIndex].hasInitialStartPose} | " +
                 $"initial={_roles[roleIndex].initialStartPos}"
             );
-
+            */
             if (_hasLastFrameList[roleIndex])
             {
+                /*
                 Debug.Log(
                     $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} USING LAST END " +
                     $"{_lastEndPosList[roleIndex]}"
                 );
-
+                */
                 _takeRecorder.SetDesiredStartPose(
                     _lastEndPosList[roleIndex],
                     _lastEndYawList[roleIndex]
@@ -220,20 +225,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             if (_roles[roleIndex].hasInitialStartPose)
             {
+                /*
                 Debug.Log(
                     $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} USING INITIAL " +
                     $"{_roles[roleIndex].initialStartPos}"
                 );
+                */
 
                 _takeRecorder.SetDesiredStartPose(
                     _roles[roleIndex].initialStartPos,
                     _roles[roleIndex].initialStartYawDeg
                 );
-
+/*
                 Debug.Log(
                     $"[DESIRED START] [NpcIntegration Debug] role={roleIndex} NO REBASE"
                 );
-
+*/
                 return;
             }
         }
@@ -463,11 +470,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             pos = role.root.localPosition;
             yaw = role.root.localEulerAngles.y;
 
+/*
             Debug.Log(
                 $"[TryGetLastEndPose] [NpcIntegration Debug] No last/initial pose for role {roleIndex}. " +
                 $"Using current root pose of role with ID: {_roles[roleIndex].roleId} and Index: {_roles[roleIndex].roleIndex} : pos={pos}, yaw={yaw:F1}"
             );
-
+*/
             return true;
         }
 
@@ -524,13 +532,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 Quaternion.Inverse(role.root.rotation) * role.head.rotation;
 
             yaw = headLocalRot.eulerAngles.y;
-
+/*
             Debug.Log(
                 $"[TryGetLastHeadEndPose] [NpcIntegration Debug] " +
                 $"role={roleIndex} USING CURRENT HEAD | " +
                 $"headBodyLocal={pos} | yaw={yaw:F1}"
             );
-
+*/
             return true;
         }
 

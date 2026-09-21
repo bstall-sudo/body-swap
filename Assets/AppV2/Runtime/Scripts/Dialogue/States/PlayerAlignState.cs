@@ -21,7 +21,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         }
 
         public void Enter()
+
         {
+
+            _flow.Stage.SetPlayerGravityEnabled(false);
+
+
+            //_flow.Stage.SetPlayerCharacterControllerEnabled(false);
+
             _reactiveIdles = _flow._data.ReactiveIdles;
             _playbacks = _flow._data.Playbacks;
 
@@ -32,7 +39,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
             _roleToAlignTo = _flow._data.ToBeRecorded;
 
-            UnityEngine.Debug.Log($"[PlayerAlignState] Enter qwert || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} RoleID is: {_flow._data.Roles[_roleToAlignTo].roleId}");
+            //UnityEngine.Debug.Log($"[PlayerAlignState] Enter qwert || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} RoleID is: {_flow._data.Roles[_roleToAlignTo].roleId}");
             
 
             
@@ -56,17 +63,17 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
                 if (_flow._data.GoToRecordRemainingState)
                 {
-                    PrintRoleLists("[PlayerAlignState] GoTo RecordRemainingState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
+                    //PrintRoleLists("[PlayerAlignState] GoTo RecordRemainingState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordRemainingIdlesAfterPreRecordedEncounterState(_flow)); 
                 }
                 else if(_flow._data.GoToSpeakerState){
-                    UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordSpeakerState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
+                    //UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordSpeakerState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
                     
-                    PrintRoleLists("[PlayerAlignState] GoTo RecordSpeakerState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
+                    //PrintRoleLists("[PlayerAlignState] GoTo RecordSpeakerState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordSpeakerState(_flow)); 
                 }else{
-                    UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordListenersState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
-                    PrintRoleLists("[PlayerAlignState] GoTo RecordListenersState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
+                    //UnityEngine.Debug.Log($"[PlayerAlignState] GoTo RecordListenersState || Scene is: {_flow._data.SceneCount} || Role to Align to has index: {_roleToAlignTo} || ReactiveIdles.Count: {_flow._data.ReactiveIdles.Count} || GoToSpeakerState: {_flow._data.GoToSpeakerState}");
+                    //PrintRoleLists("[PlayerAlignState] GoTo RecordListenersState", _playbacks, _reactiveIdles, _roleToAlignTo, _sceneCount );
                     _flow.SetState(new RecordListenersState(_flow));
                 }
                 /*
@@ -83,24 +90,28 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumePrimaryAction())
             {
-                UnityEngine.Debug.Log("[PlayerAlignState] Consumed PrimaryAction");
+                //UnityEngine.Debug.Log("[PlayerAlignState] Consumed PrimaryAction");
                 // sp�ter: _flow.SetState(new CalibrateState(_flow));
             }
 
             if (_flow.ConsumeSecondaryAction())
             {
-                UnityEngine.Debug.Log("[PlayerAlignState] Consumed SecondaryAction");
+                //UnityEngine.Debug.Log("[PlayerAlignState] Consumed SecondaryAction");
             }
 
             if (_flow.ConsumeResetAction())
             {
-                UnityEngine.Debug.Log("[PlayerAlignState] Consumed ResetAction");
+                //UnityEngine.Debug.Log("[PlayerAlignState] Consumed ResetAction");
             }
         }
 
         public void Exit()
         {
-            UnityEngine.Debug.Log("[PlayerAlignState] Exit");
+            //UnityEngine.Debug.Log("[PlayerAlignState] Exit");
+            _flow.Stage.SetPlayerGravityEnabled(true);
+
+
+            _flow.Stage.SetPlayerCharacterControllerEnabled(true);
  
         }
 

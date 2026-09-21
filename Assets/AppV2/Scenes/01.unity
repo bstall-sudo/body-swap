@@ -23,8 +23,8 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.31565198, g: 0.57909095, b: 0.754717, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 3.12
-  m_AmbientMode: 1
+  m_AmbientIntensity: 1.73
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.34117648, g: 0.42745098, b: 0.43529412, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
@@ -34,7 +34,7 @@ RenderSettings:
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
-  m_ReflectionBounces: 2
+  m_ReflectionBounces: 5
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
@@ -376,6 +376,7 @@ MonoBehaviour:
     sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
     sourceSessionId: 
@@ -440,6 +441,7 @@ MonoBehaviour:
     sourceRoleIndex: 1
     npcGroupId: 
     hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
     sourceSessionId: 
@@ -504,6 +506,7 @@ MonoBehaviour:
     sourceRoleIndex: 2
     npcGroupId: 
     hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
     sourceSessionId: 
@@ -576,6 +579,8 @@ MonoBehaviour:
   XrHip: {fileID: 1628277078}
   XrLeftFoot: {fileID: 1265543182}
   XrRightFoot: {fileID: 355327816}
+  _xrCharacterController: {fileID: 0}
+  _gravityProvider: {fileID: 0}
   xRLocomotionToggle: {fileID: 0}
   haptics: {fileID: 32639117}
 --- !u!114 &32639114
@@ -10852,18 +10857,11 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: Lobby_03
-  stageSpawnId: gast_rezeption
+  environmentId: PreRecordingTest_01
+  stageSpawnId: 00
   preRecordedSceneCount: 0
-  _radiusNpcStartTalking: 6
-  preRecordedScenes:
-  - enabled: 1
-    npcGroupId: NpcGroup01
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\2026-09-16-UTC-10-28-42_90
-    workshopFolderName: preRecordedScenes
-    sessionFolderName: HotelLobby
-    sessionId: 2026-09-16-UTC-10-28-42_90
-    npcGroupSpawnId: rezeptionist
+  _radiusNpcStartTalking: 4
+  preRecordedScenes: []
   importedNpcRoles:
   - avatarId: 
     roleSpawnId: 
@@ -10874,6 +10872,7 @@ MonoBehaviour:
     sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 0
     takeSource: 
     sourceSessionId: 
@@ -10931,14 +10930,14 @@ MonoBehaviour:
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: kanguruh_2027_09_16
-  _personalFolderName: simon
-  roleCount: 1
+  _workshopFolderName: PreRecordingTest_01
+  _personalFolderName: multiplePreRecorded
+  roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 130
+  heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -10956,7 +10955,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: froschmann_001
+  - avatarId: ziegenwolf_001
     roleSpawnId: 
     roleId: A
     slotId: A
@@ -10965,6 +10964,7 @@ MonoBehaviour:
     sourceRoleIndex: 0
     npcGroupId: 
     hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
     takeSource: 
     sourceSessionId: 
@@ -11020,6 +11020,71 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+  - avatarId: froschmann_001
+    roleSpawnId: 
+    roleId: B
+    slotId: B
+    sourceRoleId: 
+    roleIndex: 1
+    sourceRoleIndex: 1
+    npcGroupId: 
+    hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
+    isActiveConversationPartner: 1
+    takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
+    avatarLoader: {fileID: 780788515}
+    roleRoot: {fileID: 780788514}
+    root: {fileID: 1106718683}
+    head: {fileID: 1466196902}
+    leftHand: {fileID: 1396646244}
+    rightHand: {fileID: 632902929}
+    leftFoot: {fileID: 291678139}
+    rightFoot: {fileID: 1140240597}
+    hip: {fileID: 1822376785}
+    hipSolver: {fileID: 1822376786}
+    leftFootSolver: {fileID: 291678135}
+    rightFootSolver: {fileID: 1140240598}
+    audioSource: {fileID: 529194169}
+    heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 133
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+    visualRigRoot: {fileID: 689874910}
+    visualRolesVisibility: {fileID: 1899071022}
+    sittingIdle: 0
+    avatarRoot: {fileID: 715581305}
+    avatarName: 
+    avatar: {fileID: 715581306}
+    rigFollower: {fileID: 715581307}
+    visualRigFollower: {fileID: 1899071023}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 1
+    preRecordedCalibration:
+      headTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      hipTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   UseXR: 1
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
@@ -11028,7 +11093,7 @@ MonoBehaviour:
   ProceduralHipAndFeetMove: 1
   AvatarPlacementAtStart: 1
   StartInPlaybackFullConversationMode: 0
-  _sessionFolder: 2026-09-16-UTC-10-28-42_90
+  _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
@@ -11037,6 +11102,8 @@ MonoBehaviour:
   XrHip: {fileID: 1097586137}
   XrLeftFoot: {fileID: 972270302}
   XrRightFoot: {fileID: 1591742457}
+  _xrCharacterController: {fileID: 0}
+  _gravityProvider: {fileID: 0}
   xRLocomotionToggle: {fileID: 1028122067}
   haptics: {fileID: 793401275}
 --- !u!114 &793401275
@@ -25634,6 +25701,10 @@ MonoBehaviour:
     prefab: {fileID: 8827827258431270469, guid: c64a58ffcf535154082083934c4abf28, type: 3}
   - environmentId: Lobby_03
     prefab: {fileID: 5118735016084328382, guid: aeacbadd18007ab40aca21d31b36f396, type: 3}
+  - environmentId: HotelUndLobby_01
+    prefab: {fileID: 7282061116930728918, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+  - environmentId: PreRecordingTest_01
+    prefab: {fileID: 9038906056174042635, guid: 9a622dd918a45614f968531e6aab9541, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0

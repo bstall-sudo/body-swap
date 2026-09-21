@@ -72,10 +72,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     targetRoleIndex,
                     targetSceneCount))
             {
+                /*
                 Debug.Log(
                     $"[PreRecordedTakeImporter] Take already exists. " +
                     $"role={targetRoleIndex}, scene={targetSceneCount}"
                 );
+                */
 
                 return false;
             }
@@ -344,25 +346,27 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     targetRoleMeta.StartRootPose =
                         transformedStartPose;
 
+                    /*
                     Debug.Log(
                         $"[PreRecordedTakeImporter] Updated StartRootPose " +
                         $"for role={targetRole.roleId}, " +
                         $"sourcePos={sourceRoleMeta.StartRootPose.LocalPosition}, " +
                         $"targetPos={transformedStartPose.LocalPosition}"
                     );
+                    */
                 }
             }
 
             _targetStore.SaveSessionModel(_targetSession);
 
-
+            /*
             Debug.Log(
                 $"[PreRecordedTakeImporter] Imported and transformed take: " +
                 $"{sourceTakeMeta.TakeId} -> {targetTakeId}, " +
                 $"role={targetRole.roleId}, " +
                 $"targetScene={targetSceneCount}"
             );
-
+            */
             return true;
         }
 

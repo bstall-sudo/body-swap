@@ -355,11 +355,11 @@ namespace UnityEngine.XR.OpenXR.Features.Interactions
  
             if (OpenXRRuntime.IsExtensionEnabled("XR_HTCX_vive_tracker_interaction"))
             {
-                Debug.Log("HTC Vive Tracker Extension Enabled");
+                //Debug.Log("HTC Vive Tracker Extension Enabled");
             }
             else
             {
-                Debug.Log("HTC Vive Tracker Extension Not Enabled");
+                //Debug.Log("HTC Vive Tracker Extension Not Enabled");
             }
  
             return res;

@@ -44,7 +44,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             _session = session;
 
-            Debug.Log($"InitializeFrom Session: _session.SessionId is: {_session.SessionId}");
+            //Debug.Log($"InitializeFrom Session: _session.SessionId is: {_session.SessionId}");
             
             _groundHeightProvider = groundHeightProvider;
             InitializePlayers(roles, _groundHeightProvider);
@@ -75,12 +75,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
                
 
-
+                /*
                 UnityEngine.Debug.Log(
                     $"InitializePlayers: roleIndex={i}, roleId={roles[i].roleId}, " +
                     $"heightOfRoleCm={roles[i].heightOfRoleCm}, playerHeightCm={_playerHeightCm}"
                 );
-
+                */
                 players.Add(player);
             }
         }
@@ -107,7 +107,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         {
             if(_takeIndex.TryGetTakeForScene(roleIndex, sceneCount, out TakeMeta takeMeta)){
 
-                    UnityEngine.Debug.Log($"[PlaybackForIndexBegin] sessionId is: {sessionId}");
+                    //UnityEngine.Debug.Log($"[PlaybackForIndexBegin] sessionId is: {sessionId}");
 
                     TakeData take = _store.LoadTakeData(takeMeta, sessionId);
 
@@ -201,12 +201,20 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             foreach (int roleIndex in roleIndices)
             {
                 if (roleIndex < 0 || roleIndex >= players.Count)
+                {
+                    //UnityEngine.Debug.Log($"[PlaybackController][ArePlaybacksStoppedForIndices] roleIndex '{roleIndex}' is out of Range");
                     continue;
+                }
+                    
 
                 if (players[roleIndex].IsPlaying)
+                {
+                    
                     return false;
+                }
+                    
             }
-
+            //UnityEngine.Debug.Log($"[PlaybackController][ArePlaybacksStoppedForIndices] roleIndex '{roleIndices[0]}' has stopped playing");
             return true;
         }
 

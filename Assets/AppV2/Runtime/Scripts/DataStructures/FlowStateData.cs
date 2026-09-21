@@ -10,6 +10,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         public List<int> IndicesOfPassiveRoles;
 
+        //Diese Liste beinhaltet die Indices von den PreRecorded Npc's, welche die selbe NpcGroupId haben.
         public List<int> CurrentPreRecordedPlaybacks;
 
         public string CurrentNpcGroupId;
@@ -66,11 +67,11 @@ namespace AppV2.Runtime.Scripts.DataStructures
                 {
                     Roles.Add(role);
 
-                    UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} is active");
+                    //UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} is active");
                 }
                 else
                 {
-                    UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} is passive");
+                    //UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} is passive");
                 }
 
                 
@@ -89,7 +90,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
                 {
                     passiveRolesIndices.Add(role.roleIndex);
 
-                    UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} was added to passiveRoleIndices");
+                    //UnityEngine.Debug.Log($"[FlowStateData] Role with Index: {role.roleIndex} was added to passiveRoleIndices");
                 }
           
 

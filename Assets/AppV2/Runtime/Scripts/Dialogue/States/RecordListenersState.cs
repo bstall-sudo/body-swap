@@ -36,7 +36,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            UnityEngine.Debug.Log("[RecordListenersState] Enter Start");
+            //UnityEngine.Debug.Log("[RecordListenersState] Enter Start");
             _isUsingXr = _flow.Stage.UseXR;
 
             if (_flow == null)
@@ -89,7 +89,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
             PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
-            UnityEngine.Debug.Log("[RecordListenersState] Enter End");
+            //UnityEngine.Debug.Log("[RecordListenersState] Enter End");
 
         }
 
@@ -117,7 +117,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (!_waitingForRecordingSave && _flow.Stage.PlaybacksAreAllStopped(playbacks) )
                 {
-                    //UnityEngine.Debug.Log("[RecordListenersState] All playbacks are stopped, stopping recording now.");
+                    UnityEngine.Debug.Log($"[RecordListenersState] All playbacks are stopped, stopping recording now. ToBeRecorded: {toBeRecorded}, sceneCount: {sceneCount}, plabacks[0]: {playbacks[0]}");
 
                     _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
                     
@@ -181,14 +181,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.ConsumePrimaryAction())
             {
-                UnityEngine.Debug.Log("[RecordListenersState] Consumed PrimaryAction");
+                //UnityEngine.Debug.Log("[RecordListenersState] Consumed PrimaryAction");
    
             }
 
             if (_flow.ConsumeSecondaryAction())
             {
                 _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
-                UnityEngine.Debug.Log("[RecordListenersState] Consumed SecondaryAction");
+                //UnityEngine.Debug.Log("[RecordListenersState] Consumed SecondaryAction");
                 _startWaitingToSwitchToFullPlayback = true;
                 
             }
@@ -196,7 +196,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.ConsumeResetAction())
             {
                 
-                
+                /*
 
                 if (!_waitingForRecordingSave && _allplaybaksStoped)
                 {
@@ -207,7 +207,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     UnityEngine.Debug.Log("[RecordListenersState] Consumed ResetAction -> has no effect when waiting for RecordingSave or playbacks still running");
 
                 }
-              
+                */
             }
         }
 
@@ -245,7 +245,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.Stage.ResetVisualScaleOfConversationStage(toBeRecorded);
             }
            */
-            UnityEngine.Debug.Log("[RecordListenersState] Exit");
+            //UnityEngine.Debug.Log("[RecordListenersState] Exit");
             PrintRoleLists("[RecordListenersState] Exit", playbacks, reactiveIdles, toBeRecorded);
         }
 

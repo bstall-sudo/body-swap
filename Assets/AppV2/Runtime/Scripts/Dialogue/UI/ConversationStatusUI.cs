@@ -79,7 +79,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowCustomCue(string message)
         {
-            Debug.Log($"xrCueText null? {xrCueText == null}");
+            //Debug.Log($"xrCueText null? {xrCueText == null}");
             ShowCue(message, defaultDesktopCuePosition, defaultXrCuePosition, defaultCueColor);
         }
 
@@ -90,7 +90,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowCustomCue(string message, Vector2 desktopPosition, Vector2 xrPosition, Color color)
         {
-            Debug.Log($"xrCueText null? {xrCueText == null}");
+            //Debug.Log($"xrCueText null? {xrCueText == null}");
             ShowCue(message, desktopPosition, xrPosition, color);
         }
 
