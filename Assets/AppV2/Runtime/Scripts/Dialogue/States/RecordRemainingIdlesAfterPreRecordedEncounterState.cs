@@ -79,6 +79,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _selectableNext = _flow.Stage.selectableNext;
             _preRecordedRolesIndices = _flow._data.CurrentPreRecordedPlaybacks;
             _sceneCount = _flow._data.SceneCountWhilePlaybackPreRecorded;
+
+            _reactiveIdles = _flow._data.ReactiveIdles;
             
             //CheckFlowCondition();
 

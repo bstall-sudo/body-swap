@@ -155,7 +155,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
-                    //UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} ");
+                    UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneCount: {sceneCount} GoToPlaybackPreRecordedState: {_flow._data.GoToPlaybackPreRecordedState}");
                     
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
@@ -192,6 +192,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     else
                     {
                         if(_isUsingXr){
+                            
+                            
                             if(_flow._data.Roles.Count == 1)
                             {
                                 _flow.SetState(new RecordSpeakerState(_flow));
@@ -227,6 +229,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     _waitingForRecordingSave = true;
 
                 }
+                if (_flow.Stage.loseConversationPartnersIfTooFarAway)
+                {
+                    //das passt die FlowStateData auch schon an, daher muss das hier sein, damit entsprechend der Daten der richtige State angesteuert wird
+                    //false weil es nicht listenerState ist.
+                    _flow.RemoveActiveRolesTooFarAwayFromPlayer( toBeRecorded,  false);
+                }
                 
                 
             }
@@ -249,6 +257,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             //UnityEngine.Debug.Log("[RecordSpeakerState] Exit Start");
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
+
+            
 
             if (selectableNext)
             {

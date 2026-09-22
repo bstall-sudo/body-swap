@@ -129,51 +129,67 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //PrintRoleListsAndFlowStateDataWithStateInfo("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName);
             _state?.Enter();
             //PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
-            PrintRoleListsAndFlowStateDataWithStateInfo("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName);
+            PrintRoleListsAndFlowStateDataWithStateInfo($"FlowController PreRecorded Debug | SetState AFTER ENTER| RoleCount is: {_data.Roles.Count}", oldStateName, newStateName);
 
         }
 
         //Funktionen, die von den States gerufen werden
+
+        //Funktion, um aktive Gesprächspartner, wieder zu entfernen, damit die Anzahl aktiver Rollen nicht immer zunimmt.
+        // die Idee ist, dass Rollen immer immer im Radius des Players sein müssen, um weiterhin aktiv sein zu können
+        // die Entfernung wird jeweils am Ende vom RecordSpeakerState und am Ende vom RecordListenerState abgefragt und entsprechend im FlowStateData-Objekt eingetragen wird.
+
+        public void RemoveActiveRolesTooFarAwayFromPlayer( int toBeRecorded, bool listenerState = true)
+        {
+            if(toBeRecorded <0 || toBeRecorded > _data.AllRoles.Count)
+            {
+                UnityEngine.Debug.LogError($"ToBeRecorded with Index: {toBeRecorded} is out of Range.");
+                return;
+            }
+
+            float radius = Stage.distanceToLoseActiveConversationPartner;
+            
+
+            List<RoleRig> tooFarAwayRoles = ActiveRolesThatAreNotNearPlayer(toBeRecorded,radius);
+
+            foreach(RoleRig r in tooFarAwayRoles)
+            {
+                r.isActiveConversationPartner = false;
+
+                
+                
+                int index = r.roleIndex;
+                _data.Roles.Remove(r);
+                UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {r.roleIndex} was removed from _data.Roles | GoToPlaybackPreRecordedState: {_data.GoToPlaybackPreRecordedState}");
+                if (!_data.IndicesOfPassiveRoles.Contains(index ))
+                {
+                    _data.IndicesOfPassiveRoles.Add(index );
+                }
+                
+                
+                _data.ReactiveIdles.Remove(index);
+                if (listenerState)
+                {
+                    _data.Playbacks.Remove(index);
+                }
+                          
+                
+            }
+
+            foreach (RoleRig role in _data.Roles)
+            {
+                UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {role.roleIndex} is in _data.Roles");
+            }
+
+            _data.ActiveRoleCount = _data.Roles.Count;
+        }
         public void IncrementSceneCount()
         {
             _data.SceneCount++;
             //UnityEngine.Debug.Log($"SceneCount is now: {_data.SceneCount}");
         }
 
-        //Das wird am Anfang von RecordListenerState gerufen, um Speaker und 
-        // reactiveIdles zu setzen
-        /*
-        public int RecSpeakStateSetSpeaker()
-        {
-            int nextSpeaker;
-            int selected = _data.SelectedNext;
 
-            if(selected == -1){
-                nextSpeaker = _data.SceneCount  % _data.ActiveRoleCount;
-                //UnityEngine.Debug.Log($"Next Default Speaker has index: {nextSpeaker}");
-                //update Rollen, die im Idle sind in _data- object (FlowStateData)
-                RecSpeakStateSetReactiveIdles(nextSpeaker);
-                //update nächster Sprecher in _data- object (FlowStateData)
-                _data.ToBeRecorded = nextSpeaker;
-                return nextSpeaker;
-            }
-            else{
-                if(selected > (_data.ActiveRoleCount -1) || selected < 0){
-                    UnityEngine.Debug.LogError($"selected Speaker index is out of Range");
-                    return -1000;
-                }else{
-                    //update Rollen, die im Idle sind in _data- object (FlowStateData)
-                    RecSpeakStateSetReactiveIdles(selected);
-                    //update nächster Sprecher in _data- object (FlowStateData)
-                    _data.ToBeRecorded = selected;
-                    //Damit die Frage, ob ein nächster Sprecher ausgesucht wurde, nächstes mal wieder funktioniert, zurücksetzen.
-                    _data.SelectedNext = -1;
-                    //UnityEngine.Debug.Log($"Next Selected Speaker has index: {selected}");
-                    return selected;
-                }
-            }
-        }
-*/
         //Das wird in RecSpeakStateSetSpeaker gerufen updated das FlowStateData-Object
         public void RecSpeakStateSetReactiveIdles(int nextSpeaker)
         {
@@ -268,10 +284,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SpeakerStateEnter(){
             int nextSpeaker;
+            int nextSpeakerIndex;
             int selected = _data.SelectedNext;
 
             if(selected == -1){
-                nextSpeaker = _data.SceneCount  % _data.ActiveRoleCount;
+
+                List<int> activeRolesIndices = new List<int>();
+
+                foreach (RoleRig role in _data.Roles)
+                {
+                    activeRolesIndices.Add(role.roleIndex);
+                }
+                nextSpeakerIndex = _data.SceneCount  % _data.ActiveRoleCount;
+                nextSpeaker = activeRolesIndices[nextSpeakerIndex];
                 
                 UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][SpeakerStateEnter][_data.SceneCount  % _data.ActiveRoleCount] -> {_data.SceneCount % _data.ActiveRoleCount}  activeRoleCount is: {_data.ActiveRoleCount}");
                 //update Rollen, die im Idle sind in _data- object (FlowStateData)
@@ -318,7 +343,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         if (_data.AllRoles[i].isActiveConversationPartner)
                         {
                             reactiveIdles.Add(_data.AllRoles[i].roleIndex);
-                            //UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] Role with Index{_data.AllRoles[i].roleIndex} was added to reactiveIdles.");
+                            UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] Role with Index{_data.AllRoles[i].roleIndex} was added to reactiveIdles.");
                             
                         }
                         
@@ -335,7 +360,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if(_data.Roles.Count == 1)
             {
                 //UnityEngine.Debug.Log($"[FlowController] [SpeakerStateExitAutoSelection()] SceneCount={_data.SceneCount} still in reactive Idles: [" + string.Join(", ", _data.ReactiveIdles) + $"] toBeRecoreded={_data.ToBeRecorded}");
-                _data.ToBeRecorded = 0;
+                _data.ToBeRecorded = _data.Roles[0].roleIndex;
                 _data.GoToSpeakerState = true;
                 SpeakerStateEnterSetLists(_data.ToBeRecorded);
                 _data.SceneCount ++;
@@ -507,6 +532,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             foreach (int passiveIndex in roleIndicesOfPassiveRoles)
             {
+                if (_data.AllRoles[passiveIndex].hasPlayedBackPreRecordedTakes)
+                {
+                    continue;
+                }
+
+                if (!_data.AllRoles[passiveIndex].hasPreRecordedTakes)
+                {
+                    continue;
+                }
                 if (!IsPlayerNearNpc(
                         passiveIndex,
                         _data.AllRoles[playerIndex].root,
@@ -525,6 +559,38 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
             return playbackPreRecordedScene;
             
+        }
+
+        private List<RoleRig> ActiveRolesThatAreNotNearPlayer(
+            int playerIndex,
+            float radius)
+        {
+            List<RoleRig> rolesNotNearPlayer = new List<RoleRig>();
+
+            RoleRig playerRole = _data.AllRoles[playerIndex];
+
+            foreach (RoleRig role in _data.Roles)
+            {
+                int index = role.roleIndex;
+
+                if (index == playerIndex)
+                    continue;
+
+                if (!IsPlayerNearNpc(
+                        index,
+                        playerRole.root,
+                        radius))
+                {
+                    UnityEngine.Debug.Log(
+                        $"[RecordListenerState] in Scene: {_data.SceneCount} " +
+                        $"[FlowController] Role with index: {role.roleIndex} " +
+                        $"is not near Role with Index: {playerIndex}");
+
+                    rolesNotNearPlayer.Add(role);
+                }
+            }
+
+            return rolesNotNearPlayer;
         }
 
         public string GetNpcGroupId(
@@ -559,63 +625,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             return npcGroupId;
         }
 
-/*
-        public void AdjustFlowStateDataBeforeGoingToPlaybackPreRecordedScenes(
-            List<int> roleIndicesOfPassiveRoles,
-            int playerIndex,
-            float radius)
-        {
-            List<int> passiveSnapshot =
-                new List<int>(roleIndicesOfPassiveRoles);
 
-            foreach (int passiveIndex in passiveSnapshot)
-            {
-                if (!IsPlayerNearNpc(
-                        passiveIndex,
-                        _data.AllRoles[playerIndex].root,
-                        radius))
-                {
-                    continue;
-                }
-
-                RoleRig npc = _data.AllRoles[passiveIndex];
-                string currentNpcGroupId = npc.npcGroupId;
-
-                List<int> activatedIndices = new List<int>();
-                
-                for (int i = 0; i < _data.AllRoles.Count; i++)
-                {
-                    RoleRig role = _data.AllRoles[i];
-
-                    if (role.npcGroupId != currentNpcGroupId)
-                        continue;
-                    UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]: npcGroupId: {role.npcGroupId} roleIndex: {role.roleIndex}, sourceRoleIndex: {role.sourceRoleIndex}");
-                    
-                    //die aktuellen PreRecorded werden erst den (aktiven Rollen) zugefügt, wenn für alle Reactive Idles Takes aufgenommen worden sind.
-                    if(_data.ReactiveIdles.Count == 0)
-                    {
-                        _data.Roles.Add(role);
-                    }
-                    
-                    _data.CurrentPreRecordedPlaybacks.Add(role.roleIndex);
-                    activatedIndices.Add(role.roleIndex);
-                }
-
-                foreach (int index in activatedIndices)
-                {
-                    _data.IndicesOfPassiveRoles.Remove(index);
-                }
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] before update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                _data.CurrentPreRecordedPlaybacksCount = _data.ActiveRoleCount;
-                _data.ActiveRoleCount += _data.CurrentPreRecordedPlaybacks.Count;
-                 
-                _data.SceneCountBeforePlaybackPreRecorded = _data.SceneCount;
-                _data.SceneCount++;
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs] after update: ActiveRoleCount: {_data.ActiveRoleCount}, SceneCount: {_data.SceneCount}");
-                UnityEngine.Debug.Log($"[FlowController][PlayerNearNpcs]Player came near NPC group: {currentNpcGroupId}");
-            }
-        }
-        */
 
         public void RecordSpeakerToPlaybackPreRecorded_DataAdjustments(
             List<int> roleIndicesOfPassiveRoles,
@@ -682,6 +692,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (role.npcGroupId == npcGroupId)
                 {
                     role.isActiveConversationPartner = true;
+                    role.hasPlayedBackPreRecordedTakes = true;
                 }
             }
         }
@@ -724,6 +735,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 if (!_data.Roles.Contains(role))
                 {
+                    //role.hasPlayedBackPreRecordedTakes = true;
                     _data.Roles.Add(role);
                 }
 

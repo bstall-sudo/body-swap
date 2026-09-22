@@ -32,6 +32,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private string stageSpawnId = "default";
         public string StageSpawnId => stageSpawnId;
 
+        public bool loseConversationPartnersIfTooFarAway= true;
+        public float distanceToLoseActiveConversationPartner = 10F;
+
         [Header("NPC Imports")]
         [Range(0,6)]
         public int preRecordedSceneCount = 0;

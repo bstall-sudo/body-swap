@@ -144,17 +144,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     //UnityEngine.Debug.Log("[PlaybackFullPreRecordedScenes] No more scenes found. Restart PlaybackFullConversation.");
                     
                     _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
-                    //_flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
-                    //_flow._data.TimesPreRecordedPlaybacksWerePlayed --;
-
-                    //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] TimesPreRecordedPlaybacksWerePlayed: {_flow._data.TimesPreRecordedPlaybacksWerePlayed}.");
-                    /*
-                    if(_flow._data.TimesPreRecordedPlaybacksWerePlayed <= 0)
-                    {
-                        _flow._data.GoToSpeakerState = true;
-                        _flow._data.GoToPlaybackPreRecordedState = false;
-                        _flow._data.GoToRecordRemainingState = false;
-                    } */
+                    PrintRoleLists(
+                            $"[PlaybackPreRecordedScenes] Direction at Scene: {_flow._data.SceneCount}, Roles.Count is: {_flow._data.Roles.Count}", 
+                            _flow._data.Playbacks,
+                            _flow._data.ReactiveIdles,
+                            _flow._data.CurrentPreRecordedPlaybacks,
+                            _flow._data.ToBeRecorded
+                            );
+                    
                     if(_flow._data.Roles.Count == 1)
                     {
                         

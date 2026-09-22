@@ -1,4 +1,5 @@
 using UnityEngine;
+using AppV2.Runtime.Scripts.DataStructures;
 using System.Collections.Generic;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
@@ -117,7 +118,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (!_waitingForRecordingSave && _flow.Stage.PlaybacksAreAllStopped(playbacks) )
                 {
-                    UnityEngine.Debug.Log($"[RecordListenersState] All playbacks are stopped, stopping recording now. ToBeRecorded: {toBeRecorded}, sceneCount: {sceneCount}, plabacks[0]: {playbacks[0]}");
+                    //UnityEngine.Debug.Log($"[RecordListenersState] All playbacks are stopped, stopping recording now. ToBeRecorded: {toBeRecorded}, sceneCount: {sceneCount}, plabacks[0]: {playbacks[0]}");
 
                     _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
                     
@@ -148,6 +149,20 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                             // (reactiveIdles.Count = 0) mehr
                             // gibt, dann in den Align Modus zu neuem Record Speaker State.
                             if(_isUsingXr){
+                                if (_flow.Stage.loseConversationPartnersIfTooFarAway)
+                                {
+                                    
+                                    //true weil es  listenerState ist.
+                                    _flow.RemoveActiveRolesTooFarAwayFromPlayer( toBeRecorded,  true);
+                                    foreach(RoleRig role in _flow._data.Roles)
+                                    {
+                                        UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {sceneCount} Role with index: {role.roleIndex} is in _data.Roles");
+                                    }
+                                    
+                                }
+                                //Das muss hier nochmal aktualisiert werden, weil die obige Funktion die FlowStateData verändert.
+                                _flow.Stage.ReactiveIdleEnd(reactiveIdles);
+                                reactiveIdles = _flow._data.ReactiveIdles;
                                 // GoToSpeakerState wird hier schon gesetzt, weil im RecordListenerState Exit die reactiveIdles schon neu gesetzt werden
                                 // basierend auf den Reactive Idles muss der PlayerAlignState den Ziel State bestimmen.
                                 if(reactiveIdles.Count > 0){
@@ -213,25 +228,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Exit()
         {
-            _flow.Stage.ReactiveIdleEnd(reactiveIdles);
+            
+
+
             if (selectableNext)
             {
                 _flow.ListenerStateExitManualSelection();
             }
             else
             {
-                //Das muss auch noch angepasst werden, damit das auch funktioniert mit selectable Next.
-                //hier true, weil die FlowStateData sollen ja noch angepasst werden, bevor man in den 
-                //PlaybackFullPreRecordedScenesState kommt.
-                if (goingToPlaybackPreRecordedScenes && _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
-                {
-                    _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
-                    _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
-                }
-                else
+                if (_flow._data.GoToSpeakerState)
                 {
                     _flow.ListenerStateExitAutoSelection();
                 }
+                
+                
+                
                 
                 
             }
