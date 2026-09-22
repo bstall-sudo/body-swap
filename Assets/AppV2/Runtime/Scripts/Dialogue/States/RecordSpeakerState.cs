@@ -234,6 +234,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     //das passt die FlowStateData auch schon an, daher muss das hier sein, damit entsprechend der Daten der richtige State angesteuert wird
                     //false weil es nicht listenerState ist.
                     _flow.RemoveActiveRolesTooFarAwayFromPlayer( toBeRecorded,  false);
+                    _flow.AddPassiveRolesToActiveRoles(toBeRecorded);
                 }
                 
                 

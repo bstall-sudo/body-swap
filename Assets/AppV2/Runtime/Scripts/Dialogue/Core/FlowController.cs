@@ -183,6 +183,52 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             _data.ActiveRoleCount = _data.Roles.Count;
         }
+
+         public void AddPassiveRolesToActiveRoles( int toBeRecorded)
+        {
+            if(toBeRecorded <0 || toBeRecorded > _data.AllRoles.Count)
+            {
+                UnityEngine.Debug.LogError($"ToBeRecorded with Index: {toBeRecorded} is out of Range.");
+                return;
+            }
+
+            float radius = Stage.distanceToLoseActiveConversationPartner;
+            
+
+            List<RoleRig> newActiveRoles = PassiveRolesThatAreNearPlayer(toBeRecorded,radius);
+
+            if(newActiveRoles.Count > 0)
+            {
+                 foreach(RoleRig r in newActiveRoles)
+                {
+                    r.isActiveConversationPartner = true;
+
+                    
+                    
+                    int index = r.roleIndex;
+                    _data.Roles.Add(r);
+                    //UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {r.roleIndex} was removed from _data.Roles | GoToPlaybackPreRecordedState: {_data.GoToPlaybackPreRecordedState}");
+                    if (_data.IndicesOfPassiveRoles.Contains(index ))
+                    {
+                        _data.IndicesOfPassiveRoles.Remove(index );
+                    }
+                    
+                    
+                    _data.ReactiveIdles.Add(index);
+                    
+                            
+                    
+                }
+
+               
+
+                _data.ActiveRoleCount = _data.Roles.Count;
+                
+            }
+           
+        }
+
+
         public void IncrementSceneCount()
         {
             _data.SceneCount++;
@@ -581,16 +627,57 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         playerRole.root,
                         radius))
                 {
-                    UnityEngine.Debug.Log(
+                    /*UnityEngine.Debug.Log(
                         $"[RecordListenerState] in Scene: {_data.SceneCount} " +
                         $"[FlowController] Role with index: {role.roleIndex} " +
-                        $"is not near Role with Index: {playerIndex}");
+                        $"is not near Role with Index: {playerIndex}");*/
 
                     rolesNotNearPlayer.Add(role);
                 }
             }
 
             return rolesNotNearPlayer;
+        }
+
+        private List<RoleRig> PassiveRolesThatAreNearPlayer(
+            int playerIndex,
+            float radius)
+        {
+            List<RoleRig> rolesNearPlayer = new List<RoleRig>();
+
+            RoleRig playerRole = _data.AllRoles[playerIndex];
+
+            foreach (RoleRig role in _data.AllRoles)
+            {
+                int index = role.roleIndex;
+
+                if(!_data.IndicesOfPassiveRoles.Contains(index))
+                    continue;
+
+                if(role.hasPreRecordedTakes == true && role.hasPlayedBackPreRecordedTakes == false)
+                    continue;
+
+                if (index == playerIndex)
+                    continue;
+
+                if(_data.Roles.Contains(role))
+                    continue;
+
+                if (IsPlayerNearNpc(
+                        index,
+                        playerRole.root,
+                        radius))
+                {
+                    /*UnityEngine.Debug.Log(
+                        $"[RecordListenerState] in Scene: {_data.SceneCount} " +
+                        $"[FlowController] Role with index: {role.roleIndex} " +
+                        $"is not near Role with Index: {playerIndex}");*/
+
+                    rolesNearPlayer.Add(role);
+                }
+            }
+
+            return rolesNearPlayer;
         }
 
         public string GetNpcGroupId(
