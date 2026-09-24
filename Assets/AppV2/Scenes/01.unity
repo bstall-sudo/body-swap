@@ -336,6 +336,8 @@ MonoBehaviour:
   sceneLoader: {fileID: 0}
   environmentId: default
   stageSpawnId: default
+  loseConversationPartnersIfTooFarAway: 1
+  distanceToLoseActiveConversationPartner: 10
   preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   preRecordedScenes: []
@@ -10858,107 +10860,58 @@ MonoBehaviour:
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
   environmentId: HotelUndLobby_01
-  stageSpawnId: gast_lobby_weit_weg
-  preRecordedSceneCount: 3
-  _radiusNpcStartTalking: 4
+  stageSpawnId: gast_draussen
+  loseConversationPartnersIfTooFarAway: 1
+  distanceToLoseActiveConversationPartner: 10
+  preRecordedSceneCount: 5
+  _radiusNpcStartTalking: 6
   preRecordedScenes:
   - enabled: 1
     npcGroupId: Group01
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotellobby\HeyHelloWieGehtsBaer
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\rezeption_besuch
     workshopFolderName: preRecordedScenes
-    sessionFolderName: hotellobby
-    sessionId: HeyHelloWieGehtsFrosch
+    sessionFolderName: HotelLobby
+    sessionId: rezeption_besuch
     npcGroupSpawnId: rezeptionist
   - enabled: 1
     npcGroupId: Group02
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotellobby\HeyHelloWieGehtsBaer
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\wieTollDuMichFindest
     workshopFolderName: preRecordedScenes
-    sessionFolderName: hotellobby
-    sessionId: HeyHelloWieGehtsEsel
-    npcGroupSpawnId: roterHimmel
+    sessionFolderName: HotelLobby
+    sessionId: wieTollDuMichFindest
+    npcGroupSpawnId: superman
   - enabled: 1
     npcGroupId: Group03
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotellobby\HeyHelloWieGehtsBaer
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\doener
     workshopFolderName: preRecordedScenes
-    sessionFolderName: hotellobby
-    sessionId: HeyHelloWieGehtsBaer
+    sessionFolderName: HotelLobby
+    sessionId: doener
     npcGroupSpawnId: tenge
-  importedNpcRoles:
-  - avatarId: 
-    roleSpawnId: 
-    roleId: 
-    slotId: 
-    sourceRoleId: 
-    roleIndex: 0
-    sourceRoleIndex: 0
-    npcGroupId: 
-    hasPreRecordedTakes: 0
-    hasPlayedBackPreRecordedTakes: 0
-    isActiveConversationPartner: 0
-    takeSource: 
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 0}
-    roleRoot: {fileID: 0}
-    root: {fileID: 0}
-    head: {fileID: 0}
-    leftHand: {fileID: 0}
-    rightHand: {fileID: 0}
-    leftFoot: {fileID: 0}
-    rightFoot: {fileID: 0}
-    hip: {fileID: 0}
-    hipSolver: {fileID: 0}
-    leftFootSolver: {fileID: 0}
-    rightFootSolver: {fileID: 0}
-    audioSource: {fileID: 0}
-    heightOfRoleCm: 0
-    heightOfSeatedRoleCm: 0
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 0}
-    visualRolesVisibility: {fileID: 0}
-    sittingIdle: 0
-    avatarRoot: {fileID: 0}
-    avatarName: 
-    avatar: {fileID: 0}
-    rigFollower: {fileID: 0}
-    visualRigFollower: {fileID: 0}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 0
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+  - enabled: 1
+    npcGroupId: Group04
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\hundeHotel
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: HotelLobby
+    sessionId: hundeHotel
+    npcGroupSpawnId: roterHimmel
+  - enabled: 1
+    npcGroupId: Group05
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\langweilig
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: HotelLobby
+    sessionId: langweilig
+    npcGroupSpawnId: haus1
+  importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: PreRecordingTest_01
-  _personalFolderName: multiplePreRecorded
+  _workshopFolderName: kanguruh_2026_09_23
+  _personalFolderName: oskar
   roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 180
+  heightOfPlayerCm: 160
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -10976,7 +10929,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: ziegenwolf_001
+  - avatarId: froschmann_001
     roleSpawnId: 
     roleId: A
     slotId: A

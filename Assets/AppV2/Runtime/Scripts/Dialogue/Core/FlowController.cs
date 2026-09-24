@@ -192,7 +192,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return;
             }
 
-            float radius = Stage.distanceToLoseActiveConversationPartner;
+            float radius = Stage._radiusNpcStartTalking;
             
 
             List<RoleRig> newActiveRoles = PassiveRolesThatAreNearPlayer(toBeRecorded,radius);
