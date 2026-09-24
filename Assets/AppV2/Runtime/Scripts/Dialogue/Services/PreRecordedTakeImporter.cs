@@ -29,7 +29,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             TakeMeta sourceTakeMeta,
             RolePlaybackSource source,
             Transform stageRoot,
-            Transform roleSpawn)
+            Transform roleSpawn,
+            Transform player)
         {
             if (targetRole == null)
             {
@@ -172,7 +173,81 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
                 return false;
             }
+            ///der folgende Abschnitt importiert die Frames so, dass die Figur zum Player ausgerichtet ist
+            // ------------------------------------------------------------
+            // Optionales Alignment des NPCs zum Player
+            // ------------------------------------------------------------
 
+            Quaternion playerAlignmentRotation = Quaternion.identity;
+            Vector3 alignmentPivotWorld = Vector3.zero;
+
+            ConversationRoleMeta sourceRoleMeta =
+                    source.session?.Roles?.Find(
+                        r => r.RoleIndex == source.sourceRoleIndex
+                    );
+
+
+            if (targetRole.alignWithPlayer && player != null)
+            {
+                
+                if (sourceRoleMeta?.StartRootPose != null)
+                {
+                    // Startposition des NPCs in der aktuellen Welt
+                    alignmentPivotWorld =
+                        roleSpawn.TransformPoint(
+                            sourceRoleMeta.StartRootPose.LocalPosition
+                        );
+
+                    // Alignment nur EINMAL für diesen NPC bestimmen.
+                    // Alle folgenden Takes verwenden dasselbe Offset.
+                    if (!targetRole.hasPlayerAlignment)
+                    {
+                        Quaternion originalStartWorldRotation =
+                            roleSpawn.rotation *
+                            sourceRoleMeta.StartRootPose.LocalRotation;
+
+                        Vector3 directionToPlayer =
+                            player.position - alignmentPivotWorld;
+
+                        directionToPlayer.y = 0f;
+
+                        if (directionToPlayer.sqrMagnitude > 0.001f)
+                        {
+                            Quaternion desiredWorldRotation =
+                                Quaternion.LookRotation(
+                                    directionToPlayer.normalized,
+                                    Vector3.up
+                                );
+
+                            targetRole.playerAlignmentYawOffset =
+                                Mathf.DeltaAngle(
+                                    originalStartWorldRotation.eulerAngles.y,
+                                    desiredWorldRotation.eulerAngles.y
+                                );
+
+                            targetRole.hasPlayerAlignment = true;
+
+                            Debug.Log(
+                                $"[PreRecordedTakeImporter] Player alignment for " +
+                                $"{targetRole.roleId}: " +
+                                $"{targetRole.playerAlignmentYawOffset:F1}°"
+                            );
+                        }
+                    }
+
+                    if (targetRole.hasPlayerAlignment)
+                    {
+                        playerAlignmentRotation =
+                            Quaternion.Euler(
+                                0f,
+                                targetRole.playerAlignmentYawOffset,
+                                0f
+                            );
+                    }
+                }
+            }
+
+            ///-Ende des Abschnitts, der die Frames importiert, sodass die Figur zum Player ausgerichtet ist
 
             // ------------------------------------------------------------
             // Body-Daten umrechnen
@@ -187,7 +262,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             // Head / Hands / Hip / Feet bleiben unverändert,
             // da diese lokal zum ActorRoot gespeichert sind.
             // ------------------------------------------------------------
-
+/*
             for (int i = 0; i < frames.Count; i++)
             {
                 Frame frame = frames[i];
@@ -244,7 +319,99 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 // geänderten Frame wieder in Liste schreiben.
                 frames[i] = frame;
             }
+*/
+            for (int i = 0; i < frames.Count; i++)
+            {
+                Frame frame = frames[i];
 
+
+                // --------------------------------------------------------
+                // POSITION
+                // --------------------------------------------------------
+
+                Vector3 sourceBodyPos =
+                    frame.Body.Pos;
+
+                // Ursprüngliche Transformation:
+                // RoleSpawn local -> World
+                Vector3 worldPos =
+                    roleSpawn.TransformPoint(sourceBodyPos);
+
+
+                // --------------------------------------------------------
+                // OPTIONAL: gesamten Take um NPC-Startpunkt drehen
+                // --------------------------------------------------------
+
+                if (targetRole.alignWithPlayer &&
+                    targetRole.hasPlayerAlignment)
+                {
+                    Vector3 offsetFromNpcStart =
+                        worldPos - alignmentPivotWorld;
+
+                    worldPos =
+                        alignmentPivotWorld +
+                        playerAlignmentRotation * offsetFromNpcStart;
+
+                    UnityEngine.Debug.Log($"[PreRecordedTakeImporter] (targetRole.alignWithPlayer && targetRole.hasPlayerAlignment");
+                }
+
+
+                // World -> aktuelle StageRoot local
+                Vector3 targetStageLocalPos =
+                    stageRoot.InverseTransformPoint(worldPos);
+
+
+                // --------------------------------------------------------
+                // ROTATION
+                // --------------------------------------------------------
+
+                Quaternion sourceBodyRot =
+                    Quaternion.Euler(
+                        0f,
+                        frame.Body.YawDeg,
+                        0f
+                    );
+
+                // RoleSpawn local -> World
+                Quaternion worldRot =
+                    roleSpawn.rotation *
+                    sourceBodyRot;
+
+
+                // --------------------------------------------------------
+                // OPTIONAL: dieselbe Rotation auf Body anwenden
+                // --------------------------------------------------------
+
+                if (targetRole.alignWithPlayer &&
+                    targetRole.hasPlayerAlignment)
+                {
+                    worldRot =
+                        playerAlignmentRotation *
+                        worldRot;
+                }
+
+
+                // World -> aktuelle StageRoot local
+                Quaternion targetStageLocalRot =
+                    Quaternion.Inverse(stageRoot.rotation) *
+                    worldRot;
+
+
+                // --------------------------------------------------------
+                // BODY speichern
+                // --------------------------------------------------------
+
+                var body = frame.Body;
+
+                body.Pos =
+                    targetStageLocalPos;
+
+                body.YawDeg =
+                    targetStageLocalRot.eulerAngles.y;
+
+                frame.Body = body;
+                frames[i] = frame;
+            }
 
             // ------------------------------------------------------------
             // Transformierte Frames speichern
@@ -321,10 +488,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             // ins Koordinatensystem der aktuellen Stage transformieren
             // ------------------------------------------------------------
 
-            ConversationRoleMeta sourceRoleMeta =
-                source.session?.Roles?.Find(
-                    r => r.RoleIndex == source.sourceRoleIndex
-                );
 
             ConversationRoleMeta targetRoleMeta =
                 _targetSession.Roles?.Find(
@@ -338,7 +501,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     TransformStartPoseToCurrentStage(
                         sourceRoleMeta.StartRootPose,
                         stageRoot,
-                        roleSpawn
+                        roleSpawn,
+                        targetRole.alignWithPlayer,
+                        targetRole.hasPlayerAlignment,
+                        playerAlignmentRotation,
+                        alignmentPivotWorld
                     );
 
                 if (transformedStartPose != null)
@@ -373,7 +540,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private TransformData TransformStartPoseToCurrentStage(
             TransformData sourcePose,
             Transform stageRoot,
-            Transform roleSpawn)
+            Transform roleSpawn,
+            bool alignWithPlayer,
+            bool hasPlayerAlignment,
+            Quaternion playerAlignmentRotation,
+            Vector3 alignmentPivotWorld)
         {
             if (sourcePose == null ||
                 stageRoot == null ||
@@ -382,19 +553,54 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 return null;
             }
 
+
+            // --------------------------------------------------------
+            // Source StartPose -> World
+            // --------------------------------------------------------
+
             Vector3 worldPos =
-                roleSpawn.TransformPoint(sourcePose.LocalPosition);
+                roleSpawn.TransformPoint(
+                    sourcePose.LocalPosition
+                );
 
             Quaternion worldRot =
-                roleSpawn.rotation * sourcePose.LocalRotation;
+                roleSpawn.rotation *
+                sourcePose.LocalRotation;
+
+
+            // --------------------------------------------------------
+            // Optionales Player Alignment
+            // --------------------------------------------------------
+
+            if (alignWithPlayer && hasPlayerAlignment)
+            {
+                Vector3 offsetFromPivot =
+                    worldPos - alignmentPivotWorld;
+
+                worldPos =
+                    alignmentPivotWorld +
+                    playerAlignmentRotation * offsetFromPivot;
+
+                worldRot =
+                    playerAlignmentRotation *
+                    worldRot;
+            }
+
+
+            // --------------------------------------------------------
+            // World -> aktuelle StageRoot
+            // --------------------------------------------------------
 
             return new TransformData
             {
                 LocalPosition =
-                    stageRoot.InverseTransformPoint(worldPos),
+                    stageRoot.InverseTransformPoint(
+                        worldPos
+                    ),
 
                 LocalRotation =
-                    Quaternion.Inverse(stageRoot.rotation) * worldRot
+                    Quaternion.Inverse(stageRoot.rotation) *
+                    worldRot
             };
         }
     }

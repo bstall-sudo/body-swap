@@ -32,6 +32,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private string stageSpawnId = "default";
         public string StageSpawnId => stageSpawnId;
 
+        public bool simpleInputMode=true;
         public bool loseConversationPartnersIfTooFarAway= true;
         public float distanceToLoseActiveConversationPartner = 10F;
 
@@ -40,6 +41,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public int preRecordedSceneCount = 0;
 
         public float _radiusNpcStartTalking = 5;
+
+        public float _maxHeightDifferenceForNpcTrigger = 2.5f;
 
         public List<PreRecordedSceneImport> preRecordedScenes =
             new List<PreRecordedSceneImport>();
@@ -131,7 +134,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             return groundHeightProvider.GetGroundYStageLocal(stageLocalPosition);
         }
 
-        private RecordingController _recordingController;
+        public RecordingController _recordingController;
         private PlaybackController _playbackController;
         private ReactiveIdleController _reactiveIdleController;
         private SessionTakeIndex _takeIndex;
@@ -900,9 +903,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 //UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
                 //ApplyPreRecordedNpcStartPoses();
 
-                _playbackController.Initialize(roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
+                _playbackController.Initialize(_stageRoot, roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
                 // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
-                _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex, _session);
+                _recordingController = new RecordingController( roles, roleCount, _store, _takeIndex, _session);
                 //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
                 // Das passiert im Exit von CalibrationState.
                 _calibrationDataProvider = new RoleCalibrationDataProvider();
@@ -1262,7 +1265,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     noTakesFoundIndices.Add(targetRoleIndex);
                     continue;
                 }
-
+/*
                 if (source.isPreRecordedSource)
                 {
                     StageSpawnPoint spawn =
@@ -1273,6 +1276,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         spawn.transform
                     );
                 }
+
+*/
                 else
                 {
                     _playbackController.SetPlaybackOriginForIndex(
@@ -1311,8 +1316,50 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                 takeMeta,
                                 source,
                                 _stageRoot,
-                                spawn.transform
+                                spawn.transform,
+                                XrHead
                             );
+
+                            if (imported)
+                            {
+                                // Der importierte Take liegt jetzt in der
+                                // AKTUELLEN Session.
+                                if (_takeIndex.TryGetTakeForScene(
+                                        targetRoleIndex,
+                                        targetSceneCount,
+                                        out TakeMeta importedTakeMeta))
+                                {
+                                    _playbackController.SetPlaybackOriginForIndex(
+                                        targetRoleIndex,
+                                        null
+                                    );
+
+                                    Debug.Log(
+                                        $"[Turn NPC to Player PRE PLAYBACK] " +
+                                        $"take={importedTakeMeta.TakeId}, " +
+                                        $"frames={importedTakeMeta.FramesFile}, " +
+                                        $"session={_session.SessionId}, " +
+                                        $"role={targetRoleIndex}"
+                                    );
+                                    _playbackController.PlaybackForIndexBeginFromTake(
+                                        targetRoleIndex,
+                                        importedTakeMeta,
+                                        _store,
+                                        _session.SessionId,
+                                        heightOfPlayerCm
+                                    );
+
+                                    
+                                }
+                                else
+                                {
+                                    Debug.LogError(
+                                        $"[PlaybackStart] Imported take not found: " +
+                                        $"role={targetRoleIndex}, " +
+                                        $"scene={targetSceneCount}"
+                                    );
+                                }
+                            }
                             /*
                             Debug.Log(
                                 $"[ConversationStage][PlaybackStart] ImportTake result={imported}"
@@ -1320,13 +1367,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
                             */
                         }
                     }
-                    _playbackController.PlaybackForIndexBeginFromTake(
+                    else
+                    {
+                        _playbackController.SetPlaybackOriginForIndex(
+                                        targetRoleIndex,
+                                        null
+                                    );
+                         _playbackController.PlaybackForIndexBeginFromTake(
                         targetRoleIndex,
                         takeMeta,
                         source.store,
                         source.sessionId,
                         heightOfPlayerCm
                     );
+                        
+                    }
+                   
                 }
                 else
                 {
@@ -1584,6 +1640,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _session = loadedSession;
 
             _playbackController.InitializeFromSession(
+                _stageRoot,
                 roles,
                 _store,
                 _takeIndex,

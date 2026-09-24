@@ -336,6 +336,7 @@ MonoBehaviour:
   sceneLoader: {fileID: 0}
   environmentId: default
   stageSpawnId: default
+  simpleInputMode: 1
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   preRecordedSceneCount: 0
@@ -377,6 +378,7 @@ MonoBehaviour:
     roleIndex: 0
     sourceRoleIndex: 0
     npcGroupId: 
+    alignWithPlayer: 0
     hasPreRecordedTakes: 0
     hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
@@ -442,6 +444,7 @@ MonoBehaviour:
     roleIndex: 1
     sourceRoleIndex: 1
     npcGroupId: 
+    alignWithPlayer: 0
     hasPreRecordedTakes: 0
     hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
@@ -507,6 +510,7 @@ MonoBehaviour:
     roleIndex: 2
     sourceRoleIndex: 2
     npcGroupId: 
+    alignWithPlayer: 0
     hasPreRecordedTakes: 0
     hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
@@ -5597,6 +5601,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Input.XRInputEvents
   actions: {fileID: -944628639613478452, guid: 700580f0ac480844188969d7f580633d, type: 3}
   flow: {fileID: 1662749375}
+  inputMode: 0
 --- !u!4 &408572369
 Transform:
   m_ObjectHideFlags: 0
@@ -10859,59 +10864,49 @@ MonoBehaviour:
   _stageRoot: {fileID: 793401273}
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
-  environmentId: HotelUndLobby_01
-  stageSpawnId: gast_draussen
+  environmentId: PreRecordingTest_01
+  stageSpawnId: 00
+  simpleInputMode: 1
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
-  preRecordedSceneCount: 5
-  _radiusNpcStartTalking: 6
+  preRecordedSceneCount: 3
+  _radiusNpcStartTalking: 5
   preRecordedScenes:
   - enabled: 1
     npcGroupId: Group01
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\rezeption_besuch
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\HeyHelloWieGehtsBaer
     workshopFolderName: preRecordedScenes
     sessionFolderName: HotelLobby
-    sessionId: rezeption_besuch
-    npcGroupSpawnId: rezeptionist
+    sessionId: HeyHelloWieGehtsBaer
+    alignWithPlayer: 1
+    npcGroupSpawnId: 01
   - enabled: 1
     npcGroupId: Group02
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\wieTollDuMichFindest
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\HeyHelloWieGehtsEsel
     workshopFolderName: preRecordedScenes
     sessionFolderName: HotelLobby
-    sessionId: wieTollDuMichFindest
-    npcGroupSpawnId: superman
-  - enabled: 1
+    sessionId: HeyHelloWieGehtsEsel
+    alignWithPlayer: 1
+    npcGroupSpawnId: 02
+  - enabled: 0
     npcGroupId: Group03
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\doener
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\HeyHelloWieGehtsFrosch
     workshopFolderName: preRecordedScenes
     sessionFolderName: HotelLobby
-    sessionId: doener
-    npcGroupSpawnId: tenge
-  - enabled: 1
-    npcGroupId: Group04
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\hundeHotel
-    workshopFolderName: preRecordedScenes
-    sessionFolderName: HotelLobby
-    sessionId: hundeHotel
-    npcGroupSpawnId: roterHimmel
-  - enabled: 1
-    npcGroupId: Group05
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\langweilig
-    workshopFolderName: preRecordedScenes
-    sessionFolderName: HotelLobby
-    sessionId: langweilig
-    npcGroupSpawnId: haus1
+    sessionId: HeyHelloWieGehtsFrosch
+    alignWithPlayer: 1
+    npcGroupSpawnId: 03
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: kanguruh_2026_09_23
-  _personalFolderName: oskar
+  _workshopFolderName: PreRecordingTest_01
+  _personalFolderName: multiplePreRecorded
   roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 160
+  heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -10937,6 +10932,7 @@ MonoBehaviour:
     roleIndex: 0
     sourceRoleIndex: 0
     npcGroupId: 
+    alignWithPlayer: 0
     hasPreRecordedTakes: 0
     hasPlayedBackPreRecordedTakes: 0
     isActiveConversationPartner: 1
@@ -11047,8 +11043,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  rayStartHeight: 100
-  rayLength: 300
+  rayStartHeight: 1
+  rayLength: 3
 --- !u!114 &793401277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20574,6 +20570,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Input.XRInputEvents
   actions: {fileID: -944628639613478452, guid: 700580f0ac480844188969d7f580633d, type: 3}
   flow: {fileID: 2099971727}
+  inputMode: 0
 --- !u!4 &1418234169
 Transform:
   m_ObjectHideFlags: 0

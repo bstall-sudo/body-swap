@@ -12,6 +12,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string workshopFolderName;
         public string sessionFolderName;
         public string sessionId;
+
+        public bool alignWithPlayer = false;
         
 
         public string npcGroupSpawnId = "default";

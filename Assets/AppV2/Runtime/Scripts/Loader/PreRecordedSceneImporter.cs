@@ -108,7 +108,7 @@ namespace AppV2.Runtime.Scripts.Loader
                         avatarName = meta.RoleName,
                         heightOfRoleCm = meta.HeightOfRoleCm,
                         sittingIdle = meta.SittingIdle,
-                        
+                        alignWithPlayer = import.alignWithPlayer
                     };
 
                     result.Add(role);

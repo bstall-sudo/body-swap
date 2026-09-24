@@ -167,6 +167,67 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8021001004253913084, guid: 8affff5d6554c8045bb9964407712182, type: 3}
   m_PrefabInstance: {fileID: 1015495956}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &75060586
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8939575303090800606, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[0]'
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
+      propertyPath: m_Name
+      value: SchneeMann_mit_Rig
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: baf9910ef2bb9cd49abc0e7b2a3614be, type: 3}
 --- !u!4 &101046410 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7666680083751660616, guid: 8affff5d6554c8045bb9964407712182, type: 3}
@@ -360,6 +421,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 9ed89f0b2398d7044b1a4b9276fab190, type: 3}
       propertyPath: m_Name
       value: roteFrau@T-Pose
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9ed89f0b2398d7044b1a4b9276fab190, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2946,6 +3011,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ZiegenWolf_QuadMesh@T-Pose
       objectReference: {fileID: 0}
+    - target: {fileID: 7565606056603905894, guid: b36ff306da4e4a94dba68211e70af60c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3556,3 +3625,4 @@ SceneRoots:
   - {fileID: 1540719733}
   - {fileID: 479149830551359114}
   - {fileID: 220959777}
+  - {fileID: 75060586}

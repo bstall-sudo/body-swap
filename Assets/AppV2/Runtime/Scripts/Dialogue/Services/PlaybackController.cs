@@ -15,6 +15,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private TakePlayer player;
         public List<RoleRig> roles;
 
+        public Transform _stageRoot;
+
         private SessionStore _store;
         public SessionModel _session;
 
@@ -29,7 +31,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         private float _roleScale;
 
-        public void Initialize(List<RoleRig> roles, float playerHeigthCm, SessionStore sessionStore , SessionTakeIndex takeIndex, GroundHeightProvider groundHeightProvider){
+        public void Initialize(Transform stageRoot, List<RoleRig> roles, float playerHeigthCm, SessionStore sessionStore , SessionTakeIndex takeIndex, GroundHeightProvider groundHeightProvider){
+            _stageRoot = stageRoot;
             _playerHeightCm = playerHeigthCm;
             _store = sessionStore;
             _takeIndex = takeIndex;
@@ -37,8 +40,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             InitializePlayers(roles, _groundHeightProvider);
         }
         
-        public void InitializeFromSession(List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, SessionModel session, GroundHeightProvider groundHeightProvider)
+        public void InitializeFromSession(Transform stageRoot, List<RoleRig> roles, SessionStore sessionStore, SessionTakeIndex takeIndex, SessionModel session, GroundHeightProvider groundHeightProvider)
         {
+            _stageRoot = stageRoot;
             _store = sessionStore;
             _takeIndex = takeIndex;
 
@@ -147,6 +151,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             string sessionId,
             float playerHeightCM)
         {
+            Debug.Log(
+                $"[Turn NPC to Player] [PlaybackForIndexBeginFromTake] " +
+                $"take={takeMeta.TakeId}, " +
+                $"frames={takeMeta.FramesFile}, " +
+                $"session={sessionId}, " +
+                $"role={targetRoleIndex}"
+            );
             TakeData take = store.LoadTakeData(takeMeta, sessionId);
 
             float roleScale = 1f;
@@ -236,6 +247,166 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             return false;
         }
+
+        public void AlignPreRecordedNpcTakesToPlayer(
+            List<int> npcRoleIndices,
+            Transform player)
+        {
+            if (npcRoleIndices == null || player == null)
+                return;
+
+            foreach (int roleIndex in npcRoleIndices)
+            {
+                if (roleIndex < 0 || roleIndex >= roles.Count)
+                    continue;
+
+                RoleRig role = roles[roleIndex];
+
+                if (role == null ||
+                    !role.hasPreRecordedTakes ||
+                    !role.alignWithPlayer)
+                {
+                    continue;
+                }
+
+                AlignSinglePreRecordedNpcToPlayer(
+                    roleIndex,
+                    role,
+                    player
+                );
+            }
+        }
+
+         //Die folgenden Funktionen drehen den NPC so, dass er in Richtung player schaut, beim Playback:
+
+        private void AlignSinglePreRecordedNpcToPlayer(
+            int roleIndex,
+            RoleRig role,
+            Transform player)
+        {
+            SessionModel session = _store.LoadSessionModel(
+                _store.CurrentSessionId
+            );
+
+            if (session == null)
+            {
+                Debug.LogError(
+                    "[NPC Align] Current session could not be loaded."
+                );
+                return;
+            }
+
+            ConversationRoleMeta roleMeta =
+                session.Roles?.Find(
+                    r => r.RoleIndex == roleIndex
+                );
+
+            if (roleMeta?.StartRootPose == null)
+            {
+                Debug.LogWarning(
+                    $"[NPC Align] No StartRootPose for role {role.roleId}"
+                );
+                return;
+            }
+
+
+            // --------------------------------------------------
+            // NPC STARTPOSITION IN WORLD
+            // --------------------------------------------------
+
+            Vector3 npcStageLocalPos =
+                roleMeta.StartRootPose.LocalPosition;
+
+            Vector3 npcWorldPos =
+                _stageRoot.TransformPoint(npcStageLocalPos);
+
+
+            // --------------------------------------------------
+            // RICHTUNG ZUM PLAYER
+            // --------------------------------------------------
+
+            Vector3 direction =
+                player.position - npcWorldPos;
+
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude < 0.001f)
+                return;
+
+
+            // --------------------------------------------------
+            // GEWÜNSCHTE ROTATION
+            // --------------------------------------------------
+
+            Quaternion desiredWorldRotation =
+                Quaternion.LookRotation(
+                    direction.normalized,
+                    Vector3.up
+                );
+
+            Quaternion currentWorldRotation =
+                _stageRoot.rotation *
+                roleMeta.StartRootPose.LocalRotation;
+
+
+            float yawOffset =
+                Mathf.DeltaAngle(
+                    currentWorldRotation.eulerAngles.y,
+                    desiredWorldRotation.eulerAngles.y
+                );
+
+
+            Debug.Log(
+                $"[NPC Align] {role.roleId}: " +
+                $"yawOffset={yawOffset:F1}"
+            );
+
+
+            // --------------------------------------------------
+            // ALLE TAKES DIESER ROLE ROTIEREN
+            // --------------------------------------------------
+
+
+
+
+            // --------------------------------------------------
+            // START ROOT POSE ROTIEREN
+            // --------------------------------------------------
+
+            RotateStartRootPose(
+                roleMeta,
+                yawOffset
+            );
+
+
+            // --------------------------------------------------
+            // SESSION SPEICHERN
+            // --------------------------------------------------
+
+            _store.SaveSessionModel(session);
+        }
+
+        private void RotateStartRootPose(
+            ConversationRoleMeta roleMeta,
+            float yawOffset)
+        {
+            if (roleMeta?.StartRootPose == null)
+                return;
+
+            Quaternion rotation =
+                Quaternion.Euler(
+                    0f,
+                    yawOffset,
+                    0f
+                );
+
+            roleMeta.StartRootPose.LocalRotation =
+                rotation *
+                roleMeta.StartRootPose.LocalRotation;
+        }
+
+       
+        
 
 
 

@@ -1,0 +1,35 @@
+Eingabeaufforderung starten ->
+
+cd docu   -> tab -> autocomplete -> Documents -> cd (change directory)
+
+so in den richtigen Ordner navigieren.
+
+git Status -> zeigt aktuellen Status an.
+
+git add . -> fügt alle neuen Dateien zum Austausch mit dem Remote Repository hinzu.
+
+git commit -m "Steuerung aktualisiert"  -> gibt dem commit einen Titel
+
+git push -> lädt die Änderungen auf das remote repository hoch.
+
+
+Hartes Reset:
+
+(wenn man einfach den neuesten Stand vom remote auf das local repository laden möchte ohne Rücksicht auf Verluste im local repository)
+
+git pull origin main
+
+git reset --hard origin/main
+
+
+Einige Änderungen auf dem LocalRepository sichern bevor man was vom remote Repository holt:
+
+git Status  -> hier werden dann Änderungen angezeigt.
+git stash push -u -m "Workshop Environment sichern"  -> hier werden diese Änderungen in einen Zwischenspeicher gelegt.
+ 
+git fetch origin 
+git reset --hard origin/main  -> diese beiden Befehle holen das remote auf das local Repository
+
+git stash pop   -> Holt den Zwischenspeicher zurück
+
+git Status   -> hier sollte man dann sehen, dass alles gut ist.

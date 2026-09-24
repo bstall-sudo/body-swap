@@ -8,6 +8,7 @@ using AppV2.Runtime.Scripts.Input;
 
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
+
 namespace AppV2.Runtime.Scripts.Dialogue.Services
 {
     public class RecordingController 
@@ -20,6 +21,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         private SessionStore _store;
         private SessionModel _session;
+
+        
         private string sessionFolder;
         // hier wird abgespeichert, welche Role in welcher Szene schon einen Take hat. -> Wichtig für PlaybackController
         private SessionTakeIndex _takeIndex;
@@ -60,8 +63,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private int _currentSceneCount = -1;
 
 
-        public RecordingController(List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, SessionModel session)
+        public RecordingController( List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, SessionModel session)
         {
+            
             _roles = roles;
             _hasDesiredStartList = new List<bool>(new bool[roleCount]);
             _hasLastFrameList    = new List<bool>(new bool[roleCount]);
@@ -552,6 +556,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             roleIndex < _hasLastFrameList.Count &&
             _hasLastFrameList[roleIndex];
     }
+
+       
+
+
 
     }
 }

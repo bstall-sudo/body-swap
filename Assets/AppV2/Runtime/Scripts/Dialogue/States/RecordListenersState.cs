@@ -239,10 +239,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 if (_flow._data.GoToSpeakerState)
                 {
-                    _flow.ListenerStateExitAutoSelection();
+                    //testweise entfernt
+                    //_flow.ListenerStateExitAutoSelection();
                 }
                 
-                
+                _flow.ListenerStateExitAutoSelection();
                 
                 
                 

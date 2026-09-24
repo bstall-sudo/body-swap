@@ -43,6 +43,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Objekt mit ConversationStage Script Komponente")]
         public ConversationStage Stage; 
 
+        private bool _simpleInputMode;
+
         //damit man merkt, wann es vom Listener zum Speaker wechselt.
         [SerializeField] 
         [Header("Objekt mit ConversationStatusUI-Script Komponente")]
@@ -50,10 +52,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public ConversationStatusUI StatusUI => statusUI;
         public bool _xrMode;
 
-        string _currentNpcGroupId = "";
+        private string _currentNpcGroupId = "";
+
+        private float _maxHeightDifference;
 
         private void Awake()
         {
+            _simpleInputMode = Stage.simpleInputMode;
+
+            _maxHeightDifference = Stage._maxHeightDifferenceForNpcTrigger;
+
+            if (_simpleInputMode)
+            {
+                XRInput.SetInputMode(XRInputEvents.InputMode.Simple);
+            }
+            else
+            {
+                XRInput.SetInputMode(XRInputEvents.InputMode.Standard);
+            }
             _data = new FlowStateData();
             _data.Initialize(Stage.roles);
             _startInPlaybackFullConversationMode = Stage.StartInPlaybackFullConversationMode;
@@ -549,19 +565,43 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
 
-        public bool IsPlayerNearNpc(int roleIndex, Transform player, float radius)
+        public bool IsPlayerNearNpc(
+            int roleIndex,
+            Transform player,
+            float radius,
+            float maxHeightDifference = 2.5f)
         {
-            if(roleIndex < 0 || roleIndex > _data.AllRoleCount)
+            if (roleIndex < 0 || roleIndex >= _data.AllRoles.Count)
             {
-                UnityEngine.Debug.LogError("[FlowController]: roleIndex is out of Range");
+                Debug.LogError(
+                    "[FlowController]: roleIndex is out of Range"
+                );
+                return false;
             }
-            RoleRig npc = _data.AllRoles[roleIndex];
-            float distance = Vector3.Distance(
-                npc.root.position,
-                player.position
-            );
 
-            return distance <= radius;
+            RoleRig npc = _data.AllRoles[roleIndex];
+
+            Vector3 npcPos = npc.root.position;
+            Vector3 playerPos = player.position;
+
+            // Höhenunterschied separat prüfen
+            float heightDifference =
+                Mathf.Abs(npcPos.y - playerPos.y);
+
+            if (heightDifference > maxHeightDifference)
+                return false;
+
+            // Nur horizontale Distanz X/Z
+            Vector2 npcXZ =
+                new Vector2(npcPos.x, npcPos.z);
+
+            Vector2 playerXZ =
+                new Vector2(playerPos.x, playerPos.z);
+
+            float horizontalDistance =
+                Vector2.Distance(npcXZ, playerXZ);
+
+            return horizontalDistance <= radius;
         }
 
 //diese Funktion schaut, ob der Spieler in der Nähe von Figuren mit PreRecordedScenes ist, abhängig von der adjustFlowStateData 
@@ -590,7 +630,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 if (!IsPlayerNearNpc(
                         passiveIndex,
                         _data.AllRoles[playerIndex].root,
-                        radius))
+                        radius, _maxHeightDifference))
                 {
                     continue;
                 }

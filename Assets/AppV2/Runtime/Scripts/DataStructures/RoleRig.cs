@@ -27,9 +27,19 @@ namespace AppV2.Runtime.Scripts.DataStructures
         
         
         public string npcGroupId;           // z.B. "NpcGroup1"
+        public bool alignWithPlayer;
+
+        [NonSerialized]
+        public bool hasPlayerAlignment;
+
+        [NonSerialized]
+        public float playerAlignmentYawOffset;
+       
         public bool hasPreRecordedTakes = false;
         public bool hasPlayedBackPreRecordedTakes = false;
         public bool isActiveConversationPartner = true;
+
+
         public string takeSource; // Pfad zur importierten Session / Take-Datei
 
         public string sourceSessionId;
