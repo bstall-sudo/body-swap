@@ -35,6 +35,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool simpleInputMode=true;
         public bool loseConversationPartnersIfTooFarAway= true;
         public float distanceToLoseActiveConversationPartner = 10F;
+        public float distanceToReactivatePassiveRole = 3f;
 
         [Header("NPC Imports")]
         [Range(0,6)]
@@ -115,8 +116,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public float heightOfPlayerCm = 180f;
         public float heightOfSeatedPlayerCm = 133f;
 
-        [SerializeField] private float fallbackFootSpacing = 0.2f;
-        [SerializeField] private float fallbackHipHeight = 0.9f;
+        [SerializeField] public float fallbackFootSpacing = 0.2f;
+        [SerializeField] public float fallbackHipHeight = 0.9f;
 
         public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
@@ -731,7 +732,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool allowTeleportation = false;
 
         public bool ProceduralHipAndFeetMove = false;
-        public bool AvatarPlacementAtStart = true;
+        
 
         [Header("Start im Playback Mode. Grundeinstellung: letzte Aufnahme, sonst SessionId")]
         public bool StartInPlaybackFullConversationMode = false;
@@ -1088,6 +1089,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void SetEnvironmentId(string id)
         {
             environmentId = id;
+        }
+
+        public void SetStageSpawnId(string id)
+        {
+            stageSpawnId = id;
         }
 
         public void PlaceStageRoot(Transform spawn)

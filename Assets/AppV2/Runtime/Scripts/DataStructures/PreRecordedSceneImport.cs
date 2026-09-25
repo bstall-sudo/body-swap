@@ -9,11 +9,15 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public string npcGroupId = "NpcGroup_";
 
         public string sessionSourcePath;
+    
         public string workshopFolderName;
+        
         public string sessionFolderName;
         public string sessionId;
 
         public bool alignWithPlayer = false;
+
+        public bool canBecomeActiveConversationPartner = true;
         
 
         public string npcGroupSpawnId = "default";

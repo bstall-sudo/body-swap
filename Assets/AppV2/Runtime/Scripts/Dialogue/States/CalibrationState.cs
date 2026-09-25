@@ -8,7 +8,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private readonly FlowController _flow;
         private int _currentRoleIndexForCalibration;
         private bool selectableNext;
-        private bool _avatarPlacementAtStart;
+       
 
         private bool _seatedMode;
 
@@ -65,7 +65,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
 
             _currentRoleIndexForCalibration = 0;
-            _avatarPlacementAtStart = _flow.Stage.AvatarPlacementAtStart;
+            
             
             _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
 
@@ -195,19 +195,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             _flow.Stage.SaveTargetTransformsAfterCalibration();
 
-            if(_avatarPlacementAtStart){
-                _flow.SetState(new AvatarPlacementState(_flow));
+          
+            _flow.SetState(new AvatarPlacementState(_flow));
 
-            }else{
-                if (selectableNext)
-                {
-                    _flow.SetState(new ChooseSpeakerState(_flow));
-                }
-                else
-                {
-                    _flow.SetState(new RecordSpeakerState(_flow));
-                }
-            }
+   
 
 
         }

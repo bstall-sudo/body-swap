@@ -1,0 +1,64 @@
+Presets:
+
+was muss gespeichert werden:
+
+EnvironmentSettings:
+string EnvironmentId,
+string StageSpawnId,
+bool LoseConversationPartnersIfTooFarAway,
+float DistanceToLoseConversationPartner,
+float DistanceToReactivatePassiveRole,
+float RadiusNpcStartTalking,
+float MaxHeightDifferenceForNpcTrigger,
+
+
+PlayerSettings:
+int HeightOfPlayerCm,
+int HeightOfSeatedPlayerCm,
+float FallbackRootSpacing,
+float FallbackHipHeight,
+float FallbackFootSpacing,
+int AvatarBaseHeightCm,
+
+
+ControlSettings:
+bool SimpleInputMode,
+bool FullBodyTrackers,
+bool SeatedMode,
+bool AllowTeleportation,
+bool ProceduralHipAndFeetMove,
+float SmoothAlign,
+bool SelectableNext,
+
+
+StartRolesSettings:
+int RoleCount,
+
+per Role:
+string AvatarId,
+int HeightOfRoleCm,
+int HeightOfSeatedRoleCm,
+bool HasInitialStartPose,
+vector3 InitialStartPos,
+float initialStartYawDeg,
+
+NpcSettings:
+int PreRecordedSceneCount,
+
+Per NpcGroup:
+bool Enabled, 
+string NpcGroupId,
+(Im ConversationStage Unity-Editor gibt es den SessionSourcePath, aber den speichert man vielleicht besser nicht, sondern setzt ihn dann zusammen aus ApplicationPersistentDataPath/MainFolder/WorkshopFolder/SessionFolderName/SessionId?),
+string MainFolderName -> SessionRecordingData, (Der ist zwar zurzeit immer gleich, aber er kommt halt trotzdem vor...) 
+string WorkshopFolderName,
+string SessionFolderName,
+string SessionId,
+bool AlignWithPlayer,
+string NpcGroupSpawnId,
+(Die Anzahl Rollen ist im session.json schon vorhanden. hier bspw. 2 Rollen
+mögliche Overrides):
+AvatarIdOverride for RoleId: A -> langohr_001,
+AvatarIdOverride for RoleId: B -> froschmann_001
+
+
+
