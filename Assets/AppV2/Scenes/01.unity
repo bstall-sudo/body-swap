@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.31565198, g: 0.57909095, b: 0.754717, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1.73
+  m_AmbientIntensity: 4.46
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.34117648, g: 0.42745098, b: 0.43529412, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -11035,7 +11035,7 @@ MonoBehaviour:
   ProceduralHipAndFeetMove: 1
   StartInPlaybackFullConversationMode: 0
   _sessionFolder: 
-  selectableNext: 1
+  selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
   XrRightHand: {fileID: 1652029214}

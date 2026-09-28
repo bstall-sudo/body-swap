@@ -38,7 +38,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public float distanceToReactivatePassiveRole = 3f;
 
         [Header("NPC Imports")]
-        [Range(0,6)]
+        [Range(0,15)]
         public int preRecordedSceneCount = 0;
 
         public float _radiusNpcStartTalking = 5;
@@ -90,7 +90,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Min(1)]
         public int roleCount = 2;
 
-        private int maxRoleCount = 6;
+        private int maxRoleCount = 20;
         // This is used, so that CalibrationState can call Methods from AvatarRigFollower and AvatarRigDefinition 
         // e.g. set avatars visible invisible, set rot/pos of RolesVisual Targets (Cubes) to IkChainTargets.  
         [SerializeField] private AvatarCalibrationController avatarCalibration;
