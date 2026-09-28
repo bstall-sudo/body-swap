@@ -362,7 +362,7 @@ Transform:
   m_GameObject: {fileID: 287533507}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15.12, y: 0.343, z: 0.25}
+  m_LocalPosition: {x: -15.120001, y: 0.24868792, z: 0.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -382,6 +382,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: gast_weit_weg_lobby
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &302248637
 GameObject:
   m_ObjectHideFlags: 0
@@ -783,7 +788,7 @@ Transform:
   m_GameObject: {fileID: 430044270}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.03, y: 0.181, z: 3.09}
+  m_LocalPosition: {x: 13.029999, y: 0.14826259, z: 3.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -803,6 +808,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: rezeptionist
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &481883968
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,7 +1056,7 @@ Transform:
   m_GameObject: {fileID: 613201276}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -28.98, y: 0.35, z: 0}
+  m_LocalPosition: {x: -28.98, y: 0.7408197, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1065,6 +1075,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: gast_draussen
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &732327631
 GameObject:
   m_ObjectHideFlags: 0
@@ -2356,7 +2371,7 @@ Transform:
   m_GameObject: {fileID: 1345189517}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -22.27, y: 26.23, z: -142.49}
+  m_LocalPosition: {x: -22.27, y: 26.203484, z: -142.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2376,6 +2391,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: tenge
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &1355092466
 GameObject:
   m_ObjectHideFlags: 0
@@ -2687,7 +2707,7 @@ Transform:
   m_GameObject: {fileID: 1802775721}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.53, y: 0.181, z: -2.4}
+  m_LocalPosition: {x: 18.53, y: 0.118768856, z: -2.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2707,6 +2727,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: default
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &1868765965
 GameObject:
   m_ObjectHideFlags: 0
@@ -2733,7 +2758,7 @@ Transform:
   m_GameObject: {fileID: 1868765965}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.11, y: 0.106, z: -2.55}
+  m_LocalPosition: {x: 13.109999, y: 0.048482515, z: -2.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2753,6 +2778,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: gast_rezeption
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &1944631866
 GameObject:
   m_ObjectHideFlags: 0
@@ -2779,7 +2809,7 @@ Transform:
   m_GameObject: {fileID: 1944631866}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -53.4, y: 21.7, z: -41.47}
+  m_LocalPosition: {x: -53.4, y: 21.630745, z: -41.47}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2799,6 +2829,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: roterHimmel
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  searchUp: 2
+  searchDown: 5
 --- !u!1001 &5552359310995310518
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2868,6 +2903,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1079614459380524174, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 21.630745
+      objectReference: {fileID: 0}
     - target: {fileID: 1694033810169683350, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_Name
       value: HotelStockwerke
@@ -2924,9 +2963,25 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -26.67
       objectReference: {fileID: 0}
+    - target: {fileID: 3187327841491011939, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 24.462223
+      objectReference: {fileID: 0}
+    - target: {fileID: 3716292417066617991, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 26.203484
+      objectReference: {fileID: 0}
+    - target: {fileID: 4234419816009692191, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.8719908
+      objectReference: {fileID: 0}
     - target: {fileID: 4326600074034479751, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_Name
       value: LandschaftGruen
+      objectReference: {fileID: 0}
+    - target: {fileID: 4469790254555175558, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.8243375
       objectReference: {fileID: 0}
     - target: {fileID: 6121140222778985872, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2956,9 +3011,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 361.026
       objectReference: {fileID: 0}
+    - target: {fileID: 6535363856386729725, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.109999
+      objectReference: {fileID: 0}
+    - target: {fileID: 6535363856386729725, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.048482515
+      objectReference: {fileID: 0}
     - target: {fileID: 7602919065167207892, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7688922058963900116, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 22.422401
+      objectReference: {fileID: 0}
+    - target: {fileID: 7717514667307322760, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.118768856
+      objectReference: {fileID: 0}
+    - target: {fileID: 7764248246945478142, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 17.544905
+      objectReference: {fileID: 0}
+    - target: {fileID: 7840291075890892115, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.7408197
       objectReference: {fileID: 0}
     - target: {fileID: 7939769486322848288, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2972,13 +3051,33 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -57.2
       objectReference: {fileID: 0}
+    - target: {fileID: 7960214166452774323, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15.120001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960214166452774323, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.24868792
+      objectReference: {fileID: 0}
+    - target: {fileID: 8447694282129808224, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.029999
+      objectReference: {fileID: 0}
+    - target: {fileID: 8447694282129808224, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.14826259
+      objectReference: {fileID: 0}
     - target: {fileID: 8827827258431270469, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_Name
       value: HotelLobby_002
       objectReference: {fileID: 0}
     - target: {fileID: 8827827258431270469, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9031321008640587509, guid: 377da6678cfc03f449e310e81b5e1083, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 15.501108
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -3394,6 +3493,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -5143123357161247900, guid: 570821e2f6494274994735c3f2847999, type: 3}
+--- !u!1001 &8349337391013093248
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.02169
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -11.34177
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 31.72451
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2809118455730201386, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7282061116930728918, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
+      propertyPath: m_Name
+      value: HotelUndLobby
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1e16fbab2f7fddd4a8c8f48054d7e81f, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3401,3 +3557,4 @@ SceneRoots:
   - {fileID: 935594526}
   - {fileID: 7924710565524134884}
   - {fileID: 5552359310995310518}
+  - {fileID: 8349337391013093248}

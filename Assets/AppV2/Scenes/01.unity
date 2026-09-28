@@ -10915,21 +10915,30 @@ MonoBehaviour:
   environmentLoader: {fileID: 1729402803}
   sceneLoader: {fileID: 793401280}
   environmentId: HotelUndLobby_01
-  stageSpawnId: 00
-  simpleInputMode: 0
-  loseConversationPartnersIfTooFarAway: 0
-  distanceToLoseActiveConversationPartner: 100
-  distanceToReactivatePassiveRole: 50
-  preRecordedSceneCount: 0
-  _radiusNpcStartTalking: 500
-  _maxHeightDifferenceForNpcTrigger: 2555
-  preRecordedScenes: []
+  stageSpawnId: gast_draussen
+  simpleInputMode: 1
+  loseConversationPartnersIfTooFarAway: 1
+  distanceToLoseActiveConversationPartner: 10
+  distanceToReactivatePassiveRole: 3
+  preRecordedSceneCount: 1
+  _radiusNpcStartTalking: 5
+  _maxHeightDifferenceForNpcTrigger: 2.5
+  preRecordedScenes:
+  - enabled: 1
+    npcGroupId: NpcGroup1
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\HeyHelloWieGehtsBaer
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: HotelLobby
+    sessionId: HeyHelloWieGehtsBaer
+    alignWithPlayer: 1
+    canBecomeActiveConversationPartner: 1
+    npcGroupSpawnId: haus2
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
   _workshopFolderName: PreRecordingTest_01
   _personalFolderName: multiplePreRecorded
-  roleCount: 3
+  roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
@@ -11018,142 +11027,10 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: baer_001
-    roleSpawnId: 
-    roleId: B
-    slotId: B
-    sourceRoleId: 
-    roleIndex: 1
-    sourceRoleIndex: 1
-    npcGroupId: 
-    alignWithPlayer: 0
-    hasPreRecordedTakes: 0
-    hasPlayedBackPreRecordedTakes: 0
-    isActiveConversationPartner: 1
-    takeSource: 
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 780788515}
-    roleRoot: {fileID: 780788514}
-    root: {fileID: 1106718683}
-    head: {fileID: 1466196902}
-    leftHand: {fileID: 1396646244}
-    rightHand: {fileID: 632902929}
-    leftFoot: {fileID: 291678139}
-    rightFoot: {fileID: 1140240597}
-    hip: {fileID: 1822376785}
-    hipSolver: {fileID: 1822376786}
-    leftFootSolver: {fileID: 291678135}
-    rightFootSolver: {fileID: 1140240598}
-    audioSource: {fileID: 529194169}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 689874910}
-    visualRolesVisibility: {fileID: 1899071022}
-    sittingIdle: 0
-    avatarRoot: {fileID: 715581305}
-    avatarName: 
-    avatar: {fileID: 715581306}
-    rigFollower: {fileID: 715581307}
-    visualRigFollower: {fileID: 1899071023}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: esel_001
-    roleSpawnId: 
-    roleId: C
-    slotId: C
-    sourceRoleId: 
-    roleIndex: 2
-    sourceRoleIndex: 2
-    npcGroupId: 
-    alignWithPlayer: 0
-    hasPreRecordedTakes: 0
-    hasPlayedBackPreRecordedTakes: 0
-    isActiveConversationPartner: 1
-    takeSource: 
-    sourceSessionId: 
-    sourceWorkshopFolderName: 
-    sourceSessionFolderName: 
-    avatarLoader: {fileID: 1793231928}
-    roleRoot: {fileID: 1793231927}
-    root: {fileID: 2052147253}
-    head: {fileID: 1118498817}
-    leftHand: {fileID: 809324112}
-    rightHand: {fileID: 661055649}
-    leftFoot: {fileID: 491648282}
-    rightFoot: {fileID: 1803523710}
-    hip: {fileID: 1742463763}
-    hipSolver: {fileID: 1742463764}
-    leftFootSolver: {fileID: 491648278}
-    rightFootSolver: {fileID: 1803523711}
-    audioSource: {fileID: 124318373}
-    heightOfRoleCm: 180
-    heightOfSeatedRoleCm: 133
-    hasInitialStartPose: 0
-    initialStartPos: {x: 0, y: 0, z: 0}
-    initialStartYawDeg: 0
-    preRecordedStartRootPose:
-      LocalPosition: {x: 0, y: 0, z: 0}
-      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-    visualRigRoot: {fileID: 2139258669}
-    visualRolesVisibility: {fileID: 1818411481}
-    sittingIdle: 0
-    avatarRoot: {fileID: 398669106}
-    avatarName: 
-    avatar: {fileID: 398669107}
-    rigFollower: {fileID: 398669108}
-    visualRigFollower: {fileID: 1818411482}
-    visualGroundOffsetY: 0
-    usePlayerHeightAsDefault: 1
-    preRecordedCalibration:
-      headTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightHandTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      hipTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      leftFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-      rightFootTarget:
-        LocalPosition: {x: 0, y: 0, z: 0}
-        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   UseXR: 1
   SmoothAlignSeconds: 0.1
-  FullBodyTrackers: 1
-  SeatedMode: 1
+  FullBodyTrackers: 0
+  SeatedMode: 0
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   StartInPlaybackFullConversationMode: 0
