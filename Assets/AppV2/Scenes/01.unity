@@ -941,6 +941,7 @@ Transform:
   - {fileID: 1020266747}
   - {fileID: 434795073}
   - {fileID: 385245928}
+  - {fileID: 232354965}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &61080435
@@ -1240,6 +1241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Config.PresetController
   conversationStage: {fileID: 793401274}
+  configurationUI: {fileID: 232354966}
 --- !u!4 &88413066
 Transform:
   m_ObjectHideFlags: 0
@@ -3058,6 +3060,77 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231338012}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &232354964
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 232354965}
+  - component: {fileID: 232354966}
+  m_Layer: 0
+  m_Name: WorkshopConfigurationUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &232354965
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232354964}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 56014208}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &232354966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232354964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c777f16fa3bc6d743b7ee7d06d112385, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Dialogue.UI.WorkshopConfigurationUI
+  menuRoot: {fileID: 0}
+  presetDropdown: {fileID: 0}
+  loadPresetButton: {fileID: 0}
+  savePresetButton: {fileID: 0}
+  savePresetAsButton: {fileID: 0}
+  presetNameInput: {fileID: 0}
+  environmentIdInput: {fileID: 0}
+  stageSpawnIdInput: {fileID: 0}
+  playerHeightInput: {fileID: 0}
+  seatedPlayerHeightInput: {fileID: 0}
+  fallbackRootSpacingInput: {fileID: 0}
+  fallbackHipHeightInput: {fileID: 0}
+  fallbackFootSpacingInput: {fileID: 0}
+  avatarBaseHeightInput: {fileID: 0}
+  simpleInputModeToggle: {fileID: 0}
+  fullBodyTrackersToggle: {fileID: 0}
+  seatedModeToggle: {fileID: 0}
+  allowTeleportationToggle: {fileID: 0}
+  proceduralHipAndFeetMoveToggle: {fileID: 0}
+  selectableNextToggle: {fileID: 0}
+  smoothAlignInput: {fileID: 0}
+  loseConversationPartnersToggle: {fileID: 0}
+  distanceToLosePartnerInput: {fileID: 0}
+  distanceToReactivateRoleInput: {fileID: 0}
+  npcTriggerRadiusInput: {fileID: 0}
+  maxHeightDifferenceInput: {fileID: 0}
+  startWorkshopButton: {fileID: 0}
 --- !u!1 &232546620
 GameObject:
   m_ObjectHideFlags: 0
@@ -3371,6 +3444,22 @@ MonoBehaviour:
     isExternal: 0
   - avatarId: schneemann_001
     prefab: {fileID: 7054019189590878310, guid: 8baa22ba975e13547b0c5e85f3ee813c, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: kuerbiskopf_001
+    prefab: {fileID: 8914687094006140283, guid: 9ae2f64c261b5394b9c9ba6fb37afaff, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: hornmonster_001
+    prefab: {fileID: 7484481463373692753, guid: d677cd07f976f7444b7c4dfd597c0ff4, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: hornmonster_001
+    prefab: {fileID: 7484481463373692753, guid: d677cd07f976f7444b7c4dfd597c0ff4, type: 3}
+    sourcePath: 
+    isExternal: 0
+  - avatarId: adabadenixe_001
+    prefab: {fileID: 9020908024229155621, guid: 6537a43fa962c134cb0582bb03b63c38, type: 3}
     sourcePath: 
     isExternal: 0
 --- !u!1 &241298607
@@ -24830,6 +24919,8 @@ MonoBehaviour:
   XRInput: {fileID: 408572368}
   Stage: {fileID: 32639113}
   statusUI: {fileID: 1579606410}
+  configurationUI: {fileID: 0}
+  presetController: {fileID: 0}
   _xrMode: 0
 --- !u!4 &1662749376
 Transform:
@@ -32671,6 +32762,8 @@ MonoBehaviour:
   XRInput: {fileID: 1418234168}
   Stage: {fileID: 793401274}
   statusUI: {fileID: 385245927}
+  configurationUI: {fileID: 232354966}
+  presetController: {fileID: 88413065}
   _xrMode: 0
 --- !u!4 &2099971728
 Transform:
