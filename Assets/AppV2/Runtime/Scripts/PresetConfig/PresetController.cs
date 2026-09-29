@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using AppV2.Runtime.Scripts.Dialogue;
+using AppV2.Runtime.Scripts.Dialogue.UI;
 using AppV2.Runtime.Scripts.DataStructures;
 
 namespace AppV2.Runtime.Scripts.Config
@@ -13,6 +14,13 @@ namespace AppV2.Runtime.Scripts.Config
         private ConversationStage conversationStage;
 
         private PresetStore _presetStore;
+
+        [SerializeField]
+        private WorkshopConfigurationUI configurationUI;
+
+        private PresetConfig _currentConfig;
+
+        public PresetConfig CurrentConfig => _currentConfig;
 
 
         // ============================================================
@@ -29,6 +37,46 @@ namespace AppV2.Runtime.Scripts.Config
                     "[PresetController] ConversationStage is not assigned."
                 );
             }
+        }
+
+        public void BeginConfiguration()
+        {
+            if (configurationUI == null)
+            {
+                Debug.LogError(
+                    "[PresetController] WorkshopConfigurationUI is missing."
+                );
+                return;
+            }
+
+            // Für den Moment:
+            // Aktuelle Inspector-Einstellungen als Ausgangskonfiguration verwenden.
+            _currentConfig = CreateConfigFromCurrentStage(
+                "current",
+                "Current Configuration"
+            );
+
+            if (_currentConfig == null)
+            {
+                Debug.LogError(
+                    "[PresetController] Could not create current configuration."
+                );
+                return;
+            }
+
+            // Vorhandene Presets ins Dropdown
+            var presetIds = _presetStore.GetAllPresetIds();
+
+            configurationUI.SetPresetOptions(presetIds);
+
+            // Aktuelle Werte in UI schreiben
+            configurationUI.DisplayConfig(_currentConfig);
+
+            configurationUI.Show();
+
+            Debug.Log(
+                "[PresetController] Configuration UI initialized."
+            );
         }
 
 

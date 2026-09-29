@@ -16,6 +16,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         RecordRemainingIdlesAfterPreRecordedEncounterState,
 
         PlaybackFullPreRecordedScenes,
+
+        SceneConfigurationState,
+        
         Idle,
         Test
     }

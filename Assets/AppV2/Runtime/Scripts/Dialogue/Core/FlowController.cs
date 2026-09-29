@@ -6,6 +6,7 @@ using AppV2.Runtime.Scripts.Input;
 using AppV2.Runtime.Scripts.Dialogue.States;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.UI;
+using AppV2.Runtime.Scripts.Config;
 
 namespace AppV2.Runtime.Scripts.Dialogue
 {
@@ -50,6 +51,20 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Objekt mit ConversationStatusUI-Script Komponente")]
         private ConversationStatusUI statusUI;
         public ConversationStatusUI StatusUI => statusUI;
+
+        [SerializeField]
+        private WorkshopConfigurationUI configurationUI;
+
+        public WorkshopConfigurationUI ConfigurationUI =>
+            configurationUI;
+
+        [SerializeField]
+        private PresetController presetController;
+
+        public PresetController PresetController =>
+            presetController;
+
+        
         public bool _xrMode;
 
         private string _currentNpcGroupId = "";
@@ -102,7 +117,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }else{
                 if(_xrMode){
                    
-                    SetState(new CalibrationState(this));
+                   SetState(new CalibrationState(this));
+                    //SetState(new SceneConfigurationState(this));
                 }else {
                     if(selectableNext)
                     {
