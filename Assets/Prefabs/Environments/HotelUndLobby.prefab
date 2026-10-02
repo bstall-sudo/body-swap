@@ -228,7 +228,7 @@ MonoBehaviour:
   spawnId: rezeptionist
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &920204900104902302
@@ -279,7 +279,7 @@ MonoBehaviour:
   spawnId: roteBurg1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &954319105978323788
@@ -330,7 +330,7 @@ MonoBehaviour:
   spawnId: gast_rezeption
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &1311661191918489799
@@ -658,7 +658,7 @@ MonoBehaviour:
   spawnId: roterHimmel
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &2113613950060258841
@@ -822,7 +822,7 @@ MonoBehaviour:
   spawnId: gast_draussen
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &2685355222041703013
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   spawnId: haus2
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &3444876010431616182
@@ -1733,7 +1733,7 @@ MonoBehaviour:
   spawnId: haus1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &4392669670573421781
@@ -1923,7 +1923,7 @@ MonoBehaviour:
   spawnId: default
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &5382314284961287664
@@ -1974,7 +1974,7 @@ MonoBehaviour:
   spawnId: superman
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &5863072100273940261
@@ -2339,7 +2339,7 @@ MonoBehaviour:
   spawnId: gast_weit_weg_lobby
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &7067039435142444277
@@ -2660,7 +2660,7 @@ MonoBehaviour:
   spawnId: aussichtBaumBurg
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &8186244699823884524
@@ -2711,7 +2711,7 @@ MonoBehaviour:
   spawnId: tenge
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1 &9046935485694245129
@@ -2964,7 +2964,7 @@ MonoBehaviour:
   spawnId: bruecke1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   searchUp: 2
   searchDown: 5
 --- !u!1001 &1425583661366751517

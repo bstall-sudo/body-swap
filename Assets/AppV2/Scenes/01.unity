@@ -3099,7 +3099,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 232354964}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c777f16fa3bc6d743b7ee7d06d112385, type: 3}
   m_Name: 
@@ -11013,24 +11013,90 @@ MonoBehaviour:
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
-  preRecordedSceneCount: 1
+  preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
   - enabled: 1
-    npcGroupId: NpcGroup1
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\HotelLobby\HeyHelloWieGehtsBaer
+    npcGroupId: npc
+    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\haus2\hornmonster_haus_2
     workshopFolderName: preRecordedScenes
-    sessionFolderName: HotelLobby
-    sessionId: HeyHelloWieGehtsBaer
+    sessionFolderName: haus2
+    sessionId: hornmonster_haus_2
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
-    npcGroupSpawnId: haus2
-  importedNpcRoles: []
+    npcGroupSpawnId: haus1
+  importedNpcRoles:
+  - avatarId: 
+    roleSpawnId: 
+    roleId: 
+    slotId: 
+    sourceRoleId: 
+    roleIndex: 0
+    sourceRoleIndex: 0
+    npcGroupId: 
+    alignWithPlayer: 0
+    hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
+    isActiveConversationPartner: 0
+    takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
+    avatarLoader: {fileID: 0}
+    roleRoot: {fileID: 0}
+    root: {fileID: 0}
+    head: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightHand: {fileID: 0}
+    leftFoot: {fileID: 0}
+    rightFoot: {fileID: 0}
+    hip: {fileID: 0}
+    hipSolver: {fileID: 0}
+    leftFootSolver: {fileID: 0}
+    rightFootSolver: {fileID: 0}
+    audioSource: {fileID: 0}
+    heightOfRoleCm: 0
+    heightOfSeatedRoleCm: 0
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+    visualRigRoot: {fileID: 0}
+    visualRolesVisibility: {fileID: 0}
+    sittingIdle: 0
+    avatarRoot: {fileID: 0}
+    avatarName: 
+    avatar: {fileID: 0}
+    rigFollower: {fileID: 0}
+    visualRigFollower: {fileID: 0}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 0
+    preRecordedCalibration:
+      headTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      hipTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: PreRecordingTest_01
-  _personalFolderName: multiplePreRecorded
+  _workshopFolderName: preRecordedScenes
+  _personalFolderName: haus2
   roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
@@ -11054,7 +11120,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: froschmann_001
+  - avatarId: hornmonster_001
     roleSpawnId: 
     roleId: A
     slotId: A
