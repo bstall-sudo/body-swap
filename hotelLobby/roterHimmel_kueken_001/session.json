@@ -1,0 +1,139 @@
+{
+  "SessionId": "roterHimmel_kueken_001",
+  "CreatedUtc": "2026-09-30T07:45:19.4475532Z",
+  "SessionVersion": 1,
+  "EnvironmentId": "HotelUndLobby_01",
+  "RoleCount": 1,
+  "StageSpawnId": "roterHimmel",
+  "Roles": [
+    {
+      "RoleId": "A",
+      "AvatarId": "kueken_001",
+      "RoleSpawnId": "",
+      "RoleIndex": 0,
+      "RoleName": "BaerSchweinchen",
+      "HeightOfRoleCm": 180,
+      "SittingIdle": false,
+      "StartRootPose": {
+        "LocalPosition": {
+          "x": 0.00560760498046875,
+          "y": 0.0,
+          "z": 0.01598358154296875
+        },
+        "LocalRotation": {
+          "x": 0.0,
+          "y": 0.04028603807091713,
+          "z": 0.0,
+          "w": -0.9991881847381592
+        }
+      },
+      "StartRoleRootPose": {
+        "LocalPosition": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "LocalRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": 1.0
+        }
+      },
+      "Calibration": {
+        "headTarget": {
+          "LocalPosition": {
+            "x": 0.04763299971818924,
+            "y": -2.767005205154419,
+            "z": 0.7070358991622925
+          },
+          "LocalRotation": {
+            "x": 0.13235409557819367,
+            "y": 0.00045110558858141303,
+            "z": -0.00343069969676435,
+            "w": -0.9911965131759644
+          }
+        },
+        "leftHandTarget": {
+          "LocalPosition": {
+            "x": 1.788132667541504,
+            "y": -2.4239094257354738,
+            "z": 2.2751119136810304
+          },
+          "LocalRotation": {
+            "x": -0.7397049069404602,
+            "y": -0.3920586407184601,
+            "z": -0.5407836437225342,
+            "w": -0.08172959089279175
+          }
+        },
+        "rightHandTarget": {
+          "LocalPosition": {
+            "x": -0.21401308476924897,
+            "y": -2.3650033473968508,
+            "z": 2.197036027908325
+          },
+          "LocalRotation": {
+            "x": -0.6929808855056763,
+            "y": 0.3178354501724243,
+            "z": 0.6345199346542358,
+            "w": -0.12705403566360475
+          }
+        },
+        "hipTarget": {
+          "LocalPosition": {
+            "x": 0.03466621786355972,
+            "y": -2.938239574432373,
+            "z": -0.07811766117811203
+          },
+          "LocalRotation": {
+            "x": 0.1503564715385437,
+            "y": 0.00000700727105140686,
+            "z": -0.0000010677613317966462,
+            "w": 0.9886319041252136
+          }
+        },
+        "leftFootTarget": {
+          "LocalPosition": {
+            "x": -1.1644260883331299,
+            "y": 0.3012561798095703,
+            "z": 3.1325502395629885
+          },
+          "LocalRotation": {
+            "x": 0.7681233882904053,
+            "y": 0.000003946945071220398,
+            "z": -0.000006211921572685242,
+            "w": 0.6403018832206726
+          }
+        },
+        "rightFootTarget": {
+          "LocalPosition": {
+            "x": 1.2685205936431885,
+            "y": 0.3012561798095703,
+            "z": 3.1324758529663088
+          },
+          "LocalRotation": {
+            "x": 0.7681233882904053,
+            "y": 0.000003891065716743469,
+            "z": -0.000006260350346565247,
+            "w": 0.6403019428253174
+          }
+        }
+      }
+    }
+  ],
+  "Takes": [
+    {
+      "TakeId": "take_0000_A",
+      "RoleId": "A",
+      "DurationSec": 4.460000038146973,
+      "SceneCount": 0,
+      "RoleIndex": 0,
+      "usesPreRecordedCalibration": false,
+      "sourceRoleId": "",
+      "npcGroupId": "",
+      "FramesFile": "take_0000_A.frames.jsonl",
+      "AudioFile": "take_0000_A.wav"
+    }
+  ]
+}

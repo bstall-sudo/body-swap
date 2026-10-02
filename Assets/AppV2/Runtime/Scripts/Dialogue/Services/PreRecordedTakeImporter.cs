@@ -186,7 +186,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                         r => r.RoleIndex == source.sourceRoleIndex
                     );
 
-
+            Debug.Log(
+                $"[ALIGN DEBUG] role={targetRole.roleId}, " +
+                $"alignWithPlayer={targetRole.alignWithPlayer}, " +
+                $"hasPlayerAlignment={targetRole.hasPlayerAlignment}, " +
+                $"player={(player != null ? player.name : "NULL")}"
+            );
             if (targetRole.alignWithPlayer && player != null)
             {
                 
@@ -202,9 +207,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     // Alle folgenden Takes verwenden dasselbe Offset.
                     if (!targetRole.hasPlayerAlignment)
                     {
+                        Quaternion firstBodyLocalRotation =
+                            Quaternion.Euler(
+                                0f,
+                                frames[0].Body.YawDeg,
+                                0f
+                            );
+
                         Quaternion originalStartWorldRotation =
                             roleSpawn.rotation *
-                            sourceRoleMeta.StartRootPose.LocalRotation;
+                            firstBodyLocalRotation;
 
                         Vector3 directionToPlayer =
                             player.position - alignmentPivotWorld;
@@ -228,9 +240,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                             targetRole.hasPlayerAlignment = true;
 
                             Debug.Log(
-                                $"[PreRecordedTakeImporter] Player alignment for " +
-                                $"{targetRole.roleId}: " +
-                                $"{targetRole.playerAlignmentYawOffset:F1}°"
+                                $"[ALIGN ROT DEBUG] role={targetRole.roleId}\n" +
+                                $"roleSpawnYaw={roleSpawn.eulerAngles.y:F1}\n" +
+                                $"sourceStartYaw={sourceRoleMeta.StartRootPose.LocalRotation.eulerAngles.y:F1}\n" +
+                                $"originalStartWorldYaw={originalStartWorldRotation.eulerAngles.y:F1}\n" +
+                                $"directionToPlayer={directionToPlayer}\n" +
+                                $"desiredWorldYaw={desiredWorldRotation.eulerAngles.y:F1}\n" +
+                                $"calculatedOffset={targetRole.playerAlignmentYawOffset:F1}\n" +
+                                $"playerPos={player.position}\n" +
+                                $"pivot={alignmentPivotWorld}"
                             );
                         }
                     }
@@ -323,6 +341,29 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             for (int i = 0; i < frames.Count; i++)
             {
                 Frame frame = frames[i];
+
+                if (i== 0){
+                    Frame firstFrame = frames[0];
+                    Vector3 firstFrameWorldBeforeAlignment =
+                        roleSpawn.TransformPoint(
+                            firstFrame.Body.Pos
+                        );
+
+                    Debug.Log(
+                        $"[NPC IMPORT DEBUG] role={targetRole.roleId}\n" +
+                        $"source first Body.Pos={firstFrame.Body.Pos}\n" +
+                        $"source first Body.Yaw={firstFrame.Body.YawDeg:F1}\n" +
+                        $"roleSpawn pos={roleSpawn.position}\n" +
+                        $"roleSpawn yaw={roleSpawn.eulerAngles.y:F1}\n" +
+                        $"firstFrameWorld BEFORE ALIGN={firstFrameWorldBeforeAlignment}\n" +
+                        $"actual NPC root BEFORE playback={targetRole.root.position}\n" +
+                        $"[SOURCE ROT DEBUG] " +
+                        $"StartRootPoseYaw=" +
+                        $"{sourceRoleMeta.StartRootPose.LocalRotation.eulerAngles.y:F1}, \n" +
+                        $"FirstFrameBodyYaw={frames[0].Body.YawDeg:F1}"
+                    );
+               
+                }
 
 
                 // --------------------------------------------------------

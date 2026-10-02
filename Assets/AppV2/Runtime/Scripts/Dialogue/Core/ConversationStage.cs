@@ -1314,7 +1314,17 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                     roles[targetRoleIndex].roleSpawnId
                                 );
 
-
+                            Debug.Log(
+                                $"[NPC SPAWN DEBUG] role={roles[targetRoleIndex].roleId}\n" +
+                                $"roleSpawnId={roles[targetRoleIndex].roleSpawnId}\n" +
+                                $"CURRENT ROOT pos={roles[targetRoleIndex].root.position}\n" +
+                                $"CURRENT ROOT rot={roles[targetRoleIndex].root.rotation.eulerAngles}\n" +
+                                $"SPAWN name={spawn.name}\n" +
+                                $"SPAWN pos={spawn.transform.position}\n" +
+                                $"SPAWN rot={spawn.transform.rotation.eulerAngles}\n" +
+                                $"STAGE pos={_stageRoot.position}\n" +
+                                $"STAGE rot={_stageRoot.rotation.eulerAngles}"
+                            );
                             bool imported = _preRecordedTakeImporter.ImportTake(
                                 roles[targetRoleIndex],
                                 targetRoleIndex,
