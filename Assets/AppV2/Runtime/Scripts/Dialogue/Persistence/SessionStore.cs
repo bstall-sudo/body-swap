@@ -17,7 +17,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         private string _workshopFolderName ;
 
-        public SessionStore(string appFolder = "AppData", string workshopFolderName= "Workshop", string sessionFolderName = "Sessions") 
+        public SessionStore(string appFolder = "SessionRecordingData", string workshopFolderName= "Workshop", string sessionFolderName = "Sessions") 
         { 
             _appFolder = appFolder; 
             _workshopFolderName = workshopFolderName; 

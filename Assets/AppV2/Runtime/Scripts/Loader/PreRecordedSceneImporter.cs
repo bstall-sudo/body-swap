@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+using System.Xml.Serialization;
 
 namespace AppV2.Runtime.Scripts.Loader
 {
@@ -10,30 +11,38 @@ namespace AppV2.Runtime.Scripts.Loader
     {
         public static List<RoleRig> BuildRoleRigsFromImports(
             List<PreRecordedSceneImport> imports,
-            string sessionRootPath, SessionStore store)
+            SessionStore store)
         {
             List<RoleRig> importedRoles = new List<RoleRig>();
 
             if (imports == null) return importedRoles;
 
+            int i = 0;
+
             foreach (var import in imports)
             {
                 if (import == null || !import.enabled) continue;
-                if (string.IsNullOrWhiteSpace(import.sessionSourcePath)) continue;
+                
+                string npcGroupId = $"NpcGroup{i}";
 
-                string sessionFolder =
-                    Path.Combine(sessionRootPath, import.sessionSourcePath);
+                string sessionRootPath = Path.Combine(
+                Application.persistentDataPath,
+                import.workshopFolderName,
+                import.sessionFolderName,
+                import.sessionId
+                );
 
-                if (!Directory.Exists(sessionFolder))
+
+                if (!Directory.Exists(sessionRootPath))
                 {
-                    Debug.LogWarning($"[PreRecordedSceneImporter] Session folder not found: {sessionFolder}");
+                    Debug.LogWarning($"[PreRecordedSceneImporter] Session folder not found: {sessionRootPath}");
                     continue;
                 }
 
                 // nächster Schritt: session.json lesen
                 // vorerst testweise Rollen aus Dateinamen finden
                 importedRoles.AddRange(
-                    BuildRoleRigsFromImportedSession(import, store)
+                    BuildRoleRigsFromImportedSession(import, store, npcGroupId)
                 );
             }
 
@@ -43,25 +52,21 @@ namespace AppV2.Runtime.Scripts.Loader
 
         public static List<RoleRig> BuildRoleRigsFromImportedSession(
                 PreRecordedSceneImport import,
-                SessionStore store)
+                SessionStore store, string npcGroupId)
             {
                 List<RoleRig> result = new();
 
                 if (import == null || !import.enabled)
                     return result;
 
-                if (string.IsNullOrWhiteSpace(import.sessionSourcePath))
-                {
-                    Debug.LogWarning("[PreRecordedSceneImporter] Missing sessionSourcePath.");
-                    return result;
-                }
+
                 //UnityEngine.Debug.Log($"der SourcePath ist: {import.sessionId}");
                 SessionModel sourceSession =
                     store.LoadSessionModel(import.sessionId, workshopFolderName: import.workshopFolderName, sessionFolderName: import.sessionFolderName);
 
                 if (sourceSession == null)
                 {
-                    Debug.LogError($"[PreRecordedSceneImporter] Could not load source session: {import.sessionSourcePath}");
+                    Debug.LogError($"[PreRecordedSceneImporter] Could not load source session:");
                     return result;
                 }
 
@@ -71,12 +76,13 @@ namespace AppV2.Runtime.Scripts.Loader
                     return result;
                 }
 
+
                 foreach (ConversationRoleMeta meta in sourceSession.Roles)
                 {
                     if (meta == null || string.IsNullOrWhiteSpace(meta.RoleId))
                         continue;
 
-                    string importedRoleId = $"{import.npcGroupId}_{meta.RoleId}";
+                    string importedRoleId = $"{npcGroupId}_{meta.RoleId}";
 
                     RoleRig role = new RoleRig
                     {
@@ -95,11 +101,11 @@ namespace AppV2.Runtime.Scripts.Loader
                         hasPreRecordedTakes = true,
                         isActiveConversationPartner = false,
 
-                        npcGroupId = import.npcGroupId,
+                        npcGroupId = npcGroupId,
                         sourceRoleId = meta.RoleId,
                         sourceRoleIndex = meta.RoleIndex,
 
-                        takeSource = import.sessionSourcePath,
+                        //takeSource = import.sessionSourcePath,
 
                         preRecordedCalibration = meta.Calibration,
 

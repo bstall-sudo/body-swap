@@ -62,6 +62,7 @@ namespace AppV2.Runtime.Scripts.Rig
         {
             for (int i = 0; i < roles.Count; i++)
             {
+                //if (roles[i].hasPreRecordedTakes) continue;
                 PlaceAvatarAtUserPosition(i, playerStagePose);
             }
         }
@@ -258,6 +259,13 @@ namespace AppV2.Runtime.Scripts.Rig
                 role.root.position = spawn.transform.position;
                 role.root.rotation = spawn.transform.rotation;
             }
+
+
+            // TechnicalRoot -> VisualRoot
+            //role.visualRigFollower?.SetVisualRigToPlayerPosition();
+
+            // VisualRoot -> AvatarRoot
+            /*role.rigFollower?.SetAvatarToPlayerPosition();*/
             /*
             Debug.Log(
                 $"[PlaceImportedNpcRoleAtSpawnPoint] {role.roleId} " +

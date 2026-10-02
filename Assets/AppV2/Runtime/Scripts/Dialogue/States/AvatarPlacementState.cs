@@ -47,10 +47,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
 
             }
+            Debug.Log("=== NPC placement-Debug  BEFORE RigUpdatePipeline ===");
+            LogNpcRigPositions();
             ////hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 
             _flow.Stage.RigUpdatePipeline(_allRolesIndices, true);
 
-            
+            Debug.Log("=== NPC placement-Debug AFTER RigUpdatePipeline ===");
+            LogNpcRigPositions();
             
             
         }
@@ -297,11 +300,30 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             // 4. Rolle platzieren
             // ----------------------------------------------------
 
+            Debug.Log(
+                $"[NPC PLACEMENT BEFORE] " +
+                $"role={role.roleId}, " +
+                $"spawnId={role.roleSpawnId}, " +
+                $"npcSpawnWorld={npcGroupSpawn.position}, " +
+                $"startPose={role.preRecordedStartRootPose?.LocalPosition}, " +
+                $"calculatedPlacement={placement}, " +
+                $"rootBeforeLocal={role.root.localPosition}, " +
+                $"rootBeforeWorld={role.root.position}"
+            );
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 roleIndex,
                 placement,
                 rotation,
                 _stageRoot
+            );
+
+            Debug.Log(
+                $"[NPC PLACEMENT AFTER] " +
+                $"role={role.roleId}, " +
+                $"rootAfterLocal={role.root.localPosition}, " +
+                $"rootAfterWorld={role.root.position}, " +
+                $"roleRootLocal={role.roleRoot.localPosition}, " +
+                $"roleRootWorld={role.roleRoot.position}"
             );
 
             /*Debug.Log(
@@ -346,6 +368,25 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.AvatarCalibration.ShowAllRoles();
             _flow.Stage.AvatarCalibration.ShowAllRoles();
 
+        }
+
+        private void LogNpcRigPositions()
+        {
+            for (int i = 0; i < _flow.Stage.roles.Count; i++)
+            {
+                RoleRig role = _flow.Stage.roles[i];
+
+                if (!role.hasPreRecordedTakes)
+                    continue;
+
+                Debug.Log(
+                    $"[NPC RIG POS] NPC placement-Debug   role={role.roleId}\n" +
+                    $"roleRoot.world={role.roleRoot?.position}\n" +
+                    $"technicalRoot.world={role.root?.position}\n" +
+                    $"visualRigRoot.world={role.visualRigRoot?.position}\n" +
+                    $"avatarRoot.world={role.avatarRoot?.position}"
+                );
+            }
         }
 
 

@@ -453,6 +453,26 @@ namespace AppV2.Runtime.Scripts.Rig
                 ? sittingIdleAnimationStateName
                 : standingIdleAnimationStateName;
 
+            Debug.Log(
+                    $"[{name}] PlayIdleAnimation: " +
+                    $"stateName='{stateName}', " +
+                    $"sittingIdle={sittingIdle}, " +
+                    $"controller='{animator.runtimeAnimatorController?.name}'"
+                );
+
+                int hash = Animator.StringToHash(stateName);
+
+                if (!animator.HasState(0, hash))
+                {
+                    Debug.LogError(
+                        $"[{name}] Animator State NICHT GEFUNDEN: '{stateName}' " +
+                        $"in Controller '{animator.runtimeAnimatorController?.name}'"
+                    );
+                    return;
+                }
+
+                animator.Play(stateName, 0, 0f);
+
             animator.Play(stateName, 0, 0f);
             //animator.Play("Base Layer.Sitting Idle", 0, 0f);
             //Debug.Log($"[{name}] PlayIdleAnimation: {stateName}");
@@ -463,7 +483,8 @@ namespace AppV2.Runtime.Scripts.Rig
 
         public void PlayBasePose(AvatarBasePose pose)
         {
-            if (animator == null) return;
+            if (animator == null)
+                return;
 
             string stateName = pose switch
             {
@@ -472,11 +493,30 @@ namespace AppV2.Runtime.Scripts.Rig
                 _ => recordPlaybackStateName
             };
 
-            //animator.Play(stateName, 0, 0f);
-            animator.Play(stateName, 0, 0f);
-            //Debug.Log($"[{name}] PlayBasePose: {stateName}");
-        }
+            int hash = Animator.StringToHash(stateName);
 
+            // Gewünschten State gibt es nicht?
+            if (!animator.HasState(0, hash))
+            {
+                Debug.LogWarning(
+                    $"[{name}] State '{stateName}' für {pose} nicht gefunden. " +
+                    $"Versuche Standing Idle als Fallback."
+                );
+
+                stateName = standingIdleAnimationStateName;
+                hash = Animator.StringToHash(stateName);
+            }
+
+            if (!animator.HasState(0, hash))
+            {
+                Debug.LogError(
+                    $"[{name}] Auch Fallback-State '{stateName}' nicht gefunden."
+                );
+                return;
+            }
+
+            animator.Play(hash, 0, 0f);
+        }
         public void SetLookAtTargetWorldPosition(Vector3 worldPosition)
         {
             if (lookAtTarget == null){

@@ -305,8 +305,7 @@ namespace AppV2.Runtime.Scripts.Config
                         Enabled =
                             npc.enabled,
 
-                        NpcGroupId =
-                            npc.npcGroupId,
+
 
                         CanBecomeActiveConversationPartner =
                             npc.canBecomeActiveConversationPartner,

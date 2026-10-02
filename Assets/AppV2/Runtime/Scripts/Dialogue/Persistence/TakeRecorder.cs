@@ -197,18 +197,40 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             // Rebase einmalig berechnen: measuredStart -> desiredStart
             if (_hasDesiredStart && !_hasRebase)
             {
-                float deltaYaw = Mathf.DeltaAngle(yaw, _desiredStartYaw); // desired - measured (als shortest angle)
+                
+                /*float deltaYaw = Mathf.DeltaAngle(yaw, _desiredStartYaw); // desired - measured (als shortest angle)
                 Quaternion qDelta = YawRot(deltaYaw);
 
                 // rebasePos so, dass: desired = rebasePos + qDelta * measured
                 _rebasePos = _desiredStartPos - (qDelta * bodyPos);
                 _rebaseYawDeg = deltaYaw;
+                _hasRebase = true;*/
+                    // Position und Rotation UNABHÄNGIG voneinander korrigieren
+
+                _rebasePos = _desiredStartPos - bodyPos;
+
+                _rebaseYawDeg = 0f;
+
                 _hasRebase = true;
             }
 
             if (_hasRebase)
             {
-                Quaternion qDelta = Quaternion.Euler(0f, _rebaseYawDeg, 0f);
+                bodyPos += _rebasePos;
+
+                headP_stageLocal += _rebasePos;
+                leftP_stageLocal += _rebasePos;
+                rightP_stageLocal += _rebasePos;
+
+                if (hasHip)
+                    hipP_stageLocal += _rebasePos;
+
+                if (hasLeftFoot)
+                    leftFootP_stageLocal += _rebasePos;
+
+                if (hasRightFoot)
+                    rightFootP_stageLocal += _rebasePos;
+                /*Quaternion qDelta = Quaternion.Euler(0f, _rebaseYawDeg, 0f);
 
                 // Body
                 bodyPos = _rebasePos + (qDelta * bodyPos);
@@ -242,7 +264,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 {
                     rightFootP_stageLocal = _rebasePos + (qDelta * rightFootP_stageLocal);
                     rightFootR_stageLocal = qDelta * rightFootR_stageLocal;
-                }
+                }*/
             }
 
             //optional normalisieren, falls yaw �ber 360 Grad

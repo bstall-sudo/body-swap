@@ -589,6 +589,7 @@ MonoBehaviour:
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
+  bodyYawFollowSpeed: 180
   preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
@@ -26188,13 +26189,12 @@ MonoBehaviour:
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
+  bodyYawFollowSpeed: 180
   preRecordedSceneCount: 1
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
   - enabled: 0
-    npcGroupId: NpcGroup0
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\haus1\2026-09-29-UTC-15-31-10_26
     workshopFolderName: preRecordedScenes
     sessionFolderName: haus1
     sessionId: 2026-09-29-UTC-15-31-10_26
@@ -26202,8 +26202,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus1
   - enabled: 1
-    npcGroupId: NpcGroup1
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\rezeptionistKuerbiskopf_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rezeptionistKuerbiskopf_001
@@ -26211,8 +26209,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rezeptionist
   - enabled: 1
-    npcGroupId: NpcGroup2
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\bruecke1Bart_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: bruecke1Bart_001
@@ -26220,8 +26216,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: bruecke1
   - enabled: 1
-    npcGroupId: NpcGroup3
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\roteBurgTorHornmonster_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgTorHornmonster_001
@@ -26229,8 +26223,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgTor
   - enabled: 1
-    npcGroupId: NpcGroup4
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\tengeGruselfrau_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: tengeGruselfrau_001
@@ -26238,8 +26230,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: tenge
   - enabled: 1
-    npcGroupId: NpcGroup5
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\roterHimmel_kueken_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roterHimmel_kueken_001
@@ -26247,8 +26237,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roterHimmel
   - enabled: 1
-    npcGroupId: NpcGroup6
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\aussichtBaumBurgAffe_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: aussichtBaumBurgAffe_001
@@ -26256,8 +26244,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: aussichtBaumBurg
   - enabled: 1
-    npcGroupId: NpcGroup7
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\roteBurgEckeVorBrueckeKaktus_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgEckeVorBrueckeKaktus_001
@@ -26265,8 +26251,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgEckeVorBruecke
   - enabled: 1
-    npcGroupId: NpcGroup8
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\grueneBurgTreppeFroschmann_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneBurgTreppeFroschmann_001
@@ -26274,8 +26258,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgTreppe
   - enabled: 1
-    npcGroupId: NpcGroup9
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\haus2Schneemann_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus2Schneemann_001
@@ -26283,8 +26265,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus2
   - enabled: 1
-    npcGroupId: NpcGroup10
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\haus1Adabadenixe_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus1Adabadenixe_001
@@ -26292,8 +26272,6 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus1
   - enabled: 1
-    npcGroupId: NpcGroup11
-    sessionSourcePath: C:\Users\berto\AppData\LocalLow\DefaultCompany\bodyswapRECOVERY\SessionRecordingData\preRecordedScenes\hotelLobby\supermanZiegenwolf_001
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: supermanZiegenwolf_001
@@ -26303,14 +26281,14 @@ MonoBehaviour:
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
-  _workshopFolderName: kanguruh_2026_09_30
-  _personalFolderName: rosa
+  _workshopFolderName: PreRecording_Test_Versatz_beheben
+  _personalFolderName: multiplePreRecorded
   roleCount: 1
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 150
+  heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -26400,8 +26378,8 @@ MonoBehaviour:
   SeatedMode: 0
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
-  StartInPlaybackFullConversationMode: 1
-  _sessionFolder: 2026-09-30-UTC-15-22-03_14
+  StartInPlaybackFullConversationMode: 0
+  _sessionFolder: 
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}

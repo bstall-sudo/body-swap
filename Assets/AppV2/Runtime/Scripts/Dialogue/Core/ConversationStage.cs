@@ -37,6 +37,21 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public float distanceToLoseActiveConversationPartner = 10F;
         public float distanceToReactivatePassiveRole = 3f;
 
+        [Header("Wie schnell folgt der Körper einer Kopf-Drehbewegung")]
+        [SerializeField] private float bodyYawFollowSpeed = 180f;
+
+        [Header("Wie schnell sind die Schritte")]
+        [SerializeField] private float _proceduralStepSpeed = 5f;
+
+        public float ProceduralStepSpeed => _proceduralStepSpeed;
+
+        [SerializeField] private float _proceduralStepLength = 0.4f;
+
+        public float ProceduralStepLength => _proceduralStepLength;
+
+        private float _fallbackBodyYaw;
+        private bool _fallbackBodyYawInitialized;
+
         [Header("NPC Imports")]
         [Range(0,15)]
         public int preRecordedSceneCount = 0;
@@ -71,15 +86,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
         
         public void BuildImportedNpcRoles(SessionStore store)
         {
-            string sessionRootPath = Path.Combine(
+            /*string sessionRootPath = Path.Combine(
                 Application.persistentDataPath,
                 _storageFolderName
-            );
+            );*/
 
             importedNpcRoles =
                 PreRecordedSceneImporter.BuildRoleRigsFromImports(
                     preRecordedScenes,
-                    sessionRootPath, store
+                    store
                 );
 
             //Debug.Log($"[ConversationStage] Imported NPC roles: {importedNpcRoles.Count}");
@@ -480,21 +495,29 @@ namespace AppV2.Runtime.Scripts.Dialogue
 */
         private void AddImportedNpcRolesToFreeSlots()
         {
+            int npcGroupIndex = 0;
             foreach (PreRecordedSceneImport import in preRecordedScenes)
             {
+                if (import == null || !import.enabled)
+                    continue;
+
+                string npcGroupId = $"NpcGroup{npcGroupIndex}";
+
                 if (!TryCreatePreRecordedSource(
                         import,
                         out SessionStore sourceStore,
                         out SessionModel sourceSession,
                         out SessionTakeIndex sourceTakeIndex))
                 {
+                    npcGroupIndex++;
                     continue;
                 }
 
                 List<RoleRig> importedRoles =
                     PreRecordedSceneImporter.BuildRoleRigsFromImportedSession(
                         import,
-                        sourceStore
+                        sourceStore,
+                        npcGroupId
                     );
 
                 foreach (RoleRig npcRole in importedRoles)
@@ -541,6 +564,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                             isPreRecordedSource = true
                         };
                 }
+                npcGroupIndex++;
             }
 
             roleCount = roles.Count;
@@ -1809,14 +1833,39 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 yaw = hipRotStageForBody.eulerAngles.y;
             }
             //if does not have Hip, the body position should be derived from the head
-            else
+            /*else
             {
                 bodyPos = headStage;
                 //bodyPos.y = 0f;
                 bodyPos.y = GetGroundYStageLocal(bodyPos);
 
                 yaw = headRotStage.eulerAngles.y;
+            }*/
+            // If there is no hip tracker, derive body position from head.
+        // Body rotation follows head rotation with some inertia.
+        else
+        {
+            bodyPos = headStage;
+            bodyPos.y = GetGroundYStageLocal(bodyPos);
+
+            float headYaw = headRotStage.eulerAngles.y;
+
+            // Beim allerersten Frame auf aktuelle Blickrichtung initialisieren,
+            // damit der Avatar nicht erst von 0° dorthin rotieren muss.
+            if (!_fallbackBodyYawInitialized)
+            {
+                _fallbackBodyYaw = headYaw;
+                _fallbackBodyYawInitialized = true;
             }
+
+            _fallbackBodyYaw = Mathf.MoveTowardsAngle(
+                _fallbackBodyYaw,
+                headYaw,
+                bodyYawFollowSpeed * dt
+            );
+
+            yaw = _fallbackBodyYaw;
+        }
 
 
 
