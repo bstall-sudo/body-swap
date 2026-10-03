@@ -93,8 +93,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 if(!_rolesSetToPlayerPosition)
                 {
-                    _playerPosRot = _flow.Stage.GetPlayerGroundPoseInStage();
-                    _flow.Stage.AvatarCalibration.PlaceAvatarsAtUserPosition(_playerPosRot);
+                    //_playerPosRot = _flow.Stage.GetPlayerGroundPoseInStage();
+                    //_flow.Stage.AvatarCalibration.PlaceAvatarsAtUserPosition(_playerPosRot);
+
+                    _flow.Stage.PlayerAlignForCalibration(_currentRoleIndexForCalibration);
                     _flow.Stage.PlaceMirrorInFrontOfPlayer();
                     _rolesSetToPlayerPosition = true;
                 }

@@ -15,6 +15,7 @@ using AppV2.Runtime.Scripts.Rig;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Gravity;
 
 
+
 namespace AppV2.Runtime.Scripts.Dialogue
 {
        
@@ -1018,7 +1019,35 @@ namespace AppV2.Runtime.Scripts.Dialogue
         //called in CalibrationState
         public void PlaceMirrorInFrontOfPlayer()
         {
-            MirrorSetVisibility.PlaceMirrorInFrontOfAvatar(roles[0].visualRigRoot);
+            if (XrHead == null || _stageRoot == null)
+                return;
+
+            // Nur horizontale Richtung
+            Vector3 forward = XrHead.forward;
+            forward.y = 0f;
+            forward.Normalize();
+
+            // Erst World-Zielposition
+            Vector3 mirrorWorldPos =
+                XrHead.position +
+                forward * MirrorSetVisibility.distanceFromAvatar;
+
+            // World -> Stage Local
+            Vector3 mirrorStageLocal =
+                _stageRoot.InverseTransformPoint(mirrorWorldPos);
+
+            // Boden bestimmen
+            mirrorStageLocal.y =
+                GetGroundYStageLocal(mirrorStageLocal);
+
+            // Stage Local -> World
+            mirrorWorldPos =
+                _stageRoot.TransformPoint(mirrorStageLocal);
+
+            MirrorSetVisibility.PlaceMirrorAtGroundPosition(
+                mirrorWorldPos,
+                XrHead.position
+            );
         }
 
         public void PlaceXrOriginAtStageOrigin()
@@ -2305,7 +2334,138 @@ namespace AppV2.Runtime.Scripts.Dialogue
             */
         }
                                 
-        
+        public void PlayerAlignForCalibration(int roleIndex)
+        {
+            if (XrOrigin == null || XrHead == null || _stageRoot == null)
+            {
+                Debug.LogError("XrOrigin, XrHead or _stageRoot == null");
+                return;
+            }
+
+            if (roleIndex < 0 || roleIndex >= roles.Count)
+            {
+                Debug.LogError($"Invalid roleIndex: {roleIndex}");
+                return;
+            }
+
+            RoleRig role = roles[roleIndex];
+
+            if (role == null || role.root == null)
+            {
+                Debug.LogError($"Role or role.root missing for roleIndex {roleIndex}");
+                return;
+            }
+
+            // ---------------------------------------------------------
+            // 1. Zielposition bestimmen
+            //
+            // Der Avatar steht während der Calibration am Stage-Nullpunkt.
+            // Wir bestimmen dort die Bodenhöhe.
+            // ---------------------------------------------------------
+
+            Vector3 targetGroundStageLocal = Vector3.zero;
+
+            targetGroundStageLocal.y =
+                GetGroundYStageLocal(targetGroundStageLocal);
+
+            Vector3 targetGroundWorld =
+                _stageRoot.TransformPoint(targetGroundStageLocal);
+
+
+            // ---------------------------------------------------------
+            // 2. Zielrotation direkt vom Avatar nehmen
+            //
+            // role.root.rotation ist bereits WORLD SPACE.
+            // Dadurch vermeiden wir Stage-local / World-space Probleme.
+            // ---------------------------------------------------------
+
+            float targetHeadYawWorld = YawOf(_stageRoot.rotation);
+
+            float currentHeadYawWorld =
+                YawOf(XrHead.rotation);
+
+            float currentOriginYawWorld =
+                YawOf(XrOrigin.rotation);
+
+
+            // Wie stark muss das gesamte XR-Rig gedreht werden,
+            // damit der reale Kopf genauso schaut wie der Avatar?
+            float deltaYaw =
+                Mathf.DeltaAngle(
+                    currentHeadYawWorld,
+                    targetHeadYawWorld
+                );
+
+            float targetOriginYawWorld =
+                currentOriginYawWorld + deltaYaw;
+
+
+            // ---------------------------------------------------------
+            // 3. XR Origin SOFORT drehen
+            // ---------------------------------------------------------
+
+            XrOrigin.rotation =
+                Quaternion.Euler(0f, targetOriginYawWorld, 0f);
+
+
+            // ---------------------------------------------------------
+            // 4. Nach der Rotation tatsächliche Head-Position verwenden
+            //
+            // Dadurch müssen wir den Roomscale-Offset nicht selbst
+            // vorausberechnen.
+            // ---------------------------------------------------------
+
+            Vector3 headAfterRotation = XrHead.position;
+
+
+            // Der Kopf soll horizontal über dem Stage-Nullpunkt stehen.
+            // Y interessiert uns hier nicht.
+            Vector3 correction =
+                targetGroundWorld - headAfterRotation;
+
+
+            // ---------------------------------------------------------
+            // 5. XR Origin nur auf X/Z verschieben
+            // ---------------------------------------------------------
+
+            Vector3 newOriginPos = XrOrigin.position;
+
+            newOriginPos.x += correction.x;
+            newOriginPos.z += correction.z;
+
+            // Y bleibt unverändert.
+            XrOrigin.position = newOriginPos;
+
+
+            // ---------------------------------------------------------
+            // 6. Bodenhöhe wie bisher korrigieren
+            // ---------------------------------------------------------
+
+            SnapXrOriginToGroundY(targetGroundWorld.y);
+
+
+            // Kein Tick / Lerp notwendig.
+            _playerAlignActive = false;
+
+
+            // ---------------------------------------------------------
+            // DEBUG
+            // ---------------------------------------------------------
+
+            Debug.Log(
+                $"[CALIBRATION ALIGN]\n" +
+                $"role={role.roleId}\n" +
+                $"targetGroundWorld={targetGroundWorld}\n" +
+                $"targetHeadYawWorld={targetHeadYawWorld:F1}\n" +
+                $"currentHeadYawBefore={currentHeadYawWorld:F1}\n" +
+                $"deltaYaw={deltaYaw:F1}\n" +
+                $"targetOriginYaw={targetOriginYawWorld:F1}\n" +
+                $"XR Origin after={XrOrigin.position}\n" +
+                $"XR Head after={XrHead.position}\n" +
+                $"XR Head yaw after={YawOf(XrHead.rotation):F1}"
+            );
+        }
+
 
 
         public void TickPlayerAlign()

@@ -5,8 +5,8 @@ namespace AppV2.Runtime.Scripts.Rig
     public class MirrorSetVisibility : MonoBehaviour
     {
         [Header("Placement")]
-        [SerializeField] private float distanceFromAvatar = 1.5f;
-        [SerializeField] private float heightOffset = 1.2f;
+        [SerializeField] public float distanceFromAvatar = 1.5f;
+        [SerializeField] private float heightOffset = - 1.2f;
 
         public void ActivateMirror(bool active)
         {
@@ -17,34 +17,36 @@ namespace AppV2.Runtime.Scripts.Rig
             }
         }
 
-        public void PlaceMirrorInFrontOfAvatar(Transform avatarRoot)
+        public void PlaceMirrorAtGroundPosition(
+            Vector3 groundWorldPosition,
+            Vector3 playerWorldPosition)
         {
-            if (avatarRoot == null)
-            {
-                Debug.LogError("[MirrorSetVisibility] avatarRoot is null.");
-                return;
-            }
+            // Spiegel steht auf dem Boden
+            Vector3 mirrorPos = groundWorldPosition;
 
-            // Avatar Position
-            Vector3 avatarPos = avatarRoot.position;
-
-            // Spiegel vor Avatar
-            Vector3 mirrorPos =
-                avatarPos +
-                avatarRoot.forward * distanceFromAvatar;
-
+            // Nur falls Pivot etwas über/unter dem Spiegelboden liegt
             mirrorPos.y += heightOffset;
 
             transform.position = mirrorPos;
 
-            // Spiegel schaut zurück zum Avatar
-            Vector3 lookTarget = avatarPos;
-            lookTarget.y += heightOffset;
 
-            transform.LookAt(lookTarget);
+            // Nur horizontal zum Spieler schauen
+            Vector3 directionToPlayer =
+                playerWorldPosition - mirrorPos;
 
-            // Spiegel umdrehen, damit Vorderseite korrekt zeigt
-            transform.Rotate(0f, 180f, 0f);
+            directionToPlayer.y = 0f;
+
+            if (directionToPlayer.sqrMagnitude > 0.001f)
+            {
+                transform.rotation =
+                    Quaternion.LookRotation(
+                        directionToPlayer.normalized,
+                        Vector3.up
+                    );
+
+                // Falls für dein Spiegelmodell notwendig
+                transform.Rotate(-15f, 180f, 0f);
+            }
         }
     }
 }

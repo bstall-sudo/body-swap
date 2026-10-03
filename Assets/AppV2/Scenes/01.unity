@@ -590,6 +590,8 @@ MonoBehaviour:
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
   bodyYawFollowSpeed: 180
+  _proceduralStepSpeed: 10
+  _proceduralStepLength: 0.4
   preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
@@ -1913,6 +1915,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -2718,6 +2725,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -2966,6 +2978,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -3544,6 +3561,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -6905,6 +6927,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -7068,6 +7095,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -8879,6 +8911,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -9809,6 +9846,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -10174,6 +10216,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -10668,6 +10715,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -11622,6 +11674,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -12510,6 +12567,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -13474,6 +13536,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -16500,6 +16567,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -16945,6 +17017,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -17621,6 +17698,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -17919,6 +18001,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -18408,6 +18495,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -18984,6 +19076,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -19704,6 +19801,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -20401,6 +20503,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -20638,6 +20745,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -21253,6 +21365,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -24617,11 +24734,16 @@ MonoBehaviour:
     m_Bits: 8
   rayStartHeight: 1
   rayLength: 3
-  stepDistance: 0.28
+  stepDistance: 0.5
   stepLength: 0.3
   sideStepLength: 0.12
   stepHeight: 0.12
-  stepSpeed: 5
+  stepSpeed: 10
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.4
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -25789,6 +25911,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -26190,94 +26317,103 @@ MonoBehaviour:
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
   bodyYawFollowSpeed: 180
+  _proceduralStepSpeed: 10
+  _proceduralStepLength: 0.5
   preRecordedSceneCount: 1
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
   - enabled: 0
     workshopFolderName: preRecordedScenes
-    sessionFolderName: haus1
-    sessionId: 2026-09-29-UTC-15-31-10_26
+    sessionFolderName: hotelLobby
+    sessionId: grueneLandschaftEcke1Froschmann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
-    npcGroupSpawnId: haus1
-  - enabled: 1
+    npcGroupSpawnId: grueneLandschaftEcke1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rezeptionistKuerbiskopf_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rezeptionist
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: bruecke1Bart_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: bruecke1
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgTorHornmonster_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgTor
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: tengeGruselfrau_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: tenge
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roterHimmel_kueken_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roterHimmel
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: aussichtBaumBurgAffe_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: aussichtBaumBurg
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgEckeVorBrueckeKaktus_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgEckeVorBruecke
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneBurgTreppeFroschmann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgTreppe
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus2Schneemann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus2
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus1Adabadenixe_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus1
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: supermanZiegenwolf_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: superman
+  - enabled: 1
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: hotelLobby
+    sessionId: rotesDach1Esmeralda_001
+    alignWithPlayer: 1
+    canBecomeActiveConversationPartner: 1
+    npcGroupSpawnId: rotesDach1
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
@@ -26288,7 +26424,7 @@ MonoBehaviour:
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 180
+  heightOfPlayerCm: 150
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -26306,7 +26442,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: hornmonster_001
+  - avatarId: esmeralda_001
     roleSpawnId: 
     roleId: A
     slotId: A
@@ -26335,7 +26471,7 @@ MonoBehaviour:
     leftFootSolver: {fileID: 755449715}
     rightFootSolver: {fileID: 1931955920}
     audioSource: {fileID: 1632719636}
-    heightOfRoleCm: 180
+    heightOfRoleCm: 0
     heightOfSeatedRoleCm: 0
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
@@ -26379,7 +26515,7 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   StartInPlaybackFullConversationMode: 0
-  _sessionFolder: 
+  _sessionFolder: 2026-10-03-UTC-09-50-01_79
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
@@ -27320,6 +27456,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -27609,6 +27750,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -29247,6 +29393,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -32481,6 +32632,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -32749,6 +32905,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -33227,6 +33388,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -34055,6 +34221,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -34229,6 +34400,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -35398,6 +35574,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -36006,6 +36187,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -39319,6 +39505,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -39697,6 +39888,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -41118,6 +41314,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -41401,6 +41602,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -43045,6 +43251,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -44925,6 +45136,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -45678,6 +45894,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -45915,6 +46136,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -47446,6 +47672,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -49533,6 +49764,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -51944,6 +52180,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -52133,6 +52374,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -52402,6 +52648,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -52542,6 +52793,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -58510,6 +58766,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -59297,6 +59558,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -60788,6 +61054,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -61196,6 +61467,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -61860,6 +62136,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -62000,6 +62281,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -62507,6 +62793,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -67284,7 +67575,12 @@ MonoBehaviour:
   stepLength: 0.3
   sideStepLength: 0.12
   stepHeight: 0.12
-  stepSpeed: 5
+  stepSpeed: 10
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -68280,6 +68576,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -68458,6 +68759,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -68872,6 +69178,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -69999,6 +70310,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -71269,6 +71585,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -72628,6 +72949,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
@@ -73755,6 +74081,11 @@ MonoBehaviour:
   sideStepLength: 0.12
   stepHeight: 0.12
   stepSpeed: 5
+  stepTriggerDelay: 0.2
+  stepCooldown: 0.35
+  minBodyMovementForStep: 0.03
+  bodyMovementThreshold: 0.1
+  walkingSpeedThreshold: 0.15
   footOffset: {x: 0, y: 0, z: 0}
   footRotationOffset: {x: 0, y: 0, z: 0}
   footYPosOffset: 0.02
