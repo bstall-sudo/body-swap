@@ -41,6 +41,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Wie schnell folgt der Körper einer Kopf-Drehbewegung")]
         [SerializeField] private float bodyYawFollowSpeed = 180f;
 
+        [Header("Verwende PreRecorded CalibrationData für die NPCs?")]
+        [SerializeField] private bool usesPreRecordedCalibrationData = true;
+
         [Header("Wie schnell sind die Schritte")]
         [SerializeField] private float _proceduralStepSpeed = 5f;
 
@@ -950,7 +953,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             InitializeRoleHeightsFromPlayerIfNeeded();
 
             // used in CalibrationState
-            avatarCalibration.Initialize(roles);
+            avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
 

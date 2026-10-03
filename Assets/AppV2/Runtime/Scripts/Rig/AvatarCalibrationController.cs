@@ -11,11 +11,14 @@ namespace AppV2.Runtime.Scripts.Rig
     {
         private IReadOnlyList<RoleRig> roles;
 
+        private bool _usePreRecordedCalibrationData;
+
         [SerializeField] public EnvironmentLoader environmentLoader;
 
-        public void Initialize(IReadOnlyList<RoleRig> roles)
+        public void Initialize(IReadOnlyList<RoleRig> roles, bool usePreRecordedCalibration)
         {
             this.roles = roles;
+            this._usePreRecordedCalibrationData = usePreRecordedCalibration;
         }
 
         public int RoleCount => roles?.Count ?? 0;
@@ -120,6 +123,8 @@ namespace AppV2.Runtime.Scripts.Rig
 
             var avatar = roles[roleIndex].avatar;
 
+            var role = roles[roleIndex];
+
             if (avatar == null)
             {
                 Debug.LogWarning($"No avatar assigned for role {roleIndex}.");
@@ -133,7 +138,16 @@ namespace AppV2.Runtime.Scripts.Rig
             }
 
             avatar.RigFollower.BuildMap();
-            avatar.RigFollower.CalibrateTargetsFromAvatar();
+            if (_usePreRecordedCalibrationData &&
+                role.hasPreRecordedTakes &&
+                role.preRecordedCalibration != null)
+            {
+                ApplyPreRecordedCalibration(role);
+            }
+            else
+            {
+                role.rigFollower.CalibrateTargetsFromAvatar();
+            }
             //Debug.Log($"CalibrateRole({roleIndex}) was called.");
         }
 
@@ -304,6 +318,75 @@ namespace AppV2.Runtime.Scripts.Rig
             };
         }
 
+        private void ApplyPreRecordedCalibration(RoleRig role)
+        {
+            if (role == null ||
+                role.visualRigRoot == null ||
+                role.preRecordedCalibration == null)
+            {
+                return;
+            }
+
+            RoleCalibrationData data = role.preRecordedCalibration;
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "headTarget"),
+                data.headTarget);
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "leftHandTarget"),
+                data.leftHandTarget);
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "rightHandTarget"),
+                data.rightHandTarget);
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "hipTarget"),
+                data.hipTarget);
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "leftFootTarget"),
+                data.leftFootTarget);
+
+            ApplyLocalTransform(
+                FindDeepChildByName(role.visualRigRoot, "rightFootTarget"),
+                data.rightFootTarget);
+
+            
+            role.rigFollower.SetCalibrated(true);
+        }
+
+        private void ApplyLocalTransform(
+            Transform target,
+            TransformData data)
+        {
+            if (target == null || data == null)
+                return;
+
+            target.localPosition = data.LocalPosition;
+            target.localRotation = data.LocalRotation;
+        }
+
+        
+        private Transform FindDeepChildByName(Transform root, string targetName)
+        {
+            if (root == null)
+                return null;
+
+            if (root.name == targetName)
+                return root;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform found = FindDeepChildByName(root.GetChild(i), targetName);
+
+                if (found != null)
+                    return found;
+            }
+
+            return null;
+        }
 
     }
 

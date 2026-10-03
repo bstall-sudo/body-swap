@@ -64,7 +64,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             }
 
-            _currentRoleIndexForCalibration = 0;
+            /*_currentRoleIndexForCalibration = 0;
             
             
             _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
@@ -73,59 +73,100 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,false);
             // Set XR-Cam to Role height
             _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration, true);
+            ShowCurrentRoleOrFinish();*/
+
+            _flow.Stage.RolesVisualsVisibilityHandler.SetAllVisible(false);
+
+            for (int i = 0; i < _flow.Stage.roles.Count; i++)
+            {
+                RoleRig role = _flow.Stage.roles[i];
+
+                Debug.Log(
+                    $"[VISIBILITY TEST] " +
+                    $"i={i}, " +
+                    $"role={role.roleId}, " +
+                    $"preRecorded={role.hasPreRecordedTakes}, " +
+                    $"avatarRootActive={role.avatarRoot?.gameObject.activeSelf}"
+                );
+            }
+            _currentRoleIndexForCalibration = 0;
+
+
+
             ShowCurrentRoleOrFinish();
         }
 
         public void Tick(float dt)
-        
-        {   
-            //im CalibrationState ist der InputDriver in Standing Mode, weil auch der Root mitverschoben werden muss.
-            _flow.Stage.DriveActiveRoleFromInputStandingMode(_currentRoleIndexForCalibration, dt);
+        {
+            // Sicherheit:
+            // _currentRoleIndexForCalibration sollte hier immer
+            // auf eine normale Rolle zeigen.
+            if (_currentRoleIndexForCalibration >= _flow.Stage.roleCount)
+                return;
 
-            //Visual und TechnicalRig folgen hier sepparat, weil ja nicht recorded wird und auch proceduralMove noch nicht aktiv sein soll. 
-            _flow.Stage.ApplyFollowerCalibrationState(_currentRoleIndexForCalibration);
+            // Im CalibrationState ist der InputDriver in Standing Mode,
+            // weil auch der Root mitverschoben werden muss.
+            _flow.Stage.DriveActiveRoleFromInputStandingMode(
+                _currentRoleIndexForCalibration,
+                dt);
+
+            // Visual und TechnicalRig folgen hier separat,
+            // weil nicht recorded wird und proceduralMove noch nicht aktiv sein soll.
+            _flow.Stage.ApplyFollowerCalibrationState(
+                _currentRoleIndexForCalibration);
+
+
             if (!_rolesSetToPlayerPosition)
             {
                 _flow.StatusUI.ShowCalibrationAlignHint();
             }
-            
+
+
             if (_flow.ConsumePrimaryAction())
             {
-                if(!_rolesSetToPlayerPosition)
-                {
-                    //_playerPosRot = _flow.Stage.GetPlayerGroundPoseInStage();
-                    //_flow.Stage.AvatarCalibration.PlaceAvatarsAtUserPosition(_playerPosRot);
+                // -----------------------------------------------------
+                // ERSTER TRIGGER:
+                // Player zum Calibration-Nullpunkt ausrichten
+                // -----------------------------------------------------
 
-                    _flow.Stage.PlayerAlignForCalibration(_currentRoleIndexForCalibration);
+                if (!_rolesSetToPlayerPosition)
+                {
+                    _flow.Stage.PlayerAlignForCalibration(
+                        _currentRoleIndexForCalibration);
+
                     _flow.Stage.PlaceMirrorInFrontOfPlayer();
+
                     _rolesSetToPlayerPosition = true;
                 }
+
+                // -----------------------------------------------------
+                // WEITERE TRIGGER:
+                // aktuelle normale Rolle kalibrieren
+                // -----------------------------------------------------
+
                 else
                 {
-                    //UnityEngine.Debug.Log($"[CalibrationState] ConsumePrimaryAction was called");
-                    // 1. Aktuelle sichtbare Rolle kalibrieren
                     _flow.Stage.AvatarCalibration
                         .CalibrateRole(_currentRoleIndexForCalibration);
 
-                    //make head of calibrated avatar visible again.
-                    _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,true);
+                    // Kopf wieder sichtbar machen
+                    _flow.Stage.AvatarCalibration
+                        .SetAvatarHeadVisible(
+                            _currentRoleIndexForCalibration,
+                            true);
 
-                    // 2. Zur nächsten Rolle wechseln
+                    // Zur nächsten Rolle
                     _currentRoleIndexForCalibration++;
 
-                    _flow.Stage.RolesVisualsVisibilityHandler.SetOnlyRoleVisible(_currentRoleIndexForCalibration);
-
-                    
-
-                    // Set XR-Cam to Role height
-                    _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration, true);
-
+                    // Diese Methode:
+                    // 1. kalibriert übersprungene PreRecorded Rollen
+                    // 2. sucht nächste normale Rolle
+                    // 3. zeigt diese an
+                    // 4. oder beendet Calibration
                     ShowCurrentRoleOrFinish();
-                    
                 }
-
-
             }
+
 
             if (_flow.ConsumeSecondaryAction())
             {
@@ -172,7 +213,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.sceneLoader.ExitCalibrationEnvironment();
         }
 
-        private void ShowCurrentRoleOrFinish()
+       /* private void ShowCurrentRoleOrFinish()
         {
             //UnityEngine.Debug.Log($"[CalibrationState] ShowCurrentRoleOrFinish() was called _currentRoleIndexForCalibration = {_currentRoleIndexForCalibration}");
             if (_currentRoleIndexForCalibration >= _flow.Stage.roleCount)
@@ -186,6 +227,54 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             //make head invisible for rig that will be calibrated.
             _flow.Stage.AvatarCalibration.SetAvatarHeadVisible(_currentRoleIndexForCalibration,false);
+        }*/
+
+        private void ShowCurrentRoleOrFinish()
+        {
+            // PreRecorded Rollen überspringen,
+            // aber ihre gespeicherte Calibration anwenden.
+            while (_currentRoleIndexForCalibration < _flow.Stage.roleCount &&
+                _flow.Stage.roles[_currentRoleIndexForCalibration].hasPreRecordedTakes)
+            {
+                int preRecordedRoleIndex = _currentRoleIndexForCalibration;
+
+                _flow.Stage.AvatarCalibration
+                    .CalibrateRole(preRecordedRoleIndex);
+
+                Debug.Log(
+                    $"[CalibrationState] Applied pre-recorded calibration " +
+                    $"for role {preRecordedRoleIndex} " +
+                    $"({_flow.Stage.roles[preRecordedRoleIndex].roleId})"
+                );
+
+                _currentRoleIndexForCalibration++;
+            }
+
+            // Keine normalen Rollen mehr übrig
+            if (_currentRoleIndexForCalibration >= _flow.Stage.roleCount)
+            {
+                FinishCalibration();
+                return;
+            }
+
+            // VisualRig: nur aktuelle Rolle sichtbar
+            _flow.Stage.RolesVisualsVisibilityHandler
+                .SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+
+            // Avatar: nur aktuelle Rolle sichtbar
+            _flow.Stage.AvatarCalibration
+                .SetOnlyRoleVisible(_currentRoleIndexForCalibration);
+
+            // Kopf der aktuellen Rolle ausblenden
+            _flow.Stage.AvatarCalibration
+                .SetAvatarHeadVisible(
+                    _currentRoleIndexForCalibration,
+                    false);
+
+            // XR-Höhe an aktuelle Rolle anpassen
+            _flow.Stage.ApplyActiveRoleEmbodimentHeight(
+                _currentRoleIndexForCalibration,
+                true);
         }
 
         private void FinishCalibration()
