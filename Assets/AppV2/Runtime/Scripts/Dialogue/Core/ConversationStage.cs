@@ -38,8 +38,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public float distanceToLoseActiveConversationPartner = 10F;
         public float distanceToReactivatePassiveRole = 3f;
 
-        [Header("Wie schnell folgt der Körper einer Kopf-Drehbewegung")]
-        [SerializeField] private float bodyYawFollowSpeed = 180f;
+        /*[Header("Wie schnell folgt der Körper einer Kopf-Drehbewegung")]
+        [SerializeField] private float bodyYawFollowSpeed = 180f;*/
 
         [Header("Verwende PreRecorded CalibrationData für die NPCs?")]
         [SerializeField] private bool usesPreRecordedCalibrationData = true;
@@ -1882,33 +1882,34 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 yaw = headRotStage.eulerAngles.y;
             }*/
             // If there is no hip tracker, derive body position from head.
-        // Body rotation follows head rotation with some inertia.
-        else
-        {
-            bodyPos = headStage;
-            bodyPos.y = GetGroundYStageLocal(bodyPos);
-
-            float headYaw = headRotStage.eulerAngles.y;
-
-            // Beim allerersten Frame auf aktuelle Blickrichtung initialisieren,
-            // damit der Avatar nicht erst von 0° dorthin rotieren muss.
-            if (!_fallbackBodyYawInitialized)
+            // Body rotation follows head rotation with some inertia.
+            else
             {
-                _fallbackBodyYaw = headYaw;
-                _fallbackBodyYawInitialized = true;
+                bodyPos = headStage;
+                bodyPos.y = GetGroundYStageLocal(bodyPos);
+
+                float headYaw = headRotStage.eulerAngles.y;
+                yaw = headRotStage.eulerAngles.y;
+
+                /*// Beim allerersten Frame auf aktuelle Blickrichtung initialisieren,
+                // damit der Avatar nicht erst von 0° dorthin rotieren muss.
+                if (!_fallbackBodyYawInitialized)
+                {
+                    _fallbackBodyYaw = headYaw;
+                    _fallbackBodyYawInitialized = true;
+                }
+
+                _fallbackBodyYaw = Mathf.MoveTowardsAngle(
+                    _fallbackBodyYaw,
+                    headYaw,
+                    bodyYawFollowSpeed * dt
+                );
+
+                yaw = _fallbackBodyYaw;*/
             }
 
-            _fallbackBodyYaw = Mathf.MoveTowardsAngle(
-                _fallbackBodyYaw,
-                headYaw,
-                bodyYawFollowSpeed * dt
-            );
 
-            yaw = _fallbackBodyYaw;
-        }
-
-
-
+            
             Transform actor = rig.root;
             actor.localPosition = bodyPos;
             actor.localRotation = Quaternion.Euler(0f, yaw, 0f);
