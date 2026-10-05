@@ -97,6 +97,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         }
 
+ 
         private void Start()
         {
             foreach (var role in _data.AllRoles)

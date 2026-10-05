@@ -5,6 +5,7 @@ using AppV2.Runtime.Scripts.Dialogue;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
+
 public class SceneLoader : MonoBehaviour
 {
     [SerializeField] private ConversationStage stage;
@@ -57,14 +58,23 @@ public class SceneLoader : MonoBehaviour
             );
         }
 
+        
+
+        stage.roleCount = session.RoleCount;
+
+        stage.BuildAllRoleRoots();
+        
+
         //Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
         // 3. RoleCount setzen
         stage.ApplyRoleCountFromSession(session.RoleCount);
 
-
+        stage.BuildActiveRoles();
 
         // 4. Rollen / Avatare / SpawnIds anwenden
         ApplyRolesFromSession(session);
+
+        
 
         // 5. TakeIndex neu aufbauen
         takeIndex.RebuildFromSession(session);
@@ -84,15 +94,17 @@ public class SceneLoader : MonoBehaviour
 
         //Debug.Log($"[ApplyRolesFromSession] RoleCount: {session.RoleCount}");
         //Debug.Log($"[ApplyRolesFromSession] stage.Roles.Count: {stage.Roles.Count}");
+        
 
         foreach (ConversationRoleMeta roleMeta in session.Roles)
         {
-            if (roleMeta.RoleIndex < 0 || roleMeta.RoleIndex >= stage.Roles.Count)
+            if (roleMeta.RoleIndex < 0 || roleMeta.RoleIndex >= session.RoleCount)
             {
                 Debug.LogWarning($"[SceneLoader] Invalid role index: {roleMeta.RoleIndex}");
                 continue;
             }
 
+           
             RoleRig role = stage.Roles[roleMeta.RoleIndex];
 
             role.roleId = roleMeta.RoleId;
@@ -100,6 +112,7 @@ public class SceneLoader : MonoBehaviour
             
             role.roleSpawnId = roleMeta.RoleSpawnId;
 
+            UnityEngine.Debug.Log($"[ApplyRolesFromSession] role with Index: {roleMeta.RoleIndex}, roleId: {role.roleId}, roleSpawnId: {role.roleSpawnId}");
             // Avatar laden
             if (role.avatarLoader != null)
             {

@@ -209,7 +209,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         //////////////////////////////////// - für die Roles im Inspektor ///////////////////////////////////////
-        private void BuildActiveRoles()
+        public void BuildActiveRoles()
         {
             roleCount = Mathf.Max(1, roleCount);
             roleCount = Mathf.Min(maxRoleCount, roleCount);
@@ -234,7 +234,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
 
             // Falls roleId leer ist, setzen
-            for (int i = 0; i < roles.Count; i++)
+            for (int i = 0; i < roleCount; i++)
             {
                 RoleRig role = roles[i];
 
@@ -271,7 +271,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }
         }
         
-        private void BuildAllRoleRoots()
+        public void BuildAllRoleRoots()
         {
             _allRoleRoots.Clear();
 
@@ -893,6 +893,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     
 
                 }
+                _playbackController.Initialize(_stageRoot, roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
+                
                 _calibrationDataApplier = new RoleCalibrationDataApplier();
                 _calibrationDataApplier.Initialize(roles);
                 _calibrationDataApplier.ApplyRoleMetasToScene(roles, _playbackController._session);
@@ -1075,20 +1077,20 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 if (role?.root == null)
                     continue;
-                /*
+                
                 Debug.Log(
                     $"[NPC Position] [{label}] {role.roleId}: " +
                     $"local={role.root.localPosition}, " +
                     $"world={role.root.position}"
                 );
-                */
+                
             }
         }
             
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            DebugRolePositions("START BEGIN");
+            //DebugRolePositions("START BEGIN");
 
             if (roles.Count == 0)
             {
@@ -1107,17 +1109,17 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     XrRightFoot
                 );
 
-                DebugRolePositions("AFTER INPUT CREATE");
+                //DebugRolePositions("AFTER INPUT CREATE");
 
 
                 SnapXrOriginToGround();
 
-                DebugRolePositions("AFTER SnapXrOriginToGround");
+                //DebugRolePositions("AFTER SnapXrOriginToGround");
 
 
                 _input.SetAnchorFromTakeRoot(_stageRoot);
 
-                DebugRolePositions("AFTER SetAnchorFromTakeRoot");
+                //DebugRolePositions("AFTER SetAnchorFromTakeRoot");
 
 
                 if (embodimentOffsetRoot != null)
@@ -1130,7 +1132,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 else
                     xRLocomotionToggle.SetLocomotionEnabled(false);
 
-                DebugRolePositions("AFTER LOCOMOTION");
+                //DebugRolePositions("AFTER LOCOMOTION");
             }
             else
             {
@@ -1140,12 +1142,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             ApplyAllRoleVisualScales();
 
-            DebugRolePositions("AFTER ApplyAllRoleVisualScales");
+            //DebugRolePositions("AFTER ApplyAllRoleVisualScales");
 
 
             chooseSpeakerController.Initialize(roles);
 
-            DebugRolePositions("AFTER ChooseSpeaker Initialize");
+            //DebugRolePositions("AFTER ChooseSpeaker Initialize");
         }
         public void SetEnvironmentId(string id)
         {
@@ -1716,6 +1718,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //Debug.Log($"[ConversationStage] InitializePlaybackFromSession RoleCount is: {loadedSession.RoleCount} session: {sessionId}");
             _session = loadedSession;
 
+            roleCount = loadedSession.RoleCount; 
             _playbackController.InitializeFromSession(
                 _stageRoot,
                 roles,

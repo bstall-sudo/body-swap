@@ -32,6 +32,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
+            
+            
             _roleCount =  _flow._data.AllRoleCount;
             _seatedMode = _flow.Stage.SeatedMode;
 
