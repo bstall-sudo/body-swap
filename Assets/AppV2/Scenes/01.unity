@@ -589,7 +589,6 @@ MonoBehaviour:
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
-  bodyYawFollowSpeed: 180
   usesPreRecordedCalibrationData: 1
   _proceduralStepSpeed: 10
   _proceduralStepLength: 0.4
@@ -26313,12 +26312,11 @@ MonoBehaviour:
   sceneLoader: {fileID: 793401280}
   environmentId: HotelUndLobby_01
   stageSpawnId: gast_draussen
-  simpleInputMode: 1
+  simpleInputMode: 0
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
   distanceToReactivatePassiveRole: 3
-  bodyYawFollowSpeed: 180
-  usesPreRecordedCalibrationData: 0
+  usesPreRecordedCalibrationData: 1
   _proceduralStepSpeed: 10
   _proceduralStepLength: 0.5
   preRecordedSceneCount: 0
@@ -26339,7 +26337,7 @@ MonoBehaviour:
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rezeptionist
-  - enabled: 1
+  - enabled: 0
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: bruecke1Bart_001
@@ -26426,7 +26424,7 @@ MonoBehaviour:
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 150
+  heightOfPlayerCm: 180
   heightOfSeatedPlayerCm: 100
   fallbackFootSpacing: 0.2
   fallbackHipHeight: 0.9
@@ -26510,7 +26508,7 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  - avatarId: esel_001
+  - avatarId: baer_001
     roleSpawnId: 
     roleId: B
     slotId: B
@@ -26648,8 +26646,8 @@ MonoBehaviour:
   SeatedMode: 0
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
-  StartInPlaybackFullConversationMode: 1
-  _sessionFolder: 2026-10-05-UTC-07-40-05_59
+  StartInPlaybackFullConversationMode: 0
+  _sessionFolder: 2026-10-05-UTC-12-35-00_09
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
