@@ -151,13 +151,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             string sessionId,
             float playerHeightCM)
         {
-            Debug.Log(
+            /*Debug.Log(
                 $"[Turn NPC to Player] [PlaybackForIndexBeginFromTake] " +
                 $"take={takeMeta.TakeId}, " +
                 $"frames={takeMeta.FramesFile}, " +
                 $"session={sessionId}, " +
                 $"role={targetRoleIndex}"
-            );
+            );*/
             TakeData take = store.LoadTakeData(takeMeta, sessionId);
 
             float roleScale = 1f;
@@ -356,10 +356,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 );
 
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[NPC Align] {role.roleId}: " +
                 $"yawOffset={yawOffset:F1}"
-            );
+            );*/
 
 
             // --------------------------------------------------

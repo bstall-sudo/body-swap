@@ -171,7 +171,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //UnityEngine.Debug.Log($"[ChooseSpeakerState] currentlySelected ={currentlySelected}, actionCounter={actionCounter}");
 
                 // order: string text, List<int> playbacks, List<int> reactiveIdles, List<int> currentlySelectable, int toBeRecorded, int currentlySelected)
-                PrintRoleLists("[ChooseSpeakerState] Enter", _playbacks, _reactiveIdles, _selectableRoles, _toBeRecorded, currentlySelected);
+                //PrintRoleLists("[ChooseSpeakerState] Enter", _playbacks, _reactiveIdles, _selectableRoles, _toBeRecorded, currentlySelected);
                 _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
                 //UnityEngine.Debug.Log("[ChooseSpeakerState] Consumed PrimaryAction");
                 

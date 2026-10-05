@@ -453,12 +453,12 @@ namespace AppV2.Runtime.Scripts.Rig
                 ? sittingIdleAnimationStateName
                 : standingIdleAnimationStateName;
 
-            Debug.Log(
+            /*Debug.Log(
                     $"[{name}] PlayIdleAnimation: " +
                     $"stateName='{stateName}', " +
                     $"sittingIdle={sittingIdle}, " +
                     $"controller='{animator.runtimeAnimatorController?.name}'"
-                );
+                );*/
 
                 int hash = Animator.StringToHash(stateName);
 
@@ -519,10 +519,32 @@ namespace AppV2.Runtime.Scripts.Rig
         }
         public void SetLookAtTargetWorldPosition(Vector3 worldPosition)
         {
-            if (lookAtTarget == null){
-                UnityEngine.Debug.LogError($"[{name}] lookAtTarget was not found.");
+            if (lookAtTarget == null)
+            {
+                // Erst den zugewiesenen Animator verwenden.
+                // Falls keiner zugewiesen ist, in den Children suchen.
+                Animator foundAnimator = animator;
+
+                if (foundAnimator == null)
+                    foundAnimator = GetComponentInChildren<Animator>(true);
+
+                string avatarName = foundAnimator != null
+                    ? foundAnimator.gameObject.name
+                    : "UNKNOWN AVATAR";
+
+                string controllerName =
+                    foundAnimator != null && foundAnimator.runtimeAnimatorController != null
+                        ? foundAnimator.runtimeAnimatorController.name
+                        : "NO ANIMATOR CONTROLLER";
+
+                UnityEngine.Debug.LogError(
+                    $"[AvatarRigDefinition] lookAtTarget was not found. " +
+                    $"Avatar='{avatarName}', AnimatorController='{controllerName}'",
+                    this
+                );
+
                 return;
-            } 
+            }
 
             lookAtTarget.position = worldPosition;
 

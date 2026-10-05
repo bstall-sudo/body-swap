@@ -89,7 +89,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ReactiveIdleStart(reactiveIdles, toBeRecorded);
             _flow.Stage.RecordingBegin(toBeRecorded,sceneCount);
 
-            PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
+            //PrintRoleLists("[RecordListenersState] Enter", playbacks, reactiveIdles, toBeRecorded);
             //UnityEngine.Debug.Log("[RecordListenersState] Enter End");
 
         }
@@ -154,10 +154,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                                     
                                     //true weil es  listenerState ist.
                                     _flow.RemoveActiveRolesTooFarAwayFromPlayer( toBeRecorded,  true);
-                                    foreach(RoleRig role in _flow._data.Roles)
+                                    /*foreach(RoleRig role in _flow._data.Roles)
                                     {
                                         UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {sceneCount} Role with index: {role.roleIndex} is in _data.Roles");
-                                    }
+                                    }*/
                                     
                                 }
                                 //Das muss hier nochmal aktualisiert werden, weil die obige Funktion die FlowStateData verändert.
@@ -259,7 +259,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
            */
             //UnityEngine.Debug.Log("[RecordListenersState] Exit");
-            PrintRoleLists("[RecordListenersState] Exit", playbacks, reactiveIdles, toBeRecorded);
+            //PrintRoleLists("[RecordListenersState] Exit", playbacks, reactiveIdles, toBeRecorded);
         }
 
         //für das Debugging

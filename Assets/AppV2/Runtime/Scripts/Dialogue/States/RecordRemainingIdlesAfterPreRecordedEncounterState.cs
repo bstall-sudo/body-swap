@@ -98,7 +98,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             PrepareStartPlaybacksReactiveIdlesForScene(_sceneCount, _toBeRecorded);
             _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
 
-            PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] at End", _playbacks, _reactiveIdles,_toBeRecorded);
+            //PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] at End", _playbacks, _reactiveIdles,_toBeRecorded);
             //UnityEngine.Debug.Log("[RecordRemainingIdlesAfterPreRecordedEncounterState] Enter End");
 
         }
@@ -117,11 +117,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 _flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
                 _sceneCount++;
-                PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update before Update", _playbacks, _reactiveIdles,_toBeRecorded);
+                //PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update before Update", _playbacks, _reactiveIdles,_toBeRecorded);
                 _playbacks = _flow.Stage.PlaybackIndicesWithTakeForScene(_activeRoles, _sceneCount);
                 _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
                 _reactiveIdles = GetIdles(_sceneCount, _toBeRecorded);
-                PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update after Update", _playbacks, _reactiveIdles,_toBeRecorded);
+                //PrintRoleLists("[RecordRemainingIdlesAfterPreRecordedEncounterState] Update after Update", _playbacks, _reactiveIdles,_toBeRecorded);
                 if (_playbacks.Count > 0)
                 {
                     //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] after update: SceneCount for Prerecorded Scenes is: {_sceneCountForPreRecordedScenes}");
@@ -149,12 +149,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     } */
                     SetFutureFlowDirection();
                     //_flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
-                    PrintRoleLists(
+                    /*PrintRoleLists(
                             "[RecordRemainingIdlesAfterPreRecordedEncounterState] -> before PlayerAlignState", 
                             _flow._data.Playbacks,
                             _flow._data.ReactiveIdles,
                             _flow._data.ToBeRecorded
-                            );
+                            );*/
                     _flow.SetState(new PlayerAlignState(_flow));
                 }  
             }

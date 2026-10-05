@@ -167,7 +167,7 @@ namespace AppV2.Runtime.Scripts.Input
                     break;
             }
 
-            Debug.Log($"[XRInputEvents] Input mode: {inputMode}");
+            //Debug.Log($"[XRInputEvents] Input mode: {inputMode}");
         }
 
 

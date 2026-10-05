@@ -77,7 +77,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             _flow.Stage.RolesVisualsVisibilityHandler.SetAllVisible(false);
 
-            for (int i = 0; i < _flow.Stage.roles.Count; i++)
+            /*for (int i = 0; i < _flow.Stage.roles.Count; i++)
             {
                 RoleRig role = _flow.Stage.roles[i];
 
@@ -88,7 +88,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     $"preRecorded={role.hasPreRecordedTakes}, " +
                     $"avatarRootActive={role.avatarRoot?.gameObject.activeSelf}"
                 );
-            }
+            }*/
             _currentRoleIndexForCalibration = 0;
 
 
@@ -241,11 +241,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _flow.Stage.AvatarCalibration
                     .CalibrateRole(preRecordedRoleIndex);
 
-                Debug.Log(
+                /*Debug.Log(
                     $"[CalibrationState] Applied pre-recorded calibration " +
                     $"for role {preRecordedRoleIndex} " +
                     $"({_flow.Stage.roles[preRecordedRoleIndex].roleId})"
-                );
+                );*/
 
                 _currentRoleIndexForCalibration++;
             }

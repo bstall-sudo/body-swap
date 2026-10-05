@@ -38,8 +38,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
             if (meta == null)
                 return;
             string key = BuildTakeKey(meta.RoleIndex, meta.SceneCount);
-            /*
-            UnityEngine.Debug.Log(
+            
+            /*UnityEngine.Debug.Log(
                 $"StoreTakeMeta: key={key}, " +
                 $"sceneCount={meta.SceneCount}, " +
                 $"roleIndex={meta.RoleIndex}, " +

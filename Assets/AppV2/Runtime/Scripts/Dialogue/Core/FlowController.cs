@@ -161,7 +161,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //PrintRoleListsAndFlowStateDataWithStateInfo("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName);
             _state?.Enter();
             //PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
-            PrintRoleListsAndFlowStateDataWithStateInfo($"FlowController PreRecorded Debug | SetState AFTER ENTER| RoleCount is: {_data.Roles.Count}", oldStateName, newStateName);
+            //PrintRoleListsAndFlowStateDataWithStateInfo($"FlowController PreRecorded Debug | SetState AFTER ENTER| RoleCount is: {_data.Roles.Count}", oldStateName, newStateName);
 
         }
 
@@ -192,7 +192,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
                 int index = r.roleIndex;
                 _data.Roles.Remove(r);
-                UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {r.roleIndex} was removed from _data.Roles | GoToPlaybackPreRecordedState: {_data.GoToPlaybackPreRecordedState}");
+                //UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {r.roleIndex} was removed from _data.Roles | GoToPlaybackPreRecordedState: {_data.GoToPlaybackPreRecordedState}");
                 if (!_data.IndicesOfPassiveRoles.Contains(index ))
                 {
                     _data.IndicesOfPassiveRoles.Add(index );
@@ -208,10 +208,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 
             }
 
-            foreach (RoleRig role in _data.Roles)
+            /*foreach (RoleRig role in _data.Roles)
             {
                 UnityEngine.Debug.Log($"[RecordListenerState] in Scene: {_data.SceneCount} [FlowController] Role with index: {role.roleIndex} is in _data.Roles");
-            }
+            }*/
 
             _data.ActiveRoleCount = _data.Roles.Count;
         }
@@ -367,7 +367,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             if(selected == -1){
 
-                List<int> activeRolesIndices = new List<int>();
+                /*List<int> activeRolesIndices = new List<int>();
 
                 foreach (RoleRig role in _data.Roles)
                 {
@@ -375,12 +375,18 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 }
                 nextSpeakerIndex = _data.SceneCount  % _data.ActiveRoleCount;
                 nextSpeaker = activeRolesIndices[nextSpeakerIndex];
-                
-                UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][SpeakerStateEnter][_data.SceneCount  % _data.ActiveRoleCount] -> {_data.SceneCount % _data.ActiveRoleCount}  activeRoleCount is: {_data.ActiveRoleCount}");
-                //update Rollen, die im Idle sind in _data- object (FlowStateData)
                 SpeakerStateEnterSetLists(nextSpeaker);
                 //update nächster Sprecher in _data- object (FlowStateData)
-                _data.ToBeRecorded = nextSpeaker;
+                _data.ToBeRecorded = nextSpeaker;*/
+
+                //update Rollen, die im Idle sind in _data- object (FlowStateData)
+                SpeakerStateEnterSetLists(_data.ToBeRecorded);
+                
+                //UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][SpeakerStateEnter][_data.SceneCount  % _data.ActiveRoleCount] -> {_data.SceneCount % _data.ActiveRoleCount}  activeRoleCount is: {_data.ActiveRoleCount}");
+                
+                
+                
+                
                 
             }
             else{
@@ -401,7 +407,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
 
-        public void SpeakerStateEnterSetLists(int nextSpeaker)
+        /*public void SpeakerStateEnterSetLists(int nextSpeaker)
         {
             //playbacks leeren bevor es weiter geht.
             _data.Playbacks = new List<int>();
@@ -421,7 +427,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                         if (_data.AllRoles[i].isActiveConversationPartner)
                         {
                             reactiveIdles.Add(_data.AllRoles[i].roleIndex);
-                            UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] Role with Index{_data.AllRoles[i].roleIndex} was added to reactiveIdles.");
+                            //UnityEngine.Debug.Log($"[SpeakerStateEnterSetLists] Role with Index{_data.AllRoles[i].roleIndex} was added to reactiveIdles.");
                             
                         }
                         
@@ -429,6 +435,66 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 }
                 _data.ReactiveIdles = reactiveIdles;
             }
+        }*/
+
+        public void SpeakerStateEnterSetLists(int nextSpeaker)
+        {
+            if (nextSpeaker > (_data.AllRoleCount - 1) || nextSpeaker < 0)
+            {
+                UnityEngine.Debug.LogError(
+                    $"nextSpeaker index is out of Range. Index is: {nextSpeaker}"
+                );
+                return;
+            }
+
+            List<int> reactiveIdles = new List<int>();
+
+            // Reihenfolge aus dem vorherigen Durchlauf übernehmen
+            if (_data.Playbacks != null && _data.Playbacks.Count > 0)
+            {
+                foreach (int roleIndex in _data.Playbacks)
+                {
+                    // nextSpeaker selbst darf nicht ReactiveIdle sein
+                    if (roleIndex == nextSpeaker)
+                        continue;
+
+                    RoleRig role = _data.AllRoles.Find(
+                        r => r.roleIndex == roleIndex
+                    );
+
+                    // Nur Rollen übernehmen, die weiterhin aktiv sind
+                    if (role != null && role.isActiveConversationPartner)
+                    {
+                        reactiveIdles.Add(roleIndex);
+                    }
+                }
+            }
+
+            // Falls neue aktive Rollen hinzugekommen sind,
+            // die noch nicht in Playbacks vorkommen:
+            foreach (RoleRig role in _data.AllRoles)
+            {
+                if (!role.isActiveConversationPartner)
+                    continue;
+
+                if (role.roleIndex == nextSpeaker)
+                    continue;
+
+                if (reactiveIdles.Contains(role.roleIndex))
+                    continue;
+
+                reactiveIdles.Add(role.roleIndex);
+            }
+
+            _data.ReactiveIdles = reactiveIdles;
+
+            // ERST JETZT Playbacks zurücksetzen
+            _data.Playbacks = new List<int>();
+
+            UnityEngine.Debug.Log(
+                $"[SpeakerStateEnterSetLists] Speaker={nextSpeaker}, " +
+                $"ReactiveIdles=[{string.Join(",", _data.ReactiveIdles)}]"
+            );
         }
 
 
@@ -866,7 +932,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
                 if (!role.isActiveConversationPartner)
                 {
-                    UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][PlaybackPreRecordedToSpeaker_DataAdjustments] role with Index {i} is not active");
+                    //UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][PlaybackPreRecordedToSpeaker_DataAdjustments] role with Index {i} is not active");
                     continue;
                 }
                     
@@ -888,7 +954,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 // -----------------------------------
 
                 _data.IndicesOfPassiveRoles.Remove(roleIndex);
-                UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][PlaybackPreRecordedToSpeaker_DataAdjustments] role with Index {roleIndex} was removed from passive Roles");
+                //UnityEngine.Debug.Log($"[FlowController][ListenerStateExitAutoSelection][PlaybackPreRecordedToSpeaker_DataAdjustments] role with Index {roleIndex} was removed from passive Roles");
 
 
                 // -----------------------------------
@@ -1002,7 +1068,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             foreach (RoleRig role in _data.AllRoles)
             {
                 if (!_data.Roles.Contains(role) && role.hasPlayedBackPreRecordedTakes == true)
-                {   UnityEngine.Debug.Log($"FlowController PreRecorded Debug | role with index {role.roleIndex} was removed from passive Roles.");
+                {   //UnityEngine.Debug.Log($"FlowController PreRecorded Debug | role with index {role.roleIndex} was removed from passive Roles.");
                     _data.Roles.Add(role);
                     _data.IndicesOfPassiveRoles.Remove(role.roleIndex);
                 }

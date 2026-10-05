@@ -137,7 +137,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             
 
-            PrintRoleLists("[RecordSpeakerState] Enter", playbacks, reactiveIdles, toBeRecorded);
+            //PrintRoleLists("[RecordSpeakerState] Enter", playbacks, reactiveIdles, toBeRecorded);
             //UnityEngine.Debug.Log("[RecordSpeakerState] Enter End");
             
         }
@@ -155,7 +155,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
-                    UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneCount: {sceneCount} GoToPlaybackPreRecordedState: {_flow._data.GoToPlaybackPreRecordedState}");
+                    //UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneCount: {sceneCount} GoToPlaybackPreRecordedState: {_flow._data.GoToPlaybackPreRecordedState}");
                     
                     _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
                     _isRecording = false;
@@ -182,7 +182,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     {
                         //UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
                         _npcGroupId = _flow.GetNpcGroupId(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
-                        UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | CurrentNpcGroupId is: {_npcGroupId} ");
+                        //UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | CurrentNpcGroupId is: {_npcGroupId} ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
                     }
                     else if(selectableNext)
@@ -287,7 +287,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
            
             
             
-            PrintRoleLists("[RecordSpeakerState] Exit", playbacks, reactiveIdles, toBeRecorded);
+            //PrintRoleLists("[RecordSpeakerState] Exit", playbacks, reactiveIdles, toBeRecorded);
             //damit der PlayerAlignState weiss, ob er zu RecordSpeaker oder zu RecordListenersState wechseln soll. 
             _flow._data.GoToSpeakerState = false;
             /*

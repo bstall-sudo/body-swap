@@ -144,13 +144,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     //UnityEngine.Debug.Log("[PlaybackFullPreRecordedScenes] No more scenes found. Restart PlaybackFullConversation.");
                     
                     _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
-                    PrintRoleLists(
+                    /*PrintRoleLists(
                             $"[PlaybackPreRecordedScenes] Direction at Scene: {_flow._data.SceneCount}, Roles.Count is: {_flow._data.Roles.Count}", 
                             _flow._data.Playbacks,
                             _flow._data.ReactiveIdles,
                             _flow._data.CurrentPreRecordedPlaybacks,
                             _flow._data.ToBeRecorded
-                            );
+                            );*/
                     
                     if(_flow._data.Roles.Count == 1)
                     {
@@ -243,13 +243,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Active Roles have length (after update): {_flow._data.Roles.Count}");
             //_flow.Stage.SwitchNpcGroupToCurrentSession(_flow._data.CurrentNpcGroupId);
 
-            PrintRoleLists(
+            /*PrintRoleLists(
                             "[PlaybackPreRecorededScenes] At Exit -> before PlayerAlignState", 
                             _flow._data.Playbacks,
                             _flow._data.ReactiveIdles,
                             _flow._data.CurrentPreRecordedPlaybacks,
                             _flow._data.ToBeRecorded
-                            );
+                            );*/
         }
 
         private List<int> PlaybackCandidates(){

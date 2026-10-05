@@ -186,12 +186,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                         r => r.RoleIndex == source.sourceRoleIndex
                     );
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[ALIGN DEBUG] role={targetRole.roleId}, " +
                 $"alignWithPlayer={targetRole.alignWithPlayer}, " +
                 $"hasPlayerAlignment={targetRole.hasPlayerAlignment}, " +
                 $"player={(player != null ? player.name : "NULL")}"
-            );
+            );*/
             if (targetRole.alignWithPlayer && player != null)
             {
                 
@@ -239,7 +239,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
                             targetRole.hasPlayerAlignment = true;
 
-                            Debug.Log(
+                            /*Debug.Log(
                                 $"[ALIGN ROT DEBUG] role={targetRole.roleId}\n" +
                                 $"roleSpawnYaw={roleSpawn.eulerAngles.y:F1}\n" +
                                 $"sourceStartYaw={sourceRoleMeta.StartRootPose.LocalRotation.eulerAngles.y:F1}\n" +
@@ -249,7 +249,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                                 $"calculatedOffset={targetRole.playerAlignmentYawOffset:F1}\n" +
                                 $"playerPos={player.position}\n" +
                                 $"pivot={alignmentPivotWorld}"
-                            );
+                            );*/
                         }
                     }
 
@@ -342,7 +342,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             {
                 Frame frame = frames[i];
 
-                if (i== 0){
+                /*if (i== 0){
                     Frame firstFrame = frames[0];
                     Vector3 firstFrameWorldBeforeAlignment =
                         roleSpawn.TransformPoint(
@@ -363,7 +363,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                         $"FirstFrameBodyYaw={frames[0].Body.YawDeg:F1}"
                     );
                
-                }
+                }*/
 
 
                  // --------------------------------------------------------
@@ -393,7 +393,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                         alignmentPivotWorld +
                         playerAlignmentRotation * offsetFromNpcStart;
 
-                    UnityEngine.Debug.Log($"[PreRecordedTakeImporter] (targetRole.alignWithPlayer && targetRole.hasPlayerAlignment");
+                    //UnityEngine.Debug.Log($"[PreRecordedTakeImporter] (targetRole.alignWithPlayer && targetRole.hasPlayerAlignment");
                 }
 
 

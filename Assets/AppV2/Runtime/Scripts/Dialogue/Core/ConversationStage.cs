@@ -843,9 +843,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             //BuildDefaultPlaybackSources();
 
-            BuildImportedNpcRoles(_store);
+            if (!StartInPlaybackFullConversationMode)
+            {
+                BuildImportedNpcRoles(_store);
 
-            AddImportedNpcRolesToFreeSlots();
+                AddImportedNpcRolesToFreeSlots();
+            }
+
+            
             BuildAllRoleRoots();
             
             ApplyRoleCount();
@@ -1370,7 +1375,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                     roles[targetRoleIndex].roleSpawnId
                                 );
 
-                            Debug.Log(
+                            /*Debug.Log(
                                 $"[NPC SPAWN DEBUG] role={roles[targetRoleIndex].roleId}\n" +
                                 $"roleSpawnId={roles[targetRoleIndex].roleSpawnId}\n" +
                                 $"CURRENT ROOT pos={roles[targetRoleIndex].root.position}\n" +
@@ -1380,7 +1385,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                 $"SPAWN rot={spawn.transform.rotation.eulerAngles}\n" +
                                 $"STAGE pos={_stageRoot.position}\n" +
                                 $"STAGE rot={_stageRoot.rotation.eulerAngles}"
-                            );
+                            );*/
                             bool imported = _preRecordedTakeImporter.ImportTake(
                                 roles[targetRoleIndex],
                                 targetRoleIndex,
@@ -1406,13 +1411,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                         null
                                     );
 
-                                    Debug.Log(
+                                    /*Debug.Log(
                                         $"[Turn NPC to Player PRE PLAYBACK] " +
                                         $"take={importedTakeMeta.TakeId}, " +
                                         $"frames={importedTakeMeta.FramesFile}, " +
                                         $"session={_session.SessionId}, " +
                                         $"role={targetRoleIndex}"
-                                    );
+                                    );*/
                                     _playbackController.PlaybackForIndexBeginFromTake(
                                         targetRoleIndex,
                                         importedTakeMeta,
@@ -2109,8 +2114,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public void StartPlayerAlignToActor(int roleIndex, float duration)
         {
             RoleRig targetRole = roles[roleIndex];
-            /*
-            Debug.Log(
+            
+            /*Debug.Log(
                 $"[StartPlayerAlignToActor] qwert roleIndex as Argument={roleIndex}, " +
                 $"roleId={targetRole.roleId}, " +
                 $"roleIndexRolesinConversationStage={targetRole.roleIndex}, " +
@@ -2455,7 +2460,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             // DEBUG
             // ---------------------------------------------------------
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[CALIBRATION ALIGN]\n" +
                 $"role={role.roleId}\n" +
                 $"targetGroundWorld={targetGroundWorld}\n" +
@@ -2466,7 +2471,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 $"XR Origin after={XrOrigin.position}\n" +
                 $"XR Head after={XrHead.position}\n" +
                 $"XR Head yaw after={YawOf(XrHead.rotation):F1}"
-            );
+            );*/
         }
 
 

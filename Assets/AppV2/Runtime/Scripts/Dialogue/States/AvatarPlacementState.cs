@@ -47,13 +47,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
 
             }
-            Debug.Log("=== NPC placement-Debug  BEFORE RigUpdatePipeline ===");
-            LogNpcRigPositions();
+            //Debug.Log("=== NPC placement-Debug  BEFORE RigUpdatePipeline ===");
+            //LogNpcRigPositions();
             ////hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 
             _flow.Stage.RigUpdatePipeline(_allRolesIndices, true);
 
-            Debug.Log("=== NPC placement-Debug AFTER RigUpdatePipeline ===");
-            LogNpcRigPositions();
+            //Debug.Log("=== NPC placement-Debug AFTER RigUpdatePipeline ===");
+            //LogNpcRigPositions();
             
             
         }
@@ -300,7 +300,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             // 4. Rolle platzieren
             // ----------------------------------------------------
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[NPC PLACEMENT BEFORE] " +
                 $"role={role.roleId}, " +
                 $"spawnId={role.roleSpawnId}, " +
@@ -309,7 +309,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"calculatedPlacement={placement}, " +
                 $"rootBeforeLocal={role.root.localPosition}, " +
                 $"rootBeforeWorld={role.root.position}"
-            );
+            );*/
             _flow.Stage.AvatarCalibration.PlaceRoleAt(
                 roleIndex,
                 placement,
@@ -317,14 +317,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 _stageRoot
             );
 
-            Debug.Log(
+            /*Debug.Log(
                 $"[NPC PLACEMENT AFTER] " +
                 $"role={role.roleId}, " +
                 $"rootAfterLocal={role.root.localPosition}, " +
                 $"rootAfterWorld={role.root.position}, " +
                 $"roleRootLocal={role.roleRoot.localPosition}, " +
                 $"roleRootWorld={role.roleRoot.position}"
-            );
+            );*/
 
             /*Debug.Log(
                 $"[PlacePreRecordedRole] " +
