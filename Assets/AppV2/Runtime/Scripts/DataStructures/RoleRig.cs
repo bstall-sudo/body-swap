@@ -179,6 +179,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
             if (animator != null)
             {
                 avatarName = animator.gameObject.name;
+
+                Debug.Log($"[RoleRig] avatarName is: '{avatarName}'.");
             }
             else if (logWarnings)
             {

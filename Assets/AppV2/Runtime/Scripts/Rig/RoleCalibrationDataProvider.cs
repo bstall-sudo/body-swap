@@ -114,6 +114,20 @@ namespace AppV2.Runtime.Scripts.Rig
                     };
                 }
 
+                /*Animator foundAnimator = animator;
+
+                if (foundAnimator == null)
+                    foundAnimator = GetComponentInChildren<Animator>(true);
+
+                string avatarName = foundAnimator != null
+                    ? foundAnimator.gameObject.name
+                    : "UNKNOWN AVATAR";
+
+                string controllerName =
+                    foundAnimator != null && foundAnimator.runtimeAnimatorController != null
+                        ? foundAnimator.runtimeAnimatorController.name
+                        : "NO ANIMATOR CONTROLLER";*/
+
                 result.Add(new ConversationRoleMeta
                 {
                     RoleId = role.roleId,

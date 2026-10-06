@@ -8480,8 +8480,8 @@ MonoBehaviour:
     prefab: {fileID: 7595365677747182099, guid: 1fad5b4caf371fe40a1d58f5922d9200, type: 3}
     sourcePath: 
     isExternal: 0
-  - avatarId: default
-    prefab: {fileID: 7595365677747182099, guid: 1fad5b4caf371fe40a1d58f5922d9200, type: 3}
+  - avatarId: affe_001
+    prefab: {fileID: 280181206569995022, guid: 487a0abba510b974a8ade7bbafd46cc5, type: 3}
     sourcePath: 
     isExternal: 0
   - avatarId: kaktus_001
@@ -26339,118 +26339,132 @@ MonoBehaviour:
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneLandschaftEcke1Froschmann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneLandschaftEcke1
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rezeptionistKuerbiskopf_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rezeptionist
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: bruecke1Bart_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: bruecke1
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgTorHornmonster_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgTor
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: tengeGruselfrau_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: tenge
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roterHimmel_kueken_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roterHimmel
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: aussichtBaumBurgAffe_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: aussichtBaumBurg
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgEckeVorBrueckeKaktus_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgEckeVorBruecke
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneBurgTreppeFroschmann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgTreppe
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus2Schneemann_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus2
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus1Adabadenixe_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus1
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: supermanZiegenwolf_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: superman
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rotesDach1Esmeralda_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rotesDach1
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneLandschaftUnterBrueckeBartrollkragen_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneLandschaftUnterBruecke
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgVorSuperman-Clown_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgVorSuperman
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: gastEingangInnen-Koenighahn_001
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
+    npcGroupSpawnId: gastEingangInnen
+  - enabled: 1
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: hotelLobby
+    sessionId: grueneBurgTreppeMitte-Schlangenmonster_001
+    alignWithPlayer: 1
+    canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgHinterBaum
+  - enabled: 1
+    workshopFolderName: preRecordedScenes
+    sessionFolderName: hotelLobby
+    sessionId: roteBurgEckeAussen-Echsenmonster_001
+    alignWithPlayer: 1
+    canBecomeActiveConversationPartner: 1
+    npcGroupSpawnId: roteBurgEckeAussen
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
   _storageFolderName: SessionRecordingData
@@ -26479,7 +26493,7 @@ MonoBehaviour:
     Takes: []
   embodimentOffsetRoot: {fileID: 2119984982}
   roles:
-  - avatarId: schlangenmonster_001
+  - avatarId: echsenmonster_001
     roleSpawnId: 
     roleId: A
     slotId: A
@@ -26552,7 +26566,7 @@ MonoBehaviour:
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
   StartInPlaybackFullConversationMode: 0
-  _sessionFolder: 2026-10-05-UTC-12-35-00_09
+  _sessionFolder: 2026-10-06-UTC-12-22-21_09
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}
