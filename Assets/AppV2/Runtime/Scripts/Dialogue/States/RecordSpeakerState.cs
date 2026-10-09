@@ -182,6 +182,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                     {
                         //UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | !_isRecording && _flow.Stage.RecordingSaveCompleted(): {!_isRecording && _flow.Stage.RecordingSaveCompleted()} [checkSceneCount01] ");
                         _npcGroupId = _flow.GetNpcGroupId(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking);
+                         _flow.RemoveActiveRolesTooFarAwayFromPlayer(toBeRecorded, false);
                         //UnityEngine.Debug.Log($"[RecordSpeakerState] toBeRecorded {toBeRecorded}, sceneConnt: {sceneCount} | CurrentNpcGroupId is: {_npcGroupId} ");
                         _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
                     }

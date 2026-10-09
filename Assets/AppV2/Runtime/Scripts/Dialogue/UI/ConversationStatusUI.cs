@@ -34,6 +34,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             SetStatusText("Zuhörer");
         }
 
+        public void ShowLRecordRemainingState()
+        {
+            SetStatusText("Zuhörer Record Remaining");
+        }
+
         public void ShowChooseSpeakerState()
         {
             SetStatusText("linker Trigger -> nächste Figur\n\n" 

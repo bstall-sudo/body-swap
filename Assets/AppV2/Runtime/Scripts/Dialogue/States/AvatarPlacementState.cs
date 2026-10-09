@@ -76,54 +76,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
         }
 
-/*
-       private void PlaceCurrentRoleAndAdvance()
-        {
-            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
-            {
-                GoToNextState();
-                return;
-            }
 
-            //Vector3 placement = GetTestPlacementPosition(_currentRoleIndexForPlacement);
-            int activeRoleCount =0;
-
-            foreach (RoleRig role in _flow.Stage.roles)
-            {
-                if (!role.hasPreRecordedTakes)
-                {
-                    activeRoleCount++;
-                }
-            }
-            Vector3 placement = RolePlacementUtility.GetCirclePlacementPosition(_currentRoleIndexForPlacement, activeRoleCount);
-
-            //y wird hier dem Terrain angeglichen.
-            placement.y = _flow.Stage.GetGroundYStageLocal(placement);
-
-            //hier nochmal flach machen, damit die Rotation nicht schief wird
-            Vector3 flatPlacement = placement;
-            flatPlacement.y = 0f;
-
-            Quaternion rotation = RolePlacementUtility.GetCirclePlacementRotation(flatPlacement);
-
-            
-            _flow.Stage.AvatarCalibration.PlaceRoleAt(
-                _currentRoleIndexForPlacement,
-                placement,
-                rotation,
-                _flow.Stage._stageRoot
-            );
-
-            _currentRoleIndexForPlacement++;
-
-            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
-            {
-                GoToNextState();
-                return;
-            }
-
-        }
-        */
 
         private void PlaceCurrentRoleAndAdvance()
         {

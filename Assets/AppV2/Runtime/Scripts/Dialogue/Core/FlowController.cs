@@ -730,6 +730,55 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
         }
 
+        public bool PlayerNearNewNpcsThatAreNotCurrentNpcs(
+            List<int> roleIndicesOfPassiveRoles,
+            List<int> roleIndicesOfCurrentNpcs,
+            int playerIndex,
+            float radius)
+        {
+            bool playbackPreRecordedScene = false; 
+
+            if (roleIndicesOfPassiveRoles == null)
+                return playbackPreRecordedScene;
+
+            foreach (int passiveIndex in roleIndicesOfPassiveRoles)
+            {
+                if (_data.AllRoles[passiveIndex].hasPlayedBackPreRecordedTakes)
+                {
+                    continue;
+                }
+
+                if (!_data.AllRoles[passiveIndex].hasPreRecordedTakes)
+                {
+                    continue;
+                }
+
+                if (roleIndicesOfCurrentNpcs.Contains(_data.AllRoles[passiveIndex].roleIndex))
+                {
+                    continue;
+                }
+                if (!IsPlayerNearNpc(
+                        passiveIndex,
+                        _data.AllRoles[playerIndex].root,
+                        radius, _maxHeightDifference))
+                {
+                    continue;
+                }
+                else
+                {
+                    playbackPreRecordedScene = true;
+                    break;
+                }
+
+                
+            }
+            
+            return playbackPreRecordedScene;
+            
+        }
+
+
+
         private List<RoleRig> ActiveRolesThatAreNotNearPlayer(
             int playerIndex,
             float radius)
@@ -986,6 +1035,25 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _data.CurrentNpcGroupId = "";
             _data.Playbacks.Clear();
             _data.CurrentPreRecordedPlaybacks.Clear();
+           
+        }
+
+        public void PlaybackPreRecordedToSpeakerIfPlayerWentOn_DataAdjustments()
+        {
+ 
+
+            Stage.SwitchNpcGroupToCurrentSession(_data.CurrentNpcGroupId);
+            //_data.FromPreRecordedToSpeaker = true;
+
+            foreach(int index in _data.CurrentPreRecordedPlaybacks)
+            {
+                _data.Playbacks.Add(index);
+            }
+
+            // Beim Wechsel zum Speaker gibt es zunächst
+            // keine laufenden Playbacks.
+            _data.CurrentNpcGroupId = "";
+            
            
         }
 

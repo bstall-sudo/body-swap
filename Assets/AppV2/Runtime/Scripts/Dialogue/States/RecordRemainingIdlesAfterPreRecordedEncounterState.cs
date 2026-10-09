@@ -63,7 +63,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (_flow.StatusUI != null)
             {
-                _flow.StatusUI.ShowListenerState();
+                _flow.StatusUI.ShowLRecordRemainingState();
                 _flow.StatusUI.ShowCustomCue(
                     "Zuhörer verbliebene Rollen",
                     new Vector2(0f, 180f),

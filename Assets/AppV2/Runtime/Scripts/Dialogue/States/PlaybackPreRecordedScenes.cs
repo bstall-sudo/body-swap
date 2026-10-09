@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using AppV2.Runtime.Scripts.DataStructures;
 
+using System.Data;
+
 namespace AppV2.Runtime.Scripts.Dialogue.States
 {
     public class PlaybackFullPreRecordedScenes : IState
@@ -21,11 +23,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int _sceneCount;
         private int _roleCount;
 
+        private float _radiusNpcStartTalking;
+
         private int _toBeRecorded;
         private bool _startInPlaybackFullConversationMode;
         
-        
+        private string _npcGroupId;
         private bool _allplaybaksStopped = false;
+        private bool _waitingForRecordingSave = false;
+         private bool _saveCompleted = false;
 
         public DialogueMode Mode => DialogueMode.PlaybackFullPreRecordedScenes;
 
@@ -47,6 +53,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _toBeRecorded = _flow._data.ToBeRecorded;
             //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter: _toBeRecorded index is: {_toBeRecorded}");
             _roleCount =  _flow._data.CurrentPreRecordedPlaybacks.Count;
+            _radiusNpcStartTalking = _flow.Stage._radiusNpcStartTalking;
             //Debug.Log($"[PlaybackFullPreRecordedScenes] Enter after RoleCountUpdate: roleCount is: {_roleCount}, SceneCount is: {_sceneCount} SceneCount For PrerecordedScenes is: {_sceneCountForPreRecordedScenes}");
 
             _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
@@ -100,58 +107,85 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
             if (!_allplaybaksStopped)
             {
-                _flow.Stage.DriveAndRecordTickActiveRole(_toBeRecorded, _sceneCount, dt);
-                _flow.Stage.PlaybackTick(_playbacks);
-                //_flow.Stage.ReactiveIdleStart(_reactiveIdles, _playbacks[0]);
-                //
-                _allplaybaksStopped = _flow.Stage.PlaybacksAreAllStopped(_preRecordedRolesIndices);
-            }
-            if (_allplaybaksStopped)
-            {/*
-                Debug.Log(
-                    $"[PRE REC] BEFORE RecordingEnd: " +
-                    $"localScene={_sceneCount}, globalScene={_flow._data.SceneCount}"
-                );
-*/
-                _flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
-/*
-                Debug.Log(
-                    $"[PRE REC] AFTER RecordingEnd: " +
-                    $"localScene={_sceneCount}, globalScene={_flow._data.SceneCount}"
-                );
-                */
-                _sceneCount++;
-                
-                /*
-                Debug.Log(
-                    $"[PRE REC] AFTER local ++: " +
-                    $"localScene={_sceneCount}, globalScene={_flow._data.SceneCount}"
+                _flow.Stage.DriveAndRecordTickActiveRole(
+                    _toBeRecorded, _sceneCount, dt
                 );
 
-                */
+                _flow.Stage.PlaybackTick(_playbacks);
+
+                _allplaybaksStopped =
+                    _flow.Stage.PlaybacksAreAllStopped(_preRecordedRolesIndices);
+            }
+            else if (!_waitingForRecordingSave && !_saveCompleted)
+            {
+                // Playbacks beendet, Recording abschließen
+
+                _flow.Stage.DriveAndRecordTickActiveRole(
+                    _toBeRecorded, _sceneCount, dt
+                );
+
+                _flow.Stage.RecordingEnd(_toBeRecorded, _sceneCount);
+
+                //Debug.Log( $"[PRE REC] RecordingEnd: Scene {_sceneCount}");
+
+                _waitingForRecordingSave = true;
+            }
+            else if (_waitingForRecordingSave && !_saveCompleted)
+            {
+                // Recorder weiter aktualisieren, damit Finalisierung erfolgt
+                _flow.Stage.DriveAndRecordTickActiveRole(
+                    _toBeRecorded, _sceneCount, dt
+                );
+                // Warten, bis Recording gespeichert wurde
+
+                if (_flow.Stage.RecordingSaveCompleted())
+                {
+                    //Debug.Log("[PRE REC] RecordingSaveCompleted!");
+
+                    _sceneCountForPreRecordedScenes++;
+                    _sceneCount++;
+
+                    _waitingForRecordingSave = false;
+                    _saveCompleted = true;
+                }
+            }
+
+            if (_saveCompleted && _allplaybaksStopped)
+            {
+                _saveCompleted = false;
+
+                _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
+               
+                bool preRecordedPlaybackTakesLeft = _flow.Stage.PlaybackHasAnyTakeForSceneForIndexList(_preRecordedRolesIndices, _sceneCountForPreRecordedScenes);
+                bool playerNearCurrentNpcs = _flow.PlayerNearNpcs(_flow._data.CurrentPreRecordedPlaybacks, _flow._data.ToBeRecorded, _radiusNpcStartTalking);
+                bool playerNearOtherNpcs = _flow.PlayerNearNewNpcsThatAreNotCurrentNpcs(_flow._data.IndicesOfPassiveRoles, _flow._data.CurrentPreRecordedPlaybacks, _toBeRecorded,_radiusNpcStartTalking);
                 
-                _sceneCountForPreRecordedScenes++;
-                if (_flow.Stage.PlaybackHasAnyTakeForSceneForIndexList(_preRecordedRolesIndices, _sceneCountForPreRecordedScenes))
+                //Fall 1
+                if (preRecordedPlaybackTakesLeft && playerNearCurrentNpcs && !playerNearOtherNpcs)
                 {
                     //UnityEngine.Debug.Log($"[PlaybackFullPreRecordedScenes] after update: SceneCount for Prerecorded Scenes is: {_sceneCountForPreRecordedScenes}");
                     _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
                     PrepareStartPlaybacksReactiveIdlesForScene();
                     _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
                     _allplaybaksStopped = false;
+                    _saveCompleted  = false;
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 1 TakesLeft && Player is near Current NPC and NOT near other NPCs. ");
                 }
-                else
+                //Fall 2
+                if (preRecordedPlaybackTakesLeft && playerNearCurrentNpcs && playerNearOtherNpcs)
                 {
-                    //UnityEngine.Debug.Log("[PlaybackFullPreRecordedScenes] No more scenes found. Restart PlaybackFullConversation.");
-                    
                     _flow.Stage.ReactiveIdleEnd(_reactiveIdles);
-                    /*PrintRoleLists(
-                            $"[PlaybackPreRecordedScenes] Direction at Scene: {_flow._data.SceneCount}, Roles.Count is: {_flow._data.Roles.Count}", 
-                            _flow._data.Playbacks,
-                            _flow._data.ReactiveIdles,
-                            _flow._data.CurrentPreRecordedPlaybacks,
-                            _flow._data.ToBeRecorded
-                            );*/
-                    
+                    PrepareStartPlaybacksReactiveIdlesForScene();
+                    _flow.Stage.RecordingBegin(_toBeRecorded,_sceneCount);
+                    _allplaybaksStopped = false;
+                    _saveCompleted  = false;
+                    Debug.LogError($"[PlaybackPreRecordedScenes] Fall 2 Player is near Current NPC and near other NPCs that should not be possible. ");
+                }
+                //Fall 3
+                if (preRecordedPlaybackTakesLeft && !playerNearCurrentNpcs && !playerNearOtherNpcs)
+                {
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 3 No Takes Left, Player is NOT near Current NPC and Not near other NPCs RoleCount ={_flow._data.Roles.Count} ");
+                    _flow.PlaybackPreRecordedToSpeakerIfPlayerWentOn_DataAdjustments();
                     if(_flow._data.Roles.Count == 1)
                     {
                         
@@ -167,26 +201,139 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                         _flow._data.GoToRecordRemainingState = true;
                         _flow.SetState(new PlayerAlignState(_flow));
                     }
+                }
+                //Fall 4
+                if (preRecordedPlaybackTakesLeft && !playerNearCurrentNpcs && playerNearOtherNpcs)
+                {
+                    //hier wird die letzte abgespielte PreRecorded Scene in die aktuelle Session integriert.
+                    _flow.Stage.SwitchNpcGroupToCurrentSession(_flow._data.CurrentNpcGroupId);
                     
-                    
-                    
-                }       
-                     /*   
-                    else
+                    _npcGroupId = _flow.GetNpcGroupId(_flow._data.IndicesOfPassiveRoles, _toBeRecorded, _radiusNpcStartTalking);
+                    //in diesem Fall, soll die Anzahl der aktiven Rollen reduziert werden, weil es sonst zu kompliziert wird.
+
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 4 Some Takes Left, Player is NOT near Current NPC and near other NPCs RoleCount ={_flow._data.Roles.Count} ");
+                    if(_flow._data.Roles.Count != 1)
                     {
-                        PrintRoleLists(
-                            "[RecordRemainingIdlesAfterPreRecordedEncounterState]", 
-                            _flow._data.Playbacks,
-                            _flow._data.ReactiveIdles,
-                            _flow._data.CurrentPreRecordedPlaybacks,
-                            _flow._data.ToBeRecorded
-                            );
+                        _flow._data.ActiveRoleCount =1;
+                        List<int> indicesToBeRemovedFromActiveRoles = new List<int>();
+
+                        foreach(RoleRig role in _flow._data.Roles){
+                            int i = role.roleIndex;
+                            if(i != _toBeRecorded && !_flow._data.IndicesOfPassiveRoles.Contains(i))
+                            { 
+                                indicesToBeRemovedFromActiveRoles.Add(i);
+                                role.isActiveConversationPartner = false;
+                                
+                                _flow._data.IndicesOfPassiveRoles.Add(i);
+                                
+                            }
+             
+                        }
+                      
+                        foreach(RoleRig role in _flow._data.Roles)
+                        {
+                            if (!indicesToBeRemovedFromActiveRoles.Contains(role.roleIndex))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                _flow._data.Roles.Remove(role);
+                            }
+                        }
+                    }
+                    _flow._data.Playbacks.Clear();
+                    _flow._data.ReactiveIdles.Clear();
+                    _flow._data.ActiveRoleCount = _flow._data.Roles.Count;
+                    _flow._data.CurrentNpcGroupId = _npcGroupId;
+                    _flow._data.SceneCount = _sceneCount;
+                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(
+                        _flow._data.IndicesOfPassiveRoles,
+                        _toBeRecorded,
+                        _radiusNpcStartTalking,
+                        _npcGroupId);
+                    _flow._data.GoToSpeakerState = false;
+                    _flow._data.GoToPlaybackPreRecordedState = true;
+                    _flow._data.GoToRecordRemainingState = false;
+                    _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
+                        
+                }
+                
+                //Fall 5
+                if (!preRecordedPlaybackTakesLeft && playerNearCurrentNpcs && !playerNearOtherNpcs)
+                {
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 5 NoTakes Left Player is near Current NPC and Not near other NPCs ");
+                    if(_flow._data.Roles.Count == 1)
+                    {
+                        Debug.Log($"[PlaybackPreRecordedScenes] Fall 5 No Takes Left, Player is near Current NPC and Not near other NPCs RoleCount ={_flow._data.Roles.Count} ");
+                        _flow.PlaybackPreRecordedToSpeaker_DataAdjustments();
+                        _flow._data.GoToSpeakerState = true;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = false;
+                        _flow.SetState(new RecordSpeakerState(_flow));
+                        
+                    }else
+                    {   
+                        Debug.Log($"[PlaybackPreRecordedScenes] Fall 5 No Takes Left, Player is near Current NPC and Not near other NPCs RoleCount ={_flow._data.Roles.Count} ");
                         _flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
                         _flow._data.GoToSpeakerState = false;
-                        _flow._data.GoToRecordRemainingState = true;
                         _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = true;
+                        _flow.SetState(new PlayerAlignState(_flow));
+                    }
+                    
+                }
+                //Fall 6
+                if (!preRecordedPlaybackTakesLeft && playerNearCurrentNpcs && playerNearOtherNpcs)
+                {
+                    Debug.LogError($"[PlaybackPreRecordedScenes] Player is near Current NPC and near other NPCs that should not be possible. ");
+                }
+                //Fall 7
+                if(!preRecordedPlaybackTakesLeft && !playerNearCurrentNpcs && !playerNearOtherNpcs)
+                {
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 7 No Takes Left, Player NOT is near Current NPC and Not near other NPCs RoleCount ={_flow._data.Roles.Count} ");
+                    //erst letzte PreRecorded zu session hinzufügen, etc.
+                    _flow.PlaybackPreRecordedToSpeaker_DataAdjustments();
+
+                    //dann alle zu weit entfernten aktiven Rollen entfernen.
+                    _flow.RemoveActiveRolesTooFarAwayFromPlayer(_toBeRecorded);
+                    _flow.SpeakerStateExitAutoSelection();
+                    if(_flow._data.Roles.Count == 1)
+                    {
                         
-                    }*/
+                        _flow._data.GoToSpeakerState = true;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = false;
+                        _flow.SetState(new RecordSpeakerState(_flow));
+                        
+                    }else
+                    {   
+                        _flow._data.GoToSpeakerState = false;
+                        _flow._data.GoToPlaybackPreRecordedState = false;
+                        _flow._data.GoToRecordRemainingState = false;
+                        _flow.SetState(new PlayerAlignState(_flow));
+                    }
+                }
+                //Fall 8
+                if(!preRecordedPlaybackTakesLeft && !playerNearCurrentNpcs && playerNearOtherNpcs)
+                {
+                    Debug.Log($"[PlaybackPreRecordedScenes] Fall 8 No Takes Left, Player NOT is near Current NPC and NEAR other NPCs RoleCount ={_flow._data.Roles.Count} ");
+                    //erst letzte PreRecorded zu session hinzufügen, etc.
+                    _flow.PlaybackPreRecordedToSpeaker_DataAdjustments();
+
+                    //dann alle zu weit entfernten aktiven Rollen entfernen.
+                    _flow.RemoveActiveRolesTooFarAwayFromPlayer(_toBeRecorded);
+                    _npcGroupId = _flow.GetNpcGroupId(_flow._data.IndicesOfPassiveRoles, _toBeRecorded, _radiusNpcStartTalking);
+                    _flow._data.SceneCount = _sceneCount;
+                    _flow.RecordSpeakerToPlaybackPreRecorded_DataAdjustments(_flow._data.IndicesOfPassiveRoles, _toBeRecorded, _radiusNpcStartTalking, _npcGroupId);
+                    _flow.SetState(new PlaybackFullPreRecordedScenes(_flow));
+               
+                    
+                }
+
+
+      
+           
                     
                     
             }
@@ -229,14 +376,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Active Roles have length (before update): {_flow._data.Roles.Count}");
             // preRecordedPlaybacks zu aktiven Rollen zufügen
 
-            if (_flow._data.GoToRecordRemainingState)
-            {
-                _flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
-            }
-            else
-            {
-                _flow.PlaybackPreRecordedToSpeaker_DataAdjustments();
-            }
+     
             
             
             //UnityEngine.Debug.Log($"[PlaybackPreRecordedScenes] Indices of IndicesOfPassiveRoles has length (after update): {_flow._data.IndicesOfPassiveRoles.Count}");
