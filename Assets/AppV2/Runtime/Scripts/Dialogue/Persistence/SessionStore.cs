@@ -17,12 +17,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         private string _workshopFolderName ;
 
-        public SessionStore(string appFolder = "SessionRecordingData", string workshopFolderName= "Workshop", string sessionFolderName = "Sessions") 
+        private string _sessionIdName;
+
+        public SessionStore(string appFolder = "SessionRecordingData", string workshopFolderName= "Workshop", string sessionFolderName = "Sessions", string sessionIdName = "") 
         { 
             _appFolder = appFolder; 
             _workshopFolderName = workshopFolderName; 
             _sessionFolderName = sessionFolderName; 
-        
+            _sessionIdName = sessionIdName;
         }
 
         public string RootPath(
@@ -51,15 +53,42 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             );
         }
 
-        public string CreateNewSessionFolder(out string sessionId)
+        public string CreateNewSessionFolder(
+            string stageSpawnId,
+            string roleId,
+            out string sessionId)
         {
-            //sessionId = Guid.NewGuid().ToString("N");
-            sessionId =  DateTime.UtcNow.ToString("yyyy-MM-dd-UTC-HH-mm-ss_ff");
+            string baseId = $"{stageSpawnId}-{roleId}";
 
-            _currentSessionId = sessionId; 
-            string Root = RootPath();
-            string dir = Path.Combine(Root, sessionId);
+            // Optionalen Session-Namen anhängen
+            if (!string.IsNullOrWhiteSpace(_sessionIdName))
+            {
+                baseId += $"-{_sessionIdName.Trim()}";
+            }
+
+            string root = RootPath();
+
+            Directory.CreateDirectory(root);
+
+            string candidateId = baseId;
+            int counter = 1;
+
+            // Prüfen, ob der Ordner bereits existiert
+            while (Directory.Exists(Path.Combine(root, candidateId)))
+            {
+                candidateId = $"{baseId}-{counter}";
+                counter++;
+            }
+
+            sessionId = candidateId;
+            _currentSessionId = sessionId;
+
+            string dir = Path.Combine(root, sessionId);
+
             Directory.CreateDirectory(dir);
+
+            Debug.Log($"[SessionStore] Created Session: {sessionId}");
+
             return dir;
         }
 

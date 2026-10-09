@@ -32,30 +32,31 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
-            //Debug.Log("[AvatarPlacementState] Enter");
-
             _roleCount = _flow.Stage.roleCount;
             selectableNext = _flow.Stage.selectableNext;
+
             _allRolesIndices = new List<int>();
             _currentRoleIndexForPlacement = 0;
             _stageRoot = _flow.Stage._stageRoot;
 
-            for (int i = 0; i < _flow.Stage.roleCount; i++){
+            for (int i = 0; i < _roleCount; i++)
+            {
                 _allRolesIndices.Add(i);
                 PlaceCurrentRoleAndAdvance();
-                
-                //UnityEngine.Debug.Log($"_allRolesIndices count is: {_allRolesIndices.Count}");
-
             }
-            //Debug.Log("=== NPC placement-Debug  BEFORE RigUpdatePipeline ===");
-            //LogNpcRigPositions();
-            ////hier true, weil bei VisualRig und AvatarRig sollen auch die Roots Kopiert werden im AvatarPlacement State. 
-            _flow.Stage.RigUpdatePipeline(_allRolesIndices, true);
 
-            //Debug.Log("=== NPC placement-Debug AFTER RigUpdatePipeline ===");
-            //LogNpcRigPositions();
-            
-            
+            _flow.Stage.RigUpdatePipeline(
+                _allRolesIndices,
+                true
+            );
+
+            // Alle Figuren haben jetzt ihre endgültige Startposition.
+            _flow.Stage._recordingController.UpdateSessionStartRootPoses(
+                _flow.Stage.roles,
+                _stageRoot
+            );
+
+            GoToNextState();
         }
 
         public void Tick(float dt)
@@ -82,7 +83,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
             {
-                GoToNextState();
                 return;
             }
 
@@ -147,10 +147,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             // Immer weitergehen, egal ob normal oder prerecorded
             _currentRoleIndexForPlacement++;
 
-            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
-            {
-                GoToNextState();
-            }
+
         }
 
         public void PlacePreRecordedRole(int roleIndex)

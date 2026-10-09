@@ -185,10 +185,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 if (preRecordedPlaybackTakesLeft && !playerNearCurrentNpcs && !playerNearOtherNpcs)
                 {
                     Debug.Log($"[PlaybackPreRecordedScenes] Fall 3 No Takes Left, Player is NOT near Current NPC and Not near other NPCs RoleCount ={_flow._data.Roles.Count} ");
-                    _flow.PlaybackPreRecordedToSpeakerIfPlayerWentOn_DataAdjustments();
+                    
                     if(_flow._data.Roles.Count == 1)
                     {
-                        
+                        _flow.PlaybackPreRecordedToSpeakerIfPlayerWentOn_DataAdjustments();
                         _flow._data.GoToSpeakerState = true;
                         _flow._data.GoToPlaybackPreRecordedState = false;
                         _flow._data.GoToRecordRemainingState = false;
@@ -196,6 +196,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                         
                     }else
                     {
+                        _flow.PlaybackPreRecordedToRecordRemaining_DataAdjustments();
                         _flow._data.GoToSpeakerState = false;
                         _flow._data.GoToPlaybackPreRecordedState = false;
                         _flow._data.GoToRecordRemainingState = true;

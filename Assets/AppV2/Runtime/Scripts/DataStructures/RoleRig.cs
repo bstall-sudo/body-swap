@@ -187,5 +187,26 @@ namespace AppV2.Runtime.Scripts.DataStructures
                 Debug.LogWarning($"[RoleRig] No Animator found under '{avatarRoot.name}'.");
             }
         }
+
+        public string GetAvatarName()
+        {
+            if (avatarRoot == null)
+            {
+                Debug.LogWarning($"[RoleRig] avatarRoot is null for role '{roleId}'.");
+                return avatarName;
+            }
+
+            var animator = avatarRoot.GetComponentInChildren<Animator>(true);
+
+            if (animator != null)
+            {
+                avatarName = animator.gameObject.name;
+
+                
+            }
+
+            return avatarName;
+      
+        }
     }
 }

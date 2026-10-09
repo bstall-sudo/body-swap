@@ -16,6 +16,7 @@ using UnityEngine.XR.Interaction.Toolkit.Locomotion.Gravity;
 
 
 
+
 namespace AppV2.Runtime.Scripts.Dialogue
 {
        
@@ -32,6 +33,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         [SerializeField] private string stageSpawnId = "default";
         public string StageSpawnId => stageSpawnId;
+
+        [Header("Grösse des Spielers")]
+        public float heightOfPlayerCm = 180f;
+        public float heightOfSeatedPlayerCm = 133f;
+
+        [SerializeField] public float fallbackFootSpacing = 0.2f;
+        [SerializeField] public float fallbackHipHeight = 0.9f;
 
         public bool simpleInputMode=true;
         public bool loseConversationPartnersIfTooFarAway= true;
@@ -52,6 +60,21 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private float _proceduralStepLength = 0.4f;
 
         public float ProceduralStepLength => _proceduralStepLength;
+
+        [Header("Name for storage folder in ApplicationPersistentDataPath (nur ändern wenn wirklich nötig)")]
+        [Header("")]
+        [SerializeField]
+        public String _storageFolderName = "SessionRecordingData";
+
+        [Header("Ordnername Workshop)")]
+        public string _workshopFolderName;
+
+        [Header("Ordnername für die Sessions einer Person, zbsp.")]
+        public string _personalFolderName = "Sessions";
+
+
+        [Header("Name für individuelle Session")]
+        public string _sessionIdName = "sessionIdName";
 
         private float _fallbackBodyYaw;
         private bool _fallbackBodyYawInitialized;
@@ -74,16 +97,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private List<Transform> _allRoleRoots = new();
 
 
-        [Header("Name for storage folder in ApplicationPersistentDataPath (nur ändern wenn wirklich nötig)")]
-        [Header("")]
-        [SerializeField]
-        public String _storageFolderName = "SessionRecordingData";
 
-        [Header("Ordnername Workshop)")]
-        public string _workshopFolderName;
-
-        [Header("Ordnername für individuelle Session")]
-        public string _personalFolderName = "Sessions";
 
         [ContextMenu("Build Imported NPC Roles")]
 
@@ -131,12 +145,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private AnimateBlendShapesViaAudioSources _blendShapeAudioAnimator;
         public AnimateBlendShapesViaAudioSources BlendShapeAudioAnimator => _blendShapeAudioAnimator;
 
-        [Header("Grösse des Spielers")]
-        public float heightOfPlayerCm = 180f;
-        public float heightOfSeatedPlayerCm = 133f;
 
-        [SerializeField] public float fallbackFootSpacing = 0.2f;
-        [SerializeField] public float fallbackHipHeight = 0.9f;
 
         public float avatarBaseHeightCm = 200f;
         public bool autoPlayerSizeRecognition = true;
@@ -623,7 +632,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             sourceStore = new SessionStore(
                 _storageFolderName,
                 import.workshopFolderName,
-                import.sessionFolderName
+                import.sessionFolderName,
+                import.sessionId
             );
 
             sourceSession = sourceStore.LoadSessionModel(import.sessionId);
@@ -837,7 +847,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
 
             
-            _store = new SessionStore(_storageFolderName, _workshopFolderName, _personalFolderName);
+            _store = new SessionStore(_storageFolderName, _workshopFolderName, _personalFolderName, _sessionIdName);
             
             _takeIndex = new SessionTakeIndex();
 
@@ -910,12 +920,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 // im OnValidate waren die Logwarnings auf false, damit man nicht mit Warnungen zugespammt wird.
                 for (int i = 0; i < roles.Count; i++)
                 {
-                    roles[i].ResolveAvatarName(true);
+                    roles[i].ResolveAvatarName(false);
                 }
 
+                string roleNameForSessionIdCreation = "";
+
+                if(roles.Count == 0 )
+                {
+                    Debug.LogError("[SessionIdCreation] roles.Count = {roles.Count} roles[0].RoleName = '' ");
+                }
+                else
+                {
+                    roleNameForSessionIdCreation = roles[0].GetAvatarName();
+                }
                 
 
-                _sessionFolder = _store.CreateNewSessionFolder(out string sessionId);
+                _sessionFolder = _store.CreateNewSessionFolder(stageSpawnId, roleNameForSessionIdCreation, out string sessionId);
 
                 _session = new SessionModel
                 {

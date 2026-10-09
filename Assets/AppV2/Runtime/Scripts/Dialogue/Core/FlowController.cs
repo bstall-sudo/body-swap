@@ -1045,8 +1045,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
             Stage.SwitchNpcGroupToCurrentSession(_data.CurrentNpcGroupId);
             //_data.FromPreRecordedToSpeaker = true;
 
+            // NPC-Gruppe aktivieren
+    
+
             foreach(int index in _data.CurrentPreRecordedPlaybacks)
             {
+                //Debug.Log($"[PlaybackPreRecordedScenes] Fall 3 No Takes Left, Player is NOT near Current NPC and Not near other NPCs index in _data.CurrentPreRecordedPlaybacks ={index} ");
                 _data.Playbacks.Add(index);
             }
 

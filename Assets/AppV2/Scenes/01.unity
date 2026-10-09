@@ -585,6 +585,10 @@ MonoBehaviour:
   sceneLoader: {fileID: 0}
   environmentId: default
   stageSpawnId: default
+  heightOfPlayerCm: 180
+  heightOfSeatedPlayerCm: 130
+  fallbackFootSpacing: 0.2
+  fallbackHipHeight: 0.9
   simpleInputMode: 1
   loseConversationPartnersIfTooFarAway: 1
   distanceToLoseActiveConversationPartner: 10
@@ -592,24 +596,21 @@ MonoBehaviour:
   usesPreRecordedCalibrationData: 1
   _proceduralStepSpeed: 10
   _proceduralStepLength: 0.4
+  _storageFolderName: SessionRecordingData
+  _workshopFolderName: 
+  _personalFolderName: Sessions
+  _sessionIdName: sessionIdName
   preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes: []
   importedNpcRoles: []
   rolesRoot: {fileID: 446506845}
-  _storageFolderName: SessionRecordingData
-  _workshopFolderName: 
-  _personalFolderName: Sessions
   roleCount: 3
   avatarCalibration: {fileID: 32639114}
   rolesVisualsVisibilityHandler: {fileID: 32639115}
   chooseSpeakerController: {fileID: 32639116}
   mirrorSetVisibility: {fileID: 1942974801}
-  heightOfPlayerCm: 180
-  heightOfSeatedPlayerCm: 130
-  fallbackFootSpacing: 0.2
-  fallbackHipHeight: 0.9
   avatarBaseHeightCm: 180
   autoPlayerSizeRecognition: 0
   groundHeightProvider: {fileID: 42353635}
@@ -26328,18 +26329,26 @@ MonoBehaviour:
   sceneLoader: {fileID: 793401280}
   environmentId: HotelUndLobby_01
   stageSpawnId: gast_draussen
+  heightOfPlayerCm: 180
+  heightOfSeatedPlayerCm: 100
+  fallbackFootSpacing: 0.2
+  fallbackHipHeight: 0.9
   simpleInputMode: 0
   loseConversationPartnersIfTooFarAway: 1
-  distanceToLoseActiveConversationPartner: 10
+  distanceToLoseActiveConversationPartner: 20
   distanceToReactivatePassiveRole: 3
   usesPreRecordedCalibrationData: 1
   _proceduralStepSpeed: 10
-  _proceduralStepLength: 0.5
+  _proceduralStepLength: 0.3
+  _storageFolderName: SessionRecordingData
+  _workshopFolderName: PreRecordingTest_01
+  _personalFolderName: multiplePreRecorded
+  _sessionIdName: Test
   preRecordedSceneCount: 0
   _radiusNpcStartTalking: 5
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
-  - enabled: 0
+  - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneLandschaftEcke1Froschmann_001
@@ -26433,7 +26442,7 @@ MonoBehaviour:
   - enabled: 1
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
-    sessionId: test_satz_1-16
+    sessionId: Test_viele_saetze_lang
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneLandschaftUnterBruecke
@@ -26467,18 +26476,11 @@ MonoBehaviour:
     npcGroupSpawnId: roteBurgEckeAussen
   importedNpcRoles: []
   rolesRoot: {fileID: 236209232}
-  _storageFolderName: SessionRecordingData
-  _workshopFolderName: PreRecordingTest_01
-  _personalFolderName: multiplePreRecorded
-  roleCount: 1
+  roleCount: 2
   avatarCalibration: {fileID: 793401279}
   rolesVisualsVisibilityHandler: {fileID: 793401278}
   chooseSpeakerController: {fileID: 793401277}
   mirrorSetVisibility: {fileID: 2084871790}
-  heightOfPlayerCm: 140
-  heightOfSeatedPlayerCm: 100
-  fallbackFootSpacing: 0.2
-  fallbackHipHeight: 0.9
   avatarBaseHeightCm: 200
   autoPlayerSizeRecognition: 0
   groundHeightProvider: {fileID: 793401276}
@@ -26522,7 +26524,7 @@ MonoBehaviour:
     leftFootSolver: {fileID: 755449715}
     rightFootSolver: {fileID: 1931955920}
     audioSource: {fileID: 1632719636}
-    heightOfRoleCm: 0
+    heightOfRoleCm: 180
     heightOfSeatedRoleCm: 0
     hasInitialStartPose: 0
     initialStartPos: {x: 0, y: 0, z: 0}
@@ -26559,14 +26561,80 @@ MonoBehaviour:
       rightFootTarget:
         LocalPosition: {x: 0, y: 0, z: 0}
         LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+  - avatarId: baer_001
+    roleSpawnId: 
+    roleId: B
+    slotId: B
+    sourceRoleId: 
+    roleIndex: 1
+    sourceRoleIndex: 1
+    npcGroupId: 
+    alignWithPlayer: 0
+    hasPreRecordedTakes: 0
+    hasPlayedBackPreRecordedTakes: 0
+    isActiveConversationPartner: 1
+    takeSource: 
+    sourceSessionId: 
+    sourceWorkshopFolderName: 
+    sourceSessionFolderName: 
+    avatarLoader: {fileID: 780788515}
+    roleRoot: {fileID: 780788514}
+    root: {fileID: 1106718683}
+    head: {fileID: 1466196902}
+    leftHand: {fileID: 1396646244}
+    rightHand: {fileID: 632902929}
+    leftFoot: {fileID: 291678139}
+    rightFoot: {fileID: 1140240597}
+    hip: {fileID: 1822376785}
+    hipSolver: {fileID: 1822376786}
+    leftFootSolver: {fileID: 291678135}
+    rightFootSolver: {fileID: 1140240598}
+    audioSource: {fileID: 529194169}
+    heightOfRoleCm: 180
+    heightOfSeatedRoleCm: 133
+    hasInitialStartPose: 0
+    initialStartPos: {x: 0, y: 0, z: 0}
+    initialStartYawDeg: 0
+    preRecordedStartRootPose:
+      LocalPosition: {x: 0, y: 0, z: 0}
+      LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+    visualRigRoot: {fileID: 689874910}
+    visualRolesVisibility: {fileID: 1899071022}
+    sittingIdle: 0
+    avatarRoot: {fileID: 715581305}
+    avatarName: 
+    avatar: {fileID: 715581306}
+    rigFollower: {fileID: 715581307}
+    visualRigFollower: {fileID: 1899071023}
+    visualGroundOffsetY: 0
+    usePlayerHeightAsDefault: 1
+    preRecordedCalibration:
+      headTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightHandTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      hipTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      leftFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
+      rightFootTarget:
+        LocalPosition: {x: 0, y: 0, z: 0}
+        LocalRotation: {x: 0, y: 0, z: 0, w: 0}
   UseXR: 1
   SmoothAlignSeconds: 0.1
   FullBodyTrackers: 0
   SeatedMode: 0
   allowTeleportation: 1
   ProceduralHipAndFeetMove: 1
-  StartInPlaybackFullConversationMode: 1
-  _sessionFolder: 
+  StartInPlaybackFullConversationMode: 0
+  _sessionFolder: gast_draussen-BaerSchweinchen-Test
   selectableNext: 0
   XrHead: {fileID: 1432525272}
   XrLeftHand: {fileID: 1625656610}

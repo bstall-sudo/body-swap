@@ -135,7 +135,7 @@ namespace AppV2.Runtime.Scripts.Rig
 
                     RoleSpawnId = role.roleSpawnId,
                     RoleIndex = i,
-                    RoleName = role.avatarName,
+                    RoleName = role.GetAvatarName(),
                     HeightOfRoleCm = role.heightOfRoleCm,
                     SittingIdle = role.sittingIdle,
 

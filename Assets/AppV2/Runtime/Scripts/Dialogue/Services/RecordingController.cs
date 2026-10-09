@@ -127,6 +127,83 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             //UnityEngine.Debug.Log($"[RecordingController] Saved {_session.Roles.Count} role calibration entries to session model.");
         }
 
+//damit Rollen, die keine Takedaten bekommen trotzdem mit einer StartRootPose relativ zum Stage root gespeichert werden und nicht relativ zu
+//zu ihrem Spawn-Punkt.
+        public void UpdateSessionStartRootPoses(
+            IReadOnlyList<RoleRig> roles,
+            Transform stageRoot)
+        {
+            if (_session == null || _session.Roles == null)
+            {
+                Debug.LogError(
+                    "[RecordingController] Cannot update StartRootPoses. SessionModel is null."
+                );
+                return;
+            }
+
+            if (roles == null || stageRoot == null)
+            {
+                Debug.LogError(
+                    "[RecordingController] Roles or StageRoot is null."
+                );
+                return;
+            }
+
+            foreach (ConversationRoleMeta meta in _session.Roles)
+            {
+                if (meta == null)
+                    continue;
+
+                RoleRig role = null;
+
+                foreach (RoleRig candidate in roles)
+                {
+                    if (candidate != null && candidate.roleId == meta.RoleId)
+                    {
+                        role = candidate;
+                        break;
+                    }
+                }
+
+                if (role == null || role.root == null)
+                {
+                    Debug.LogWarning(
+                        $"[RecordingController] No root found for role={meta.RoleId}"
+                    );
+                    continue;
+                }
+
+                // Tatsächliche Position relativ zum StageRoot speichern.
+                meta.StartRootPose = new TransformData
+                {
+                    LocalPosition =
+                        stageRoot.InverseTransformPoint(role.root.position),
+
+                    LocalRotation =
+                        Quaternion.Inverse(stageRoot.rotation) *
+                        role.root.rotation
+                };
+
+                // Bestehende lokale Pose des RoleRoot ebenfalls aktualisieren.
+                if (role.roleRoot != null)
+                {
+                    meta.StartRoleRootPose = new TransformData
+                    {
+                        LocalPosition = role.roleRoot.localPosition,
+                        LocalRotation = role.roleRoot.localRotation
+                    };
+                }
+
+                Debug.Log(
+                    $"[RecordingController] Updated StartRootPose " +
+                    $"role={meta.RoleId}, " +
+                    $"pos={meta.StartRootPose.LocalPosition}"
+                );
+            }
+
+            _store.SaveSessionModel(_session);
+        }
+
         //public void BeginRecording(Transform stageRoot, Transform roleRoot, string roleId,float roleScale, int roleIndex,  int sceneCount, IInputTransformsProvider input)
         // Transform roleRoot, string roleId
         public void BeginRecording(
