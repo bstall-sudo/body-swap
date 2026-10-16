@@ -17,6 +17,19 @@ namespace AppV2.Runtime.Scripts.Loader
             // LoadExternalAvatarBundles();
         }
 
+        public List<string> GetAllAvatarIds()
+        {
+            if (_avatarById == null)
+                RebuildIndex();
+
+            List<string> avatarIds =
+                new List<string>(_avatarById.Keys);
+
+            avatarIds.Sort();
+
+            return avatarIds;
+        }
+
         public void RebuildIndex()
         {
             _avatarById = new Dictionary<string, AvatarEntry>();

@@ -22,6 +22,8 @@ namespace AppV2.Runtime.Scripts.Config
 
         public PresetConfig CurrentConfig => _currentConfig;
 
+        public event Action WorkshopStartRequested;
+
 
         // ============================================================
         // UNITY
@@ -39,6 +41,166 @@ namespace AppV2.Runtime.Scripts.Config
             }
         }
 
+        private void OnEnable()
+        {
+            if (configurationUI == null)
+                return;
+
+            configurationUI.LoadPresetRequested += OnLoadPresetRequested;
+            configurationUI.SavePresetRequested += OnSavePresetRequested;
+            configurationUI.SavePresetAsRequested += OnSavePresetAsRequested;
+            configurationUI.StartWorkshopRequested += OnStartWorkshopRequested;
+        }
+
+        private void OnDisable()
+        {
+            if (configurationUI == null)
+                return;
+
+            configurationUI.LoadPresetRequested -= OnLoadPresetRequested;
+            configurationUI.SavePresetRequested -= OnSavePresetRequested;
+            configurationUI.SavePresetAsRequested -= OnSavePresetAsRequested;
+            configurationUI.StartWorkshopRequested -= OnStartWorkshopRequested;
+        }
+
+        private void OnStartWorkshopRequested()
+        {
+            if (_currentConfig == null)
+            {
+                Debug.LogError(
+                    "[PresetController] Cannot start: no configuration."
+                );
+                return;
+            }
+
+            // Änderungen aus der UI übernehmen
+            configurationUI.WriteToConfig(_currentConfig);
+
+            // Auf ConversationStage anwenden
+            if (!ApplyPresetConfig(_currentConfig))
+            {
+                Debug.LogError(
+                    "[PresetController] Cannot start: applying preset failed."
+                );
+                return;
+            }
+
+            Debug.Log(
+                $"[PresetController] Starting workshop: " +
+                $"{_currentConfig.PresetName}"
+            );
+
+            WorkshopStartRequested?.Invoke();
+        }
+        
+        private void OnLoadPresetRequested()
+        {
+            string presetId = configurationUI.GetSelectedPresetId();
+
+            if (string.IsNullOrEmpty(presetId))
+            {
+                Debug.LogWarning(
+                    "[PresetController] No preset selected."
+                );
+                return;
+            }
+
+            _currentConfig = _presetStore.LoadPreset(presetId);
+
+            if (_currentConfig == null)
+            {
+                Debug.LogError(
+                    $"[PresetController] Could not load preset '{presetId}'."
+                );
+                return;
+            }
+
+            configurationUI.DisplayConfig(_currentConfig);
+
+            Debug.Log(
+                $"[PresetController] Loaded preset: {_currentConfig.PresetName}"
+            );
+        }
+
+        private void OnSavePresetAsRequested()
+        {
+            if (_currentConfig == null)
+            {
+                Debug.LogError(
+                    "[PresetController] No current configuration."
+                );
+                return;
+            }
+
+            // Aktuelle UI-Werte übernehmen
+            configurationUI.WriteToConfig(_currentConfig);
+
+            // Neue unabhängige Konfiguration erstellen
+            PresetConfig newConfig =
+                JsonUtility.FromJson<PresetConfig>(
+                    JsonUtility.ToJson(_currentConfig)
+                );
+
+            // Neue eindeutige ID
+            newConfig.PresetId = Guid.NewGuid().ToString("N");
+
+            if (string.IsNullOrWhiteSpace(newConfig.PresetName))
+            {
+                newConfig.PresetName = "New Preset";
+            }
+
+            if (!_presetStore.SavePreset(newConfig))
+            {
+                Debug.LogError(
+                    "[PresetController] Save As failed."
+                );
+                return;
+            }
+
+            _currentConfig = newConfig;
+
+            configurationUI.SetPresetOptions(
+                _presetStore.GetAllPresetIds()
+            );
+
+            configurationUI.SelectPreset(newConfig.PresetId);
+
+            Debug.Log(
+                $"[PresetController] Saved new preset: " +
+                $"{newConfig.PresetName} ({newConfig.PresetId})"
+            );
+        }
+
+        private void OnSavePresetRequested()
+        {
+            if (_currentConfig == null)
+            {
+                Debug.LogError(
+                    "[PresetController] No current configuration."
+                );
+                return;
+            }
+
+            // Aktuelle UI-Werte übernehmen
+            configurationUI.WriteToConfig(_currentConfig);
+
+            // Preset speichern
+            bool success = _presetStore.SavePreset(_currentConfig);
+
+            if (success)
+            {
+                Debug.Log(
+                    $"[PresetController] Saved preset: {_currentConfig.PresetName}"
+                );
+
+                // Dropdown aktualisieren
+                configurationUI.SetPresetOptions(
+                    _presetStore.GetAllPresetIds()
+                );
+
+                configurationUI.SelectPreset(_currentConfig.PresetId);
+            }
+        }
         public void BeginConfiguration()
         {
             if (configurationUI == null)
@@ -180,8 +342,6 @@ namespace AppV2.Runtime.Scripts.Config
             settings.HeightOfSeatedPlayerCm =
                 conversationStage.heightOfSeatedPlayerCm;
 
-            settings.FallbackRootSpacing =
-                conversationStage.fallbackFootSpacing;
 
             settings.FallbackHipHeight =
                 conversationStage.fallbackHipHeight;
@@ -215,6 +375,12 @@ namespace AppV2.Runtime.Scripts.Config
 
             settings.ProceduralHipAndFeetMove =
                 conversationStage.ProceduralHipAndFeetMove;
+
+            settings.ProceduralStepLength =
+                conversationStage._proceduralStepLength;
+
+            settings.ProceduralStepSpeed =
+                conversationStage._proceduralStepSpeed;
 
             settings.SmoothAlignSeconds =
                 conversationStage.SmoothAlignSeconds;
@@ -565,5 +731,17 @@ namespace AppV2.Runtime.Scripts.Config
                 $"NpcGroups: {config.NpcGroups.Count}"
             );
         }
+
+       /* public void SelectRecordMode()
+        {
+            recordConfigurationPanel.SetActive(true);
+            playbackConfigurationPanel.SetActive(false);
+        }
+
+        public void SelectPlaybackMode()
+        {
+            recordConfigurationPanel.SetActive(false);
+            playbackConfigurationPanel.SetActive(true);
+        }*/
     }
 }

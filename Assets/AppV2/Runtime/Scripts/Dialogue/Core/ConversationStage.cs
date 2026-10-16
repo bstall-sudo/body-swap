@@ -53,11 +53,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [SerializeField] private bool usesPreRecordedCalibrationData = true;
 
         [Header("Wie schnell sind die Schritte")]
-        [SerializeField] private float _proceduralStepSpeed = 5f;
+        [SerializeField] public float _proceduralStepSpeed = 5f;
 
         public float ProceduralStepSpeed => _proceduralStepSpeed;
 
-        [SerializeField] private float _proceduralStepLength = 0.4f;
+        [SerializeField] public float _proceduralStepLength = 0.4f;
 
         public float ProceduralStepLength => _proceduralStepLength;
 

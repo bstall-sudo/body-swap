@@ -18,6 +18,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             UnityEngine.Debug.Log("[SceneConfigurationState] Enter");
 
+            _flow.PresetController.WorkshopStartRequested += OnWorkshopStartRequested;
+
             _flow.ConfigurationUI.Show();
 
             _flow.PresetController.BeginConfiguration();
@@ -43,8 +45,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
         }
 
+        private void OnWorkshopStartRequested()
+        {
+            // Hier deinen bisherigen Übergang zum CalibrationState aufrufen.
+            // Beispiel, falls FlowController eine passende Methode anbietet:
+            _flow.SetState(new CalibrationState(_flow));
+            
+        }
+
         public void Exit()
         {
+            _flow.PresetController.WorkshopStartRequested -= OnWorkshopStartRequested;
+
+            _flow.ConfigurationUI.Hide();
             UnityEngine.Debug.Log("[SceneConfigurationState] Exit");
         }
     }

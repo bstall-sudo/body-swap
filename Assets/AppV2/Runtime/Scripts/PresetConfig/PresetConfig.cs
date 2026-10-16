@@ -100,6 +100,10 @@ namespace AppV2.Runtime.Scripts.Config
         public float SmoothAlignSeconds = 1f;
 
         public bool SelectableNext = true;
+
+        public float ProceduralStepLength = 0.4f;
+
+        public float ProceduralStepSpeed = 10f;
     }
 
 

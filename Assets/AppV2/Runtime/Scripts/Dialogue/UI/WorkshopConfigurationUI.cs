@@ -17,6 +17,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private GameObject menuRoot;
 
 
+        [SerializeField]
+        private ActiveRolesSettingsUI activeRolesSettingsUI;
+
+
         // ============================================================
         // PRESET
         // ============================================================
@@ -47,8 +51,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [Header("Player")]
         [SerializeField] private TMP_InputField playerHeightInput;
         [SerializeField] private TMP_InputField seatedPlayerHeightInput;
-
-        [SerializeField] private TMP_InputField fallbackRootSpacingInput;
         [SerializeField] private TMP_InputField fallbackHipHeightInput;
         [SerializeField] private TMP_InputField fallbackFootSpacingInput;
 
@@ -65,6 +67,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private Toggle seatedModeToggle;
         [SerializeField] private Toggle allowTeleportationToggle;
         [SerializeField] private Toggle proceduralHipAndFeetMoveToggle;
+        [SerializeField] private TMP_InputField proceduralStepSpeed;
+        [SerializeField] private TMP_InputField proceduralStepLength;
         [SerializeField] private Toggle selectableNextToggle;
 
         [SerializeField] private TMP_InputField smoothAlignInput;
@@ -183,8 +187,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             seatedPlayerHeightInput.text =
                 config.Player.HeightOfSeatedPlayerCm.ToString();
 
-            fallbackRootSpacingInput.text =
-                config.Player.FallbackRootSpacing.ToString();
 
             fallbackHipHeightInput.text =
                 config.Player.FallbackHipHeight.ToString();
@@ -212,6 +214,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             proceduralHipAndFeetMoveToggle.isOn =
                 config.Controls.ProceduralHipAndFeetMove;
+
+            proceduralStepSpeed.text =
+                config.Controls.ProceduralStepSpeed.ToString();
+
+            proceduralStepLength.text =
+                config.Controls.ProceduralStepLength.ToString();
 
             selectableNextToggle.isOn =
                 config.Controls.SelectableNext;
@@ -245,6 +253,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 config.Conversation
                     .MaxHeightDifferenceForNpcTrigger
                     .ToString();
+
+            if (activeRolesSettingsUI != null)
+            {
+                activeRolesSettingsUI.Display(config);
+            }
         }
 
 
@@ -283,9 +296,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 seatedPlayerHeightInput,
                 ref config.Player.HeightOfSeatedPlayerCm);
 
-            TryReadFloat(
-                fallbackRootSpacingInput,
-                ref config.Player.FallbackRootSpacing);
+
 
             TryReadFloat(
                 fallbackHipHeightInput,
@@ -377,6 +388,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             return presetDropdown.options[
                 presetDropdown.value
             ].text;
+        }
+
+        public void SelectPreset(string presetId)
+        {
+            if (presetDropdown == null)
+                return;
+
+            for (int i = 0; i < presetDropdown.options.Count; i++)
+            {
+                if (presetDropdown.options[i].text == presetId)
+                {
+                    presetDropdown.SetValueWithoutNotify(i);
+                    presetDropdown.RefreshShownValue();
+                    return;
+                }
+            }
         }
 
 

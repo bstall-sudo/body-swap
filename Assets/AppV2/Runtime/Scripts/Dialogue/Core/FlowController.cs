@@ -118,8 +118,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }else{
                 if(_xrMode){
                    
-                   SetState(new CalibrationState(this));
-                    //SetState(new SceneConfigurationState(this));
+                   //SetState(new CalibrationState(this));
+                    SetState(new SceneConfigurationState(this));
                 }else {
                     if(selectableNext)
                     {
