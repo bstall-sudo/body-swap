@@ -2,7 +2,8 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.Collections.Generic;
+using AppV2.Runtime.Scripts.Loader;
 using AppV2.Runtime.Scripts.Config;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
@@ -40,8 +41,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         // ============================================================
 
         [Header("Environment")]
-        [SerializeField] private TMP_InputField environmentIdInput;
-        [SerializeField] private TMP_InputField stageSpawnIdInput;
+        [SerializeField] private TMP_Dropdown environmentIdDropdown;
+        [SerializeField] private TMP_Dropdown stageSpawnIdDropdown;
+
+        [SerializeField] private EnvironmentLoader environmentLoader;
+
+        private PresetConfig _displayedConfig;
+
+        private List<string> _availableEnvironmentIds = new();
+        private List<string> _availableStageSpawnIds = new();
 
 
         // ============================================================
@@ -94,6 +102,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField]
         private TMP_InputField maxHeightDifferenceInput;
 
+        [SerializeField]
+        private ImportedNpcsSettingsUI importedNpcsSettingsUI;
+
 
         // ============================================================
         // START
@@ -134,6 +145,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (startWorkshopButton != null)
                 startWorkshopButton.onClick.AddListener(
                     () => StartWorkshopRequested?.Invoke());
+
+            environmentIdDropdown.onValueChanged.AddListener(
+                OnEnvironmentChanged
+            );
+
+            stageSpawnIdDropdown.onValueChanged.AddListener(
+                OnStageSpawnChanged
+            );
         }
 
 
@@ -158,107 +177,136 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         // DISPLAY CONFIG
         // ============================================================
 
+
         public void DisplayConfig(PresetConfig config)
         {
             if (config == null)
                 return;
 
+            _displayedConfig = config;
 
+            // ============================================================
             // PRESET
+            // ============================================================
 
-            presetNameInput.text =
-                config.PresetName;
+            presetNameInput.SetTextWithoutNotify(
+                config.PresetName
+            );
 
-
+            // ============================================================
             // ENVIRONMENT
+            // ============================================================
 
-            environmentIdInput.text =
-                config.Environment.EnvironmentId;
+            RefreshEnvironmentDropdown();
+            RefreshStageSpawnDropdown();
 
-            stageSpawnIdInput.text =
-                config.Environment.StageSpawnId;
-
-
+            // ============================================================
             // PLAYER
+            // ============================================================
 
-            playerHeightInput.text =
-                config.Player.HeightOfPlayerCm.ToString();
+            playerHeightInput.SetTextWithoutNotify(
+                config.Player.HeightOfPlayerCm.ToString()
+            );
 
-            seatedPlayerHeightInput.text =
-                config.Player.HeightOfSeatedPlayerCm.ToString();
+            seatedPlayerHeightInput.SetTextWithoutNotify(
+                config.Player.HeightOfSeatedPlayerCm.ToString()
+            );
 
+            fallbackHipHeightInput.SetTextWithoutNotify(
+                config.Player.FallbackHipHeight.ToString()
+            );
 
-            fallbackHipHeightInput.text =
-                config.Player.FallbackHipHeight.ToString();
+            fallbackFootSpacingInput.SetTextWithoutNotify(
+                config.Player.FallbackFootSpacing.ToString()
+            );
 
-            fallbackFootSpacingInput.text =
-                config.Player.FallbackFootSpacing.ToString();
+            avatarBaseHeightInput.SetTextWithoutNotify(
+                config.Player.AvatarBaseHeightCm.ToString()
+            );
 
-            avatarBaseHeightInput.text =
-                config.Player.AvatarBaseHeightCm.ToString();
-
-
+            // ============================================================
             // CONTROLS
+            // ============================================================
 
-            simpleInputModeToggle.isOn =
-                config.Controls.SimpleInputMode;
+            simpleInputModeToggle.SetIsOnWithoutNotify(
+                config.Controls.SimpleInputMode
+            );
 
-            fullBodyTrackersToggle.isOn =
-                config.Controls.FullBodyTrackers;
+            fullBodyTrackersToggle.SetIsOnWithoutNotify(
+                config.Controls.FullBodyTrackers
+            );
 
-            seatedModeToggle.isOn =
-                config.Controls.SeatedMode;
+            seatedModeToggle.SetIsOnWithoutNotify(
+                config.Controls.SeatedMode
+            );
 
-            allowTeleportationToggle.isOn =
-                config.Controls.AllowTeleportation;
+            allowTeleportationToggle.SetIsOnWithoutNotify(
+                config.Controls.AllowTeleportation
+            );
 
-            proceduralHipAndFeetMoveToggle.isOn =
-                config.Controls.ProceduralHipAndFeetMove;
+            proceduralHipAndFeetMoveToggle.SetIsOnWithoutNotify(
+                config.Controls.ProceduralHipAndFeetMove
+            );
 
-            proceduralStepSpeed.text =
-                config.Controls.ProceduralStepSpeed.ToString();
+            proceduralStepSpeed.SetTextWithoutNotify(
+                config.Controls.ProceduralStepSpeed.ToString()
+            );
 
-            proceduralStepLength.text =
-                config.Controls.ProceduralStepLength.ToString();
+            proceduralStepLength.SetTextWithoutNotify(
+                config.Controls.ProceduralStepLength.ToString()
+            );
 
-            selectableNextToggle.isOn =
-                config.Controls.SelectableNext;
+            selectableNextToggle.SetIsOnWithoutNotify(
+                config.Controls.SelectableNext
+            );
 
-            smoothAlignInput.text =
-                config.Controls.SmoothAlignSeconds.ToString();
+            smoothAlignInput.SetTextWithoutNotify(
+                config.Controls.SmoothAlignSeconds.ToString()
+            );
 
-
+            // ============================================================
             // CONVERSATION
+            // ============================================================
 
-            loseConversationPartnersToggle.isOn =
-                config.Conversation
-                    .LoseConversationPartnersIfTooFarAway;
+            loseConversationPartnersToggle.SetIsOnWithoutNotify(
+                config.Conversation.LoseConversationPartnersIfTooFarAway
+            );
 
-            distanceToLosePartnerInput.text =
-                config.Conversation
-                    .DistanceToLoseConversationPartner
-                    .ToString();
+            distanceToLosePartnerInput.SetTextWithoutNotify(
+                config.Conversation.DistanceToLoseConversationPartner.ToString()
+            );
 
-            distanceToReactivateRoleInput.text =
-                config.Conversation
-                    .DistanceToReactivatePassiveRole
-                    .ToString();
+            distanceToReactivateRoleInput.SetTextWithoutNotify(
+                config.Conversation.DistanceToReactivatePassiveRole.ToString()
+            );
 
-            npcTriggerRadiusInput.text =
-                config.Conversation
-                    .RadiusNpcStartTalking
-                    .ToString();
+            npcTriggerRadiusInput.SetTextWithoutNotify(
+                config.Conversation.RadiusNpcStartTalking.ToString()
+            );
 
-            maxHeightDifferenceInput.text =
-                config.Conversation
-                    .MaxHeightDifferenceForNpcTrigger
-                    .ToString();
+            maxHeightDifferenceInput.SetTextWithoutNotify(
+                config.Conversation.MaxHeightDifferenceForNpcTrigger.ToString()
+            );
+
+            // ============================================================
+            // ACTIVE ROLES
+            // ============================================================
 
             if (activeRolesSettingsUI != null)
             {
                 activeRolesSettingsUI.Display(config);
             }
+
+            // ============================================================
+            // IMPORTED NPCS
+            // ============================================================
+
+            if (importedNpcsSettingsUI != null)
+            {
+                importedNpcsSettingsUI.Display(config);
+            }
         }
+
 
 
         // ============================================================
@@ -279,11 +327,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             // ENVIRONMENT
 
-            config.Environment.EnvironmentId =
-                environmentIdInput.text;
-
-            config.Environment.StageSpawnId =
-                stageSpawnIdInput.text;
 
 
             // PLAYER
@@ -334,6 +377,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             TryReadFloat(
                 smoothAlignInput,
                 ref config.Controls.SmoothAlignSeconds);
+
+            TryReadFloat(
+                proceduralStepSpeed,
+                ref config.Controls.ProceduralStepSpeed
+            );
+
+            TryReadFloat(
+                proceduralStepLength,
+                ref config.Controls.ProceduralStepLength
+            );
 
 
             // CONVERSATION
@@ -432,6 +485,129 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             if (float.TryParse(input.text, out float value))
                 target = value;
+        }
+
+        private void OnDestroy()
+        {
+            environmentIdDropdown.onValueChanged.RemoveListener(
+                OnEnvironmentChanged
+            );
+
+            stageSpawnIdDropdown.onValueChanged.RemoveListener(
+                OnStageSpawnChanged
+            );
+        }
+
+        private void RefreshEnvironmentDropdown()
+        {
+            if (_displayedConfig == null || environmentLoader == null)
+                return;
+
+            _availableEnvironmentIds =
+                environmentLoader.GetEnvironmentIds();
+
+            SetDropdownOptions(
+                environmentIdDropdown,
+                _availableEnvironmentIds,
+                _displayedConfig.Environment.EnvironmentId
+            );
+        }
+
+        private void RefreshStageSpawnDropdown()
+        {
+            if (_displayedConfig == null || environmentLoader == null)
+                return;
+
+            _availableStageSpawnIds =
+                environmentLoader.GetSpawnIds(
+                    _displayedConfig.Environment.EnvironmentId
+                );
+
+            SetDropdownOptions(
+                stageSpawnIdDropdown,
+                _availableStageSpawnIds,
+                _displayedConfig.Environment.StageSpawnId
+            );
+        }
+
+        private void SetDropdownOptions(
+            TMP_Dropdown dropdown,
+            List<string> values,
+            string selectedValue)
+        {
+            dropdown.ClearOptions();
+
+            List<string> options = new()
+            {
+                "Bitte auswählen..."
+            };
+
+            int selectedIndex = 0;
+
+            // Gespeicherte ID ist vorhanden
+            int index = values.IndexOf(selectedValue);
+
+            if (index >= 0)
+            {
+                options.AddRange(values);
+                selectedIndex = index + 1;
+            }
+            // Gespeicherte ID existiert im aktuellen Environment nicht
+            else if (!string.IsNullOrWhiteSpace(selectedValue))
+            {
+                options.Add($"Nicht gefunden: {selectedValue}");
+                options.AddRange(values);
+                selectedIndex = 1;
+            }
+            else
+            {
+                options.AddRange(values);
+            }
+
+            dropdown.AddOptions(options);
+            dropdown.SetValueWithoutNotify(selectedIndex);
+            dropdown.RefreshShownValue();
+        }
+
+        private void OnEnvironmentChanged(int index)
+        {
+            if (_displayedConfig == null)
+                return;
+
+            string environmentId =
+                index > 0 && index <= _availableEnvironmentIds.Count
+                    ? _availableEnvironmentIds[index - 1]
+                    : "";
+
+            _displayedConfig.Environment.EnvironmentId = environmentId;
+
+            // SpawnIds aktualisieren, ohne gespeicherte Werte zu löschen
+            RefreshStageSpawnDropdown();
+
+            if (importedNpcsSettingsUI != null)
+            {
+                importedNpcsSettingsUI.RefreshSpawnOptions(environmentId);
+            }
+        }
+
+        private void OnStageSpawnChanged(int index)
+        {
+            if (_displayedConfig == null)
+                return;
+
+            string selectedValue =
+                stageSpawnIdDropdown.options[index].text;
+
+            if (index == 0)
+            {
+                // Benutzer hat bewusst "Bitte auswählen..." gewählt
+                _displayedConfig.Environment.StageSpawnId = "";
+            }
+            else if (_availableStageSpawnIds.Contains(selectedValue))
+            {
+                _displayedConfig.Environment.StageSpawnId = selectedValue;
+            }
+            // Bei "Nicht gefunden: ..." bleibt der alte Wert erhalten
         }
     }
 }

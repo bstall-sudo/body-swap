@@ -108,6 +108,59 @@ namespace AppV2.Runtime.Scripts.Loader
 
             return null;
         }
+        public List<string> GetEnvironmentIds()
+        {
+            List<string> result = new();
+
+            foreach (EnvironmentEntry entry in environments)
+            {
+                if (entry == null ||
+                    entry.prefab == null ||
+                    string.IsNullOrWhiteSpace(entry.environmentId))
+                    continue;
+
+                if (!result.Contains(entry.environmentId))
+                    result.Add(entry.environmentId);
+            }
+
+            result.Sort();
+
+            return result;
+        }
+        public List<string> GetSpawnIds(string environmentId)
+        {
+            List<string> result = new();
+
+            // Namen deiner tatsächlichen EnvironmentEntry-Liste
+            // gegebenenfalls anpassen.
+            EnvironmentEntry entry = environments.Find(
+                e => e.environmentId == environmentId
+            );
+
+            if (entry == null || entry.prefab == null)
+            {
+                Debug.LogWarning(
+                    $"[EnvironmentLoader] Environment not found: {environmentId}"
+                );
+                return result;
+            }
+
+            StageSpawnPoint[] spawnPoints =
+                entry.prefab.GetComponentsInChildren<StageSpawnPoint>(true);
+
+            foreach (var spawnPoint in spawnPoints)
+            {
+                if (string.IsNullOrWhiteSpace(spawnPoint.spawnId))
+                    continue;
+
+                if (!result.Contains(spawnPoint.spawnId))
+                    result.Add(spawnPoint.spawnId);
+            }
+
+            result.Sort();
+
+            return result;
+        }
 
         public Transform GetTransformFromSpawnId(string spawnId = "default")
         {
