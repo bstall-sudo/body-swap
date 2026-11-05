@@ -114,5 +114,42 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 _rows.Add(row);
             }
         }
+
+        public List<string> GetMissingSessions()
+        {
+            List<string> missing = new();
+
+            if (_config?.NpcGroups == null)
+                return missing;
+
+            // Sessions erneut einlesen, nicht auf einer
+            // möglicherweise veralteten Dropdown-Liste basieren.
+            var availableSessions =
+                RecordedSessionBrowser.FindSessions(storageFolderName);
+
+            foreach (var npc in _config.NpcGroups)
+            {
+                if (npc == null || !npc.Enabled)
+                    continue;
+
+                bool found = availableSessions.Exists(s =>
+                    s.WorkshopFolderName == npc.WorkshopFolderName &&
+                    s.SessionFolderName == npc.SessionFolderName &&
+                    s.SessionId == npc.SessionId
+                );
+
+                if (!found)
+                {
+                    missing.Add(
+                        $"{npc.NpcGroupId}: " +
+                        $"{npc.WorkshopFolderName}/" +
+                        $"{npc.SessionFolderName}/" +
+                        $"{npc.SessionId}"
+                    );
+                }
+            }
+
+            return missing;
+        }
     }
 }

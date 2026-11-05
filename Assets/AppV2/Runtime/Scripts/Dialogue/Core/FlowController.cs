@@ -118,7 +118,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             }else{
                 if(_xrMode){
                    
-                   //SetState(new CalibrationState(this));
+                    //SetState(new CalibrationState(this));
                     SetState(new SceneConfigurationState(this));
                 }else {
                     if(selectableNext)
@@ -141,6 +141,16 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SetState(IState next)
         {
+            // Both the configuration menu and direct startup converge here.
+            // Do this before Exit/Enter can access recording session services.
+            if (next is CalibrationState || next is ChooseSpeakerState || next is RecordSpeakerState)
+            {
+                bool wasStarted = Stage.RecordingSessionStarted;
+                Stage.EnsureRecordingSessionStarted();
+                if (!wasStarted && Stage.RecordingSessionStarted)
+                    _data.Initialize(Stage.roles);
+            }
+
             string oldStateName = _state?.GetType().Name ?? "null";
             string newStateName = next?.GetType().Name ?? "null";
 

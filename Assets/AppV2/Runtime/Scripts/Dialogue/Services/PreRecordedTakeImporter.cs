@@ -265,105 +265,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 }
             }
 
-            ///-Ende des Abschnitts, der die Frames importiert, sodass die Figur zum Player ausgerichtet ist
 
-            // ------------------------------------------------------------
-            // Body-Daten umrechnen
-            //
-            // ALT:
-            // Frame.Body.Pos wird so interpretiert,
-            // als läge der Ursprung beim RoleSpawnPoint.
-            //
-            // NEU:
-            // Frame.Body.Pos liegt relativ zur aktuellen StageRoot.
-            //
-            // Head / Hands / Hip / Feet bleiben unverändert,
-            // da diese lokal zum ActorRoot gespeichert sind.
-            // ------------------------------------------------------------
-/*
             for (int i = 0; i < frames.Count; i++)
             {
                 Frame frame = frames[i];
 
-
-                // ---------- POSITION ----------
-
-                Vector3 sourceBodyPos =
-                    frame.Body.Pos;
-
-                // Position relativ zum RoleSpawn -> World
-                Vector3 worldPos =
-                    roleSpawn.TransformPoint(sourceBodyPos);
-
-                // World -> aktuelle StageRoot local
-                Vector3 targetStageLocalPos =
-                    stageRoot.InverseTransformPoint(worldPos);
-
-
-                // ---------- ROTATION ----------
-
-                Quaternion sourceBodyRot =
-                    Quaternion.Euler(
-                        0f,
-                        frame.Body.YawDeg,
-                        0f
-                    );
-
-                // Rotation relativ zum RoleSpawn -> World
-                Quaternion worldRot =
-                    roleSpawn.rotation *
-                    sourceBodyRot;
-
-                // World -> aktuelle StageRoot local
-                Quaternion targetStageLocalRot =
-                    Quaternion.Inverse(stageRoot.rotation) *
-                    worldRot;
-
-
-                // --------------------------------------------------------
-                // Body separat herausnehmen.
-                // Das funktioniert auch, wenn Body ein struct ist.
-                // --------------------------------------------------------
-
-                var body = frame.Body;
-
-                body.Pos = targetStageLocalPos;
-                body.YawDeg = targetStageLocalRot.eulerAngles.y;
-
-                frame.Body = body;
-
-
-                // Falls Frame ebenfalls struct ist:
-                // geänderten Frame wieder in Liste schreiben.
-                frames[i] = frame;
-            }
-*/
-            for (int i = 0; i < frames.Count; i++)
-            {
-                Frame frame = frames[i];
-
-                /*if (i== 0){
-                    Frame firstFrame = frames[0];
-                    Vector3 firstFrameWorldBeforeAlignment =
-                        roleSpawn.TransformPoint(
-                            firstFrame.Body.Pos
-                        );
-
-                    Debug.Log(
-                        $"[NPC IMPORT DEBUG] role={targetRole.roleId}\n" +
-                        $"source first Body.Pos={firstFrame.Body.Pos}\n" +
-                        $"source first Body.Yaw={firstFrame.Body.YawDeg:F1}\n" +
-                        $"roleSpawn pos={roleSpawn.position}\n" +
-                        $"roleSpawn yaw={roleSpawn.eulerAngles.y:F1}\n" +
-                        $"firstFrameWorld BEFORE ALIGN={firstFrameWorldBeforeAlignment}\n" +
-                        $"actual NPC root BEFORE playback={targetRole.root.position}\n" +
-                        $"[SOURCE ROT DEBUG] " +
-                        $"StartRootPoseYaw=" +
-                        $"{sourceRoleMeta.StartRootPose.LocalRotation.eulerAngles.y:F1}, \n" +
-                        $"FirstFrameBodyYaw={frames[0].Body.YawDeg:F1}"
-                    );
-               
-                }*/
 
 
                  // --------------------------------------------------------

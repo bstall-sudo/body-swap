@@ -143,7 +143,7 @@ public class SceneLoader : MonoBehaviour
         LoadAvatarsForRoles(roles);
     }
 
-    private void LoadAvatarsForRoles(List<RoleRig> roles)
+    public void LoadAvatarsForRoles(List<RoleRig> roles)
     {
         if (roles == null)
             return;

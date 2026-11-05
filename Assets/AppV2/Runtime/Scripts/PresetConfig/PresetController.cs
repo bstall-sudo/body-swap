@@ -211,6 +211,11 @@ namespace AppV2.Runtime.Scripts.Config
                 return;
             }
 
+            // Establish the start connection explicitly when configuration opens,
+            // independently of the canvas's OnEnable ordering.
+            configurationUI.StartWorkshopRequested -= OnStartWorkshopRequested;
+            configurationUI.StartWorkshopRequested += OnStartWorkshopRequested;
+
             // Für den Moment:
             // Aktuelle Inspector-Einstellungen als Ausgangskonfiguration verwenden.
             _currentConfig = CreateConfigFromCurrentStage(
@@ -471,6 +476,10 @@ namespace AppV2.Runtime.Scripts.Config
                         Enabled =
                             npc.enabled,
 
+                        NpcGroupId = string.IsNullOrWhiteSpace(npc.npcGroupId) || npc.npcGroupId == "NpcGroup_"
+                            ? $"NpcGroup{settings.Count}"
+                            : npc.npcGroupId,
+
 
 
                         CanBecomeActiveConversationPartner =
@@ -554,7 +563,7 @@ namespace AppV2.Runtime.Scripts.Config
             ApplyControlSettings(config.Controls);
 
             //ApplyStartRoleSettings(config.StartRoles);
-            //ApplyNpcGroupSettings(config.NpcGroups);
+            ApplyNpcGroupSettings(config.NpcGroups);
 
             Debug.Log(
                 $"[PresetController] Applied preset " +
@@ -567,6 +576,34 @@ namespace AppV2.Runtime.Scripts.Config
         // ============================================================
         // APPLY ENVIRONMENT
         // ============================================================
+
+        private void ApplyNpcGroupSettings(List<NpcGroupSettings> settings)
+        {
+            var imports = new List<PreRecordedSceneImport>();
+            if (settings != null)
+            {
+                foreach (var npc in settings)
+                {
+                    if (npc == null)
+                        continue;
+
+                    imports.Add(new PreRecordedSceneImport
+                    {
+                        enabled = npc.Enabled,
+                        npcGroupId = npc.NpcGroupId,
+                        workshopFolderName = npc.WorkshopFolderName,
+                        sessionFolderName = npc.SessionFolderName,
+                        sessionId = npc.SessionId,
+                        npcGroupSpawnId = npc.NpcGroupSpawnId,
+                        alignWithPlayer = npc.AlignWithPlayer,
+                        canBecomeActiveConversationPartner = npc.CanBecomeActiveConversationPartner
+                    });
+                }
+            }
+
+            conversationStage.preRecordedScenes = imports;
+            conversationStage.preRecordedSceneCount = imports.Count;
+        }
 
         private void ApplyEnvironmentSettings(
             EnvironmentSettings settings)

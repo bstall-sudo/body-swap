@@ -142,9 +142,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 savePresetAsButton.onClick.AddListener(
                     () => SavePresetAsRequested?.Invoke());
 
-            if (startWorkshopButton != null)
-                startWorkshopButton.onClick.AddListener(
-                    () => StartWorkshopRequested?.Invoke());
+            BindStartButton();
 
             environmentIdDropdown.onValueChanged.AddListener(
                 OnEnvironmentChanged
@@ -154,7 +152,48 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 OnStageSpawnChanged
             );
         }
+        private void OnStartClicked()
+        {
+            Debug.Log("[WorkshopConfigurationUI] START clicked.", this);
+            if (importedNpcsSettingsUI != null)
+            {
+                List<string> missing =
+                    importedNpcsSettingsUI.GetMissingSessions();
 
+                if (missing.Count > 0)
+                {
+                    Debug.LogError(
+                        "[WorkshopConfigurationUI] Workshop cannot start. " +
+                        "Missing PreRecorded sessions:\n" +
+                        string.Join("\n", missing),
+                        this
+                    );
+
+                    return;
+                }
+            }
+
+            if (StartWorkshopRequested == null)
+            {
+                Debug.LogError(
+                    "[WorkshopConfigurationUI] Cannot start: no PresetController is listening to this UI.", this);
+                return;
+            }
+
+            StartWorkshopRequested.Invoke();
+        }
+
+        private void BindStartButton()
+        {
+            if (startWorkshopButton == null)
+            {
+                Debug.LogError("[WorkshopConfigurationUI] Start button is not assigned.", this);
+                return;
+            }
+
+            startWorkshopButton.onClick.RemoveListener(OnStartClicked);
+            startWorkshopButton.onClick.AddListener(OnStartClicked);
+        }
 
         // ============================================================
         // SHOW / HIDE
@@ -164,6 +203,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         {
             if (menuRoot != null)
                 menuRoot.SetActive(true);
+
+            // Rebind when opened as well: the canvas can start inactive or be
+            // reconfigured while playing. Remove/Add keeps this idempotent.
+            BindStartButton();
         }
 
         public void Hide()

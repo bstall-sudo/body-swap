@@ -284,6 +284,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             _allRoleRoots.Clear();
 
+            if (rolesRoot == null)
+            {
+                Debug.LogWarning("[ConversationStage] Cannot build role slots: rolesRoot is missing.", this);
+                return;
+            }
+
             foreach (Transform child in rolesRoot)
             {
                 if (child.name.StartsWith("Role"))
@@ -453,7 +459,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             for (int i = 0; i < _allRoleRoots.Count; i++)
             {
-                bool active = i < roleCount;
+                // Hierarchy order need not match slot order (RoleA, RoleB, ...).
+                bool active = roles.Exists(role =>
+                    role != null && role.roleRoot == _allRoleRoots[i]);
 
                 
                 _allRoleRoots[i].gameObject.SetActive(active);
@@ -508,13 +516,24 @@ namespace AppV2.Runtime.Scripts.Dialogue
 */
         private void AddImportedNpcRolesToFreeSlots()
         {
+            importedNpcRoles.Clear();
+            if (preRecordedScenes == null)
+                return;
+
             int npcGroupIndex = 0;
+            var usedGroupIds = new HashSet<string>();
             foreach (PreRecordedSceneImport import in preRecordedScenes)
             {
                 if (import == null || !import.enabled)
                     continue;
 
-                string npcGroupId = $"NpcGroup{npcGroupIndex}";
+                string npcGroupId = !string.IsNullOrWhiteSpace(import.npcGroupId) && import.npcGroupId != "NpcGroup_"
+                    ? import.npcGroupId
+                    : $"NpcGroup{npcGroupIndex}";
+                string baseGroupId = npcGroupId;
+                int suffix = 1;
+                while (!usedGroupIds.Add(npcGroupId))
+                    npcGroupId = $"{baseGroupId}_{suffix++}";
 
                 if (!TryCreatePreRecordedSource(
                         import,
@@ -540,13 +559,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     if (targetRoleIndex >= maxRoleCount)
                     {
                         Debug.LogWarning("[NPC Import] No free role slot left.");
+                        roleCount = roles.Count;
                         return;
                     }
 
                     string slotId = DefaultRoleId(targetRoleIndex);
 
+                    if (rolesRoot == null || rolesRoot.Find($"Role{slotId}") == null)
+                    {
+                        Debug.LogWarning($"[NPC Import] Skipping role '{npcRole.roleId}': slot Role{slotId} is missing.", this);
+                        continue;
+                    }
+
                     npcRole.slotId = slotId;
-                    npcRole.sourceRoleIndex = npcRole.sourceRoleIndex;
                     npcRole.roleIndex = targetRoleIndex;
 
                     
@@ -561,6 +586,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     
 
                     roles.Add(npcRole);
+                    importedNpcRoles.Add(npcRole);
 
                     _playbackSourcesByRoleIndex[targetRoleIndex] =
                         new RolePlaybackSource
@@ -636,16 +662,30 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 import.sessionId
             );
 
-            sourceSession = sourceStore.LoadSessionModel(import.sessionId);
-
-            if (sourceSession == null)
+            string sessionPath = sourceStore.GetSessionJsonPath(import.sessionId);
+            try
             {
-                Debug.LogError($"[NPC Source] Could not load session: {import.sessionId}");
+                sourceSession = sourceStore.LoadSessionModel(import.sessionId);
+                if (sourceSession != null)
+                {
+                    sourceTakeIndex = new SessionTakeIndex();
+                    sourceTakeIndex.RebuildFromSession(sourceSession);
+                }
+            }
+            catch (Exception ex) when (
+                ex is IOException || ex is UnauthorizedAccessException ||
+                ex is ArgumentException)
+            {
+                Debug.LogWarning(
+                    $"[NPC Source] Skipping session '{import.sessionId}' at '{sessionPath}': {ex.Message}", this);
                 return false;
             }
 
-            sourceTakeIndex = new SessionTakeIndex();
-            sourceTakeIndex.RebuildFromSession(sourceSession);
+            if (sourceSession == null)
+            {
+                Debug.LogWarning($"[NPC Source] Skipping empty session at '{sessionPath}'.", this);
+                return false;
+            }
 
             return true;
         }
@@ -836,6 +876,72 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private static Quaternion YawRot(float yawDeg) => Quaternion.Euler(0f, yawDeg, 0f);
 
 
+        private bool _recordingSessionStarted;
+        public bool RecordingSessionStarted => _recordingSessionStarted;
+
+        /// <summary>
+        /// Starts once, after configuration has been applied. Also used by flows
+        /// that enter calibration or recording directly without a configuration UI.
+        /// </summary>
+        public void EnsureRecordingSessionStarted()
+        {
+            if (StartInPlaybackFullConversationMode || _recordingSessionStarted)
+                return;
+
+            // Recreate the store so current Inspector/menu settings are used.
+            _store = new SessionStore(
+                _storageFolderName, _workshopFolderName, _personalFolderName, _sessionIdName);
+
+            // Import only now: START has applied the UI's selected source sessions.
+            AddImportedNpcRolesToFreeSlots();
+            BuildAllRoleRoots();
+            ApplyRoleCount();
+            sceneLoader.LoadEnvironmentForStageRecMode(environmentId, stageSpawnId);
+            // XRInputTransforms caches a world pose, not a live Transform reference.
+            // START may have moved the stage to a newly selected spawn point.
+            _input?.SetAnchorFromTakeRoot(_stageRoot);
+
+            // Preserve the normal avatars prepared in Awake. Only the newly
+            // imported NPC slots need avatar loading and reference resolution.
+            sceneLoader.LoadAvatarsForRoles(importedNpcRoles);
+            foreach (RoleRig role in importedNpcRoles)
+            {
+                role.AutoResolveReferences();
+                role.ResolveAvatarName(false);
+            }
+
+            // These services cache per-role state; include the final NPC roster.
+            _blendShapeAudioAnimator.Initialize(roles);
+            _reactiveIdleController.Initialize(roles, _blendShapeAudioAnimator);
+            InitializeRoleHeightsFromPlayerIfNeeded();
+            // Start() ran before the NPC import when using the configuration menu.
+            ApplyAllRoleVisualScales();
+            chooseSpeakerController.Initialize(roles);
+            avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
+            rolesVisualsVisibilityHandler.Initialize(roles);
+
+            string roleName = roles.Count > 0 ? roles[0].GetAvatarName() : "";
+            _sessionFolder = _store.CreateNewSessionFolder(stageSpawnId, roleName, out string sessionId);
+            _session = new SessionModel
+            {
+                SessionId = sessionId,
+                CreatedUtc = DateTime.UtcNow.ToString("o"),
+                EnvironmentId = environmentId,
+                StageSpawnId = stageSpawnId,
+                RoleCount = roleCount,
+                SessionVersion = 1
+            };
+
+            BuildPreRecordedTakeImporter();
+            _playbackController.Initialize(
+                _stageRoot, roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
+            _recordingController = new RecordingController(roles, roleCount, _store, _takeIndex, _session);
+            _calibrationDataProvider = new RoleCalibrationDataProvider();
+            _calibrationDataProvider.Initialize(roles);
+            _recordingSessionStarted = true;
+            Debug.Log($"[ConversationStage] Started recording session: {sessionId}", this);
+        }
+
         private void Awake()
         {
             
@@ -852,13 +958,6 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _takeIndex = new SessionTakeIndex();
 
             //BuildDefaultPlaybackSources();
-
-            if (!StartInPlaybackFullConversationMode)
-            {
-                BuildImportedNpcRoles(_store);
-
-                AddImportedNpcRolesToFreeSlots();
-            }
 
             
             BuildAllRoleRoots();
@@ -923,54 +1022,14 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     roles[i].ResolveAvatarName(false);
                 }
 
-                string roleNameForSessionIdCreation = "";
-
-                if(roles.Count == 0 )
-                {
-                    Debug.LogError("[SessionIdCreation] roles.Count = {roles.Count} roles[0].RoleName = '' ");
-                }
-                else
-                {
-                    roleNameForSessionIdCreation = roles[0].GetAvatarName();
-                }
-                
-
-                _sessionFolder = _store.CreateNewSessionFolder(stageSpawnId, roleNameForSessionIdCreation, out string sessionId);
-
-                _session = new SessionModel
-                {
-                    SessionId = sessionId,
-                    CreatedUtc = DateTime.UtcNow.ToString("o"),
-                    EnvironmentId = environmentId,
-                    StageSpawnId = stageSpawnId,
-                    RoleCount = roleCount,
-                    SessionVersion = 1
-                };
-
-                //damit die abgespielten Szenen von den PreRecorded Figuren in den Aktuellen Session Ordner kopiert werden können.
-                BuildPreRecordedTakeImporter();
-
-                _preRecordedTakeImporter = new PreRecordedTakeImporter(
-                        _store,
-                        _session,
-                        _takeIndex
-                    );
-                sceneLoader.LoadSceneForRecordingMode(environmentId,stageSpawnId,roles);
+                // Prepare normal avatars and stage before Start caches the XR anchor.
+                // NPC imports still wait for the final selection at session start.
+                sceneLoader.LoadSceneForRecordingMode(environmentId, stageSpawnId, roles);
                 //UnityEngine.Debug.Log($"[Awake] Loaded environmentId is: {environmentId} | stageSpawnId is: {stageSpawnId}");
                 //ApplyPreRecordedNpcStartPoses();
 
                 _playbackController.Initialize(_stageRoot, roles, heightOfPlayerCm, _store, _takeIndex, groundHeightProvider);
-                // hier wird das RecordingController Objekt kreiert mit roleCount, damit RecordingController die entsprechenden Listen anlegen kann.
-                _recordingController = new RecordingController( roles, roleCount, _store, _takeIndex, _session);
-                //das ist wichtig, damit dei Targets vom visualRig, welche den IKChainTargets vom Avatar (im CalibrationState) angeglichen werden im SessionModel abgespeichert werden können
-                // Das passiert im Exit von CalibrationState.
-                _calibrationDataProvider = new RoleCalibrationDataProvider();
-                _calibrationDataProvider.Initialize(roles); 
-                
 
-                
-                
-                
             }
             //Für die Animation der Münder
             _blendShapeAudioAnimator = new AnimateBlendShapesViaAudioSources();

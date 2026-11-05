@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System;
 using UnityEngine;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
@@ -9,45 +10,97 @@ namespace AppV2.Runtime.Scripts.Loader
 {
     public static class PreRecordedSceneImporter
     {
+
         public static List<RoleRig> BuildRoleRigsFromImports(
             List<PreRecordedSceneImport> imports,
             SessionStore store)
         {
-            List<RoleRig> importedRoles = new List<RoleRig>();
+            List<RoleRig> importedRoles = new();
 
-            if (imports == null) return importedRoles;
+            if (imports == null)
+                return importedRoles;
+
+            if (store == null)
+            {
+                Debug.LogError(
+                    "[PreRecordedSceneImporter] SessionStore is null. " +
+                    "Cannot import NPC sessions."
+                );
+
+                return importedRoles;
+            }
 
             int i = 0;
 
             foreach (var import in imports)
             {
-                if (import == null || !import.enabled) continue;
-                
-                string npcGroupId = $"NpcGroup{i}";
+                if (import == null || !import.enabled)
+                    continue;
 
-                string sessionRootPath = Path.Combine(
-                Application.persistentDataPath,
-                import.workshopFolderName,
-                import.sessionFolderName,
-                import.sessionId
-                );
+                string npcGroupId =
+                    !string.IsNullOrWhiteSpace(import.npcGroupId)
+                        ? import.npcGroupId
+                        : $"NpcGroup{i}";
 
+                i++;
 
-                if (!Directory.Exists(sessionRootPath))
+                if (string.IsNullOrWhiteSpace(import.workshopFolderName) ||
+                    string.IsNullOrWhiteSpace(import.sessionFolderName) ||
+                    string.IsNullOrWhiteSpace(import.sessionId))
                 {
-                    Debug.LogWarning($"[PreRecordedSceneImporter] Session folder not found: {sessionRootPath}");
+                    Debug.LogError(
+                        $"[PreRecordedSceneImporter] Skipping '{npcGroupId}': " +
+                        "Incomplete session configuration. " +
+                        $"Workshop='{import.workshopFolderName}', " +
+                        $"Folder='{import.sessionFolderName}', " +
+                        $"SessionId='{import.sessionId}'"
+                    );
+
                     continue;
                 }
 
-                // nächster Schritt: session.json lesen
-                // vorerst testweise Rollen aus Dateinamen finden
-                importedRoles.AddRange(
-                    BuildRoleRigsFromImportedSession(import, store, npcGroupId)
-                );
+                try
+                {
+                    List<RoleRig> roles =
+                        BuildRoleRigsFromImportedSession(
+                            import,
+                            store,
+                            npcGroupId
+                        );
+
+                    if (roles == null || roles.Count == 0)
+                    {
+                        Debug.LogWarning(
+                            $"[PreRecordedSceneImporter] Skipping '{npcGroupId}': " +
+                            $"No roles loaded from session '{import.sessionId}'."
+                        );
+
+                        continue;
+                    }
+
+                    importedRoles.AddRange(roles);
+
+                    Debug.Log(
+                        $"[PreRecordedSceneImporter] Successfully imported " +
+                        $"{roles.Count} roles from '{import.sessionId}' " +
+                        $"(NpcGroupId='{npcGroupId}')."
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(
+                        $"[PreRecordedSceneImporter] Failed to import " +
+                        $"NpcGroupId='{npcGroupId}', " +
+                        $"SessionId='{import.sessionId}'. " +
+                        "Skipping this NPC group.\n" +
+                        ex
+                    );
+                }
             }
 
             return importedRoles;
         }
+
 
 
         public static List<RoleRig> BuildRoleRigsFromImportedSession(
@@ -66,7 +119,14 @@ namespace AppV2.Runtime.Scripts.Loader
 
                 if (sourceSession == null)
                 {
-                    Debug.LogError($"[PreRecordedSceneImporter] Could not load source session:");
+                    Debug.LogError(
+                        $"[PreRecordedSceneImporter] Source session could not be loaded. " +
+                        $"Workshop='{import.workshopFolderName}', " +
+                        $"Folder='{import.sessionFolderName}', " +
+                        $"SessionId='{import.sessionId}'. " +
+                        "The NPC group will be skipped."
+                    );
+
                     return result;
                 }
 

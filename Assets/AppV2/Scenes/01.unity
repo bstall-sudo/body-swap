@@ -895,6 +895,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8378683929509135827, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
   m_PrefabInstance: {fileID: 1455852860}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2147483001 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
+  m_PrefabInstance: {fileID: 1455852860}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!224 &29883685 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3775080246291679324, guid: ac4d9a0da0b2a56419d54a3e8493fe2a, type: 3}
@@ -50495,13 +50506,15 @@ MonoBehaviour:
   _maxHeightDifferenceForNpcTrigger: 2.5
   preRecordedScenes:
   - enabled: 1
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
-    sessionId: grueneLandschaftEcke1Froschmann_001
+    sessionId: grueneLandschaftEcke1Froschmann_00
     alignWithPlayer: 1
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneLandschaftEcke1
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rezeptionistKuerbiskopf_001
@@ -50509,6 +50522,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rezeptionist
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: bruecke1Bart_001
@@ -50516,6 +50530,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: bruecke1
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgTorHornmonster_001
@@ -50523,6 +50538,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgTor
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: tengeGruselfrau_001
@@ -50530,6 +50546,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: tenge
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roterHimmel_kueken_001
@@ -50537,6 +50554,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roterHimmel
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: aussichtBaumBurgAffe_001
@@ -50544,6 +50562,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: aussichtBaumBurg
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgEckeVorBrueckeKaktus_001
@@ -50551,6 +50570,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgEckeVorBruecke
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneBurgTreppeFroschmann_001
@@ -50558,6 +50578,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgTreppe
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus2Schneemann_001
@@ -50565,6 +50586,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus2
   - enabled: 1
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: haus1Adabadenixe_001
@@ -50572,6 +50594,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: haus1
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: supermanZiegenwolf_001
@@ -50579,6 +50602,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: superman
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: rotesDach1Esmeralda_001
@@ -50586,6 +50610,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: rotesDach1
   - enabled: 1
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: Test_viele_saetze_lang
@@ -50593,6 +50618,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneLandschaftUnterBruecke
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgVorSuperman-Clown_001
@@ -50600,6 +50626,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: roteBurgVorSuperman
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: gastEingangInnen-Koenighahn_001
@@ -50607,6 +50634,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: gastEingangInnen
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: grueneBurgTreppeMitte-Schlangenmonster_001
@@ -50614,6 +50642,7 @@ MonoBehaviour:
     canBecomeActiveConversationPartner: 1
     npcGroupSpawnId: grueneBurgHinterBaum
   - enabled: 0
+    npcGroupId: NpcGroup_
     workshopFolderName: preRecordedScenes
     sessionFolderName: hotelLobby
     sessionId: roteBurgEckeAussen-Echsenmonster_001
@@ -79407,7 +79436,7 @@ MonoBehaviour:
   npcTriggerRadiusInput: {fileID: 325115486}
   maxHeightDifferenceInput: {fileID: 298738769}
   importedNpcsSettingsUI: {fileID: 118257424}
-  startWorkshopButton: {fileID: 554824829}
+  startWorkshopButton: {fileID: 2147483001}
 --- !u!114 &1217188138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93982,6 +94011,22 @@ PrefabInstance:
     - target: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
       propertyPath: m_Colors.m_NormalColor.r
       value: 0.6792453
+      objectReference: {fileID: 0}
+    - target: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1217188132}
+    - target: {fileID: 2718428588089653596, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3406031548273671668, guid: f91aa32fd30f1344dbfaa94d2a5f2c2d, type: 3}
       propertyPath: m_Name
@@ -139559,7 +139604,7 @@ MonoBehaviour:
   XRInput: {fileID: 1418234168}
   Stage: {fileID: 793401274}
   statusUI: {fileID: 385245927}
-  configurationUI: {fileID: 232354966}
+  configurationUI: {fileID: 1217188137}
   presetController: {fileID: 1217188138}
   _xrMode: 0
 --- !u!4 &2099971728
