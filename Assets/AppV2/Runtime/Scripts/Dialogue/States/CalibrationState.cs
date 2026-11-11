@@ -31,6 +31,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         public void Enter()
         {
+            _flow.Stage.AvatarCalibration.PrepareForNewCalibration();
+            _flow.Stage.MirrorSetVisibility.ActivateMirror(true);
             //UnityEngine.Debug.Log("[CalibrationState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;

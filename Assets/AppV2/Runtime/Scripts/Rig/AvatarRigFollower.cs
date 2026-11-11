@@ -39,6 +39,14 @@ namespace AppV2.Runtime.Scripts.Rig
         };
 
         private readonly List<TransformPair> _pairs = new();
+        private Dictionary<Transform, LocalTargetPose> _initialTargetPoses = new();
+
+        private struct LocalTargetPose
+        {
+            public Vector3 position;
+            public Quaternion rotation;
+            public Vector3 scale;
+        }
 
         [System.Serializable]
         private class TransformPair
@@ -107,7 +115,36 @@ namespace AppV2.Runtime.Scripts.Rig
                 //Debug.Log($"[{name}] Mapped {ikTargetName}: visual={vis.name}, avatar={ava.name}");
             }
 
+            // Preserve each target's original pose across repeated BuildMap calls.
+            // A replaced avatar has new target instances and gets a fresh baseline.
+            var currentPoses = new Dictionary<Transform, LocalTargetPose>();
+            foreach (var pair in _pairs)
+            {
+                if (!_initialTargetPoses.TryGetValue(pair.avatar, out var pose))
+                    pose = new LocalTargetPose
+                    {
+                        position = pair.avatar.localPosition,
+                        rotation = pair.avatar.localRotation,
+                        scale = pair.avatar.localScale
+                    };
+                currentPoses[pair.avatar] = pose;
+            }
+            _initialTargetPoses = currentPoses;
+
             //Debug.Log($"[{name}] BuildMap complete. Pairs: {_pairs.Count}");
+        }
+
+        public void ResetForCalibration()
+        {
+            isCalibrated = false;
+            BuildMap();
+            foreach (var target in _initialTargetPoses)
+            {
+                if (target.Key == null) continue;
+                target.Key.localPosition = target.Value.position;
+                target.Key.localRotation = target.Value.rotation;
+                target.Key.localScale = target.Value.scale;
+            }
         }
 
         [ContextMenu("Calibrate Targets From Avatar")]

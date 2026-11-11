@@ -86,7 +86,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (!_allplaybaksStopped)
             {
                 _flow.Stage.PlaybackTick(_playbacks);
-                _flow.Stage.ReactiveIdleStart(_reactiveIdles, _playbacks[0]);
+                _flow.Stage.ReactiveIdleStart(_reactiveIdles, _playbacks.Count > 0 ? _playbacks[0] : 0);
                 _allplaybaksStopped = _flow.Stage.PlaybacksAreAllStopped(_playbacks);
             }
             if(_allplaybaksStopped)

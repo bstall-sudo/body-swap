@@ -8,7 +8,7 @@ using AppV2.Runtime.Scripts.Config;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
-    public class WorkshopConfigurationUI : MonoBehaviour
+    public partial class WorkshopConfigurationUI : MonoBehaviour
     {
         // ============================================================
         // ROOT
@@ -130,17 +130,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void Awake()
         {
-            if (loadPresetButton != null)
-                loadPresetButton.onClick.AddListener(
-                    () => LoadPresetRequested?.Invoke());
-
-            if (savePresetButton != null)
-                savePresetButton.onClick.AddListener(
-                    () => SavePresetRequested?.Invoke());
-
-            if (savePresetAsButton != null)
-                savePresetAsButton.onClick.AddListener(
-                    () => SavePresetAsRequested?.Invoke());
+            InitializeStorageUI();
+            InitializePlaybackUI();
+            InitializeSettingsBindings();
+            InitializePresetUI();
 
             BindStartButton();
 
@@ -154,8 +147,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         }
         private void OnStartClicked()
         {
+            if (_presetConfirmation != null && _presetConfirmation.activeSelf) return;
+            SynchronizeSelectedStartMode();
             Debug.Log("[WorkshopConfigurationUI] START clicked.", this);
-            if (importedNpcsSettingsUI != null)
+            if (!IsPlaybackSelected && importedNpcsSettingsUI != null)
             {
                 List<string> missing =
                     importedNpcsSettingsUI.GetMissingSessions();
@@ -195,6 +190,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             startWorkshopButton.onClick.AddListener(OnStartClicked);
         }
 
+        public void RequestStart() => OnStartClicked();
+
         // ============================================================
         // SHOW / HIDE
         // ============================================================
@@ -221,20 +218,21 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         // ============================================================
 
 
-        public void DisplayConfig(PresetConfig config)
+        public void DisplayConfig(PresetConfig config, bool restorePresetPlaybackSelection = false)
         {
             if (config == null)
                 return;
 
             _displayedConfig = config;
+            InitializeSettingsBindings();
+            DisplayStorageSettings(config);
+            DisplayPlaybackSelection(restorePresetPlaybackSelection);
 
             // ============================================================
             // PRESET
             // ============================================================
 
-            presetNameInput.SetTextWithoutNotify(
-                config.PresetName
-            );
+            RefreshPresetNamePreview();
 
             // ============================================================
             // ENVIRONMENT
@@ -348,6 +346,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 importedNpcsSettingsUI.Display(config);
             }
+            RefreshSettingsBindings();
         }
 
 
@@ -361,11 +360,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (config == null)
                 return;
 
+            WriteStorageSettings(config);
+            WritePlaybackSettings(config);
+
 
             // PRESET
 
-            config.PresetName =
-                presetNameInput.text;
+            // Save-as naming inputs do not rename the currently loaded preset.
 
 
             // ENVIRONMENT
@@ -464,43 +465,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         // PRESET DROPDOWN
         // ============================================================
 
-        public void SetPresetOptions(
-            System.Collections.Generic.List<string> presetIds)
-        {
-            presetDropdown.ClearOptions();
-
-            if (presetIds == null)
-                return;
-
-            presetDropdown.AddOptions(presetIds);
-        }
-
-
-        public string GetSelectedPresetId()
-        {
-            if (presetDropdown.options.Count == 0)
-                return null;
-
-            return presetDropdown.options[
-                presetDropdown.value
-            ].text;
-        }
-
-        public void SelectPreset(string presetId)
-        {
-            if (presetDropdown == null)
-                return;
-
-            for (int i = 0; i < presetDropdown.options.Count; i++)
-            {
-                if (presetDropdown.options[i].text == presetId)
-                {
-                    presetDropdown.SetValueWithoutNotify(i);
-                    presetDropdown.RefreshShownValue();
-                    return;
-                }
-            }
-        }
+        public void SetPresetOptions(List<string> presetIds) => RefreshPresetOptionLists(presetIds);
+        public string GetSelectedPresetId() => _selectedPresetId;
+        public void SelectPreset(string presetId) => SelectSharedPreset(presetId);
 
 
         // ============================================================
@@ -526,12 +493,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (input == null)
                 return;
 
-            if (float.TryParse(input.text, out float value))
+            if (TryParseSettingFloat(input.text, out float value))
                 target = value;
         }
 
         private void OnDestroy()
         {
+            CleanupStorageUI();
+            CleanupPlaybackUI();
+            CleanupSettingsBindings();
+            CleanupPresetUI();
             environmentIdDropdown.onValueChanged.RemoveListener(
                 OnEnvironmentChanged
             );
@@ -582,7 +553,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             List<string> options = new()
             {
-                "Bitte auswählen..."
+                "<color=#E53935>Bitte auswählen...</color>"
             };
 
             int selectedIndex = 0;
@@ -598,7 +569,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             // Gespeicherte ID existiert im aktuellen Environment nicht
             else if (!string.IsNullOrWhiteSpace(selectedValue))
             {
-                options.Add($"Nicht gefunden: {selectedValue}");
+                options.Add($"<color=#E53935>Nicht gefunden:  {selectedValue}</color>");
                 options.AddRange(values);
                 selectedIndex = 1;
             }

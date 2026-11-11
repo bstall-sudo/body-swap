@@ -23,6 +23,7 @@ namespace AppV2.Runtime.Scripts.Config
         public PresetConfig CurrentConfig => _currentConfig;
 
         public event Action WorkshopStartRequested;
+        private bool _configurationInitialized;
 
 
         // ============================================================
@@ -65,6 +66,17 @@ namespace AppV2.Runtime.Scripts.Config
 
         private void OnStartWorkshopRequested()
         {
+            if (configurationUI.IsPlaybackSelected)
+            {
+                if (configurationUI.TryStartSelectedPlayback())
+                {
+                    Debug.Log("[PresetController] Starting PlaybackFullConversation from the selected recording.", this);
+                    RememberLoadedPreset();
+                    WorkshopStartRequested?.Invoke();
+                }
+                return;
+            }
+
             if (_currentConfig == null)
             {
                 Debug.LogError(
@@ -90,117 +102,122 @@ namespace AppV2.Runtime.Scripts.Config
                 $"{_currentConfig.PresetName}"
             );
 
+            RememberLoadedPreset();
             WorkshopStartRequested?.Invoke();
         }
         
+        private string _loadedPresetId;
+        private string _loadedPresetFolder;
+        private const string LastPresetFolderKey = "BodySwap.LastPreset.Folder";
+        private const string LastPresetFileKey = "BodySwap.LastPreset.File";
+
+        private void RememberLoadedPreset()
+        {
+            if (!PresetStore.ValidName(_loadedPresetFolder) || !PresetStore.ValidName(_loadedPresetId)) return;
+            PlayerPrefs.SetString(LastPresetFolderKey, _loadedPresetFolder);
+            PlayerPrefs.SetString(LastPresetFileKey, _loadedPresetId);
+            PlayerPrefs.Save();
+        }
+
+        private bool TryRestoreLastPreset()
+        {
+            string folder = PlayerPrefs.GetString(LastPresetFolderKey, "");
+            string id = PlayerPrefs.GetString(LastPresetFileKey, "");
+            if (!PresetStore.ValidName(folder) || !PresetStore.ValidName(id)) return false;
+            string previousFolder = _presetStore.SelectedFolder;
+            _presetStore.SetFolder(folder);
+            var loaded = _presetStore.PresetExists(id) ? _presetStore.LoadPreset(id) : null;
+            if (loaded == null)
+            {
+                _presetStore.SetFolder(previousFolder);
+                Debug.LogWarning($"[PresetController] Last preset '{folder}/{id}' is unavailable. Using Inspector settings.", this);
+                return false;
+            }
+            _currentConfig = loaded;
+            _loadedPresetId = id;
+            _loadedPresetFolder = folder;
+            ApplyMenuRuntimeSettings(loaded);
+            return true;
+        }
+
         private void OnLoadPresetRequested()
         {
-            string presetId = configurationUI.GetSelectedPresetId();
-
-            if (string.IsNullOrEmpty(presetId))
-            {
-                Debug.LogWarning(
-                    "[PresetController] No preset selected."
-                );
-                return;
-            }
-
-            _currentConfig = _presetStore.LoadPreset(presetId);
-
-            if (_currentConfig == null)
-            {
-                Debug.LogError(
-                    $"[PresetController] Could not load preset '{presetId}'."
-                );
-                return;
-            }
-
-            configurationUI.DisplayConfig(_currentConfig);
-
-            Debug.Log(
-                $"[PresetController] Loaded preset: {_currentConfig.PresetName}"
-            );
+            string id = configurationUI.GetSelectedPresetId();
+            if (string.IsNullOrEmpty(id)) return;
+            string folder = _presetStore.SelectedFolder;
+            configurationUI.ConfirmPresetAction(
+                $"Achtung: Du lädst das Preset '{id}'. Deine aktuellen Einstellungen gehen verloren, falls du sie noch nicht gesichert hast. Fortfahren?",
+                () =>
+                {
+                    _presetStore.SetFolder(folder);
+                    var loaded = _presetStore.LoadPreset(id);
+                    if (loaded == null) return;
+                    _currentConfig = loaded;
+                    _loadedPresetId = id;
+                    _loadedPresetFolder = folder;
+                    configurationUI.DisplayConfig(_currentConfig, restorePresetPlaybackSelection: true);
+                    configurationUI.SetLoadedPreset(_currentConfig, true);
+                    configurationUI.SelectPreset(id);
+                    ApplyMenuRuntimeSettings(_currentConfig);
+                    RememberLoadedPreset();
+                });
         }
 
         private void OnSavePresetAsRequested()
         {
-            if (_currentConfig == null)
-            {
-                Debug.LogError(
-                    "[PresetController] No current configuration."
-                );
-                return;
-            }
-
-            // Aktuelle UI-Werte übernehmen
+            if (_currentConfig == null) return;
             configurationUI.WriteToConfig(_currentConfig);
-
-            // Neue unabhängige Konfiguration erstellen
-            PresetConfig newConfig =
-                JsonUtility.FromJson<PresetConfig>(
-                    JsonUtility.ToJson(_currentConfig)
-                );
-
-            // Neue eindeutige ID
-            newConfig.PresetId = Guid.NewGuid().ToString("N");
-
-            if (string.IsNullOrWhiteSpace(newConfig.PresetName))
+            string name = configurationUI.SaveAsPresetName;
+            if (!PresetStore.ValidName(name))
             {
-                newConfig.PresetName = "New Preset";
-            }
-
-            if (!_presetStore.SavePreset(newConfig))
-            {
-                Debug.LogError(
-                    "[PresetController] Save As failed."
-                );
+                Debug.LogError("[PresetController] Bitte einen gültigen Preset-Namen eingeben.", this);
                 return;
             }
-
-            _currentConfig = newConfig;
-
-            configurationUI.SetPresetOptions(
-                _presetStore.GetAllPresetIds()
-            );
-
-            configurationUI.SelectPreset(newConfig.PresetId);
-
-            Debug.Log(
-                $"[PresetController] Saved new preset: " +
-                $"{newConfig.PresetName} ({newConfig.PresetId})"
-            );
+            var saved = JsonUtility.FromJson<PresetConfig>(JsonUtility.ToJson(_currentConfig));
+            saved.PresetId = saved.PresetName = name;
+            saved.PresetBaseName = configurationUI.SaveAsBaseName;
+            saved.PresetSuffix = configurationUI.SaveAsSuffix;
+            if (!_presetStore.SavePreset(saved, overwrite: false))
+            {
+                configurationUI.RefreshPresetNamePreview();
+                return;
+            }
+            _currentConfig = saved;
+            _loadedPresetId = name;
+            _loadedPresetFolder = _presetStore.SelectedFolder;
+            RememberLoadedPreset();
+            configurationUI.DisplayConfig(saved);
+            configurationUI.SetPresetOptions(_presetStore.GetAllPresetIds());
+            configurationUI.SelectPreset(name);
+            configurationUI.SetLoadedPreset(saved, true);
         }
 
         private void OnSavePresetRequested()
         {
-            if (_currentConfig == null)
-            {
-                Debug.LogError(
-                    "[PresetController] No current configuration."
-                );
-                return;
-            }
-
-            // Aktuelle UI-Werte übernehmen
-            configurationUI.WriteToConfig(_currentConfig);
-
-            // Preset speichern
-            bool success = _presetStore.SavePreset(_currentConfig);
-
-            if (success)
-            {
-                Debug.Log(
-                    $"[PresetController] Saved preset: {_currentConfig.PresetName}"
-                );
-
-                // Dropdown aktualisieren
-                configurationUI.SetPresetOptions(
-                    _presetStore.GetAllPresetIds()
-                );
-
-                configurationUI.SelectPreset(_currentConfig.PresetId);
-            }
+            if (_currentConfig == null || string.IsNullOrEmpty(_loadedPresetId)) return;
+            string id = _loadedPresetId;
+            string folder = _loadedPresetFolder;
+            configurationUI.ConfirmPresetAction(
+                $"Du bist dabei, die aktuellen Einstellungen des Presets '{id}' zu überschreiben. Die vorherigen Einstellungen gehen verloren. Klicke OK, wenn du einverstanden bist. Wenn du ein neues Preset speichern möchtest, wähle Abbrechen und anschließend Speichern unter.",
+                () =>
+                {
+                    configurationUI.WriteToConfig(_currentConfig);
+                    string selectedFolder = _presetStore.SelectedFolder;
+                    _presetStore.SetFolder(folder);
+                    _currentConfig.PresetId = id;
+                    if (!_presetStore.SavePreset(_currentConfig, overwrite: true))
+                    {
+                        _presetStore.SetFolder(selectedFolder);
+                        return;
+                    }
+                    RememberLoadedPreset();
+                    _presetStore.SetFolder(selectedFolder);
+                    configurationUI.SetPresetOptions(_presetStore.GetAllPresetIds());
+                    if (folder == selectedFolder) configurationUI.SelectPreset(id);
+                    configurationUI.RefreshPresetNamePreview();
+                });
         }
+
         public void BeginConfiguration()
         {
             if (configurationUI == null)
@@ -215,6 +232,15 @@ namespace AppV2.Runtime.Scripts.Config
             // independently of the canvas's OnEnable ordering.
             configurationUI.StartWorkshopRequested -= OnStartWorkshopRequested;
             configurationUI.StartWorkshopRequested += OnStartWorkshopRequested;
+
+            if (_configurationInitialized && _currentConfig != null)
+            {
+                // Returning from a session retains the menu's unsaved configuration.
+                configurationUI.WriteToConfig(_currentConfig);
+                configurationUI.DisplayConfig(_currentConfig);
+                configurationUI.Show();
+                return;
+            }
 
             // Für den Moment:
             // Aktuelle Inspector-Einstellungen als Ausgangskonfiguration verwenden.
@@ -231,6 +257,11 @@ namespace AppV2.Runtime.Scripts.Config
                 return;
             }
 
+            _presetStore.ImportLegacyPresets();
+            _loadedPresetId = _loadedPresetFolder = null;
+            bool restoredLastPreset = TryRestoreLastPreset();
+            configurationUI.InitializePresetBrowser(_presetStore);
+
             // Vorhandene Presets ins Dropdown
             var presetIds = _presetStore.GetAllPresetIds();
 
@@ -238,8 +269,11 @@ namespace AppV2.Runtime.Scripts.Config
 
             // Aktuelle Werte in UI schreiben
             configurationUI.DisplayConfig(_currentConfig);
+            configurationUI.SetLoadedPreset(_currentConfig, restoredLastPreset);
+            if (restoredLastPreset) configurationUI.SelectPreset(_loadedPresetId);
 
             configurationUI.Show();
+            _configurationInitialized = true;
 
             Debug.Log(
                 "[PresetController] Configuration UI initialized."
@@ -274,6 +308,14 @@ namespace AppV2.Runtime.Scripts.Config
 
 
             ReadEnvironmentSettings(config.Environment);
+            config.Storage = new StorageSettings
+            {
+                StorageFolderName = conversationStage._storageFolderName,
+                WorkshopFolderName = conversationStage._workshopFolderName,
+                SessionFolderName = conversationStage._personalFolderName,
+                SessionIdName = conversationStage._sessionIdName
+            };
+            config.StartInPlaybackFullConversationMode = conversationStage.StartInPlaybackFullConversationMode;
 
             ReadConversationSettings(config.Conversation);
 
@@ -557,6 +599,22 @@ namespace AppV2.Runtime.Scripts.Config
                 return false;
             }
 
+            if (!WorkshopConfigurationUI.ValidateStorageSettings(config.Storage, out string storageError))
+            {
+                Debug.LogError($"[PresetController] Cannot start: {storageError}", this);
+                return false;
+            }
+
+            if (!conversationStage.ConfigureStartRoles(config.StartRoles?.Roles))
+                return false;
+
+            if (config.Storage?.WorkshopFolderName != null && config.Storage.SessionFolderName != null)
+            {
+                conversationStage._workshopFolderName = config.Storage.WorkshopFolderName.Trim();
+                conversationStage._personalFolderName = config.Storage.SessionFolderName.Trim();
+                if (config.Storage.SessionIdName != null) conversationStage._sessionIdName = config.Storage.SessionIdName;
+            }
+
             ApplyEnvironmentSettings(config.Environment);
             ApplyConversationSettings(config.Conversation);
             ApplyPlayerSettings(config.Player);
@@ -676,9 +734,6 @@ namespace AppV2.Runtime.Scripts.Config
             conversationStage.heightOfSeatedPlayerCm =
                 settings.HeightOfSeatedPlayerCm;
 
-            conversationStage.fallbackFootSpacing =
-                settings.FallbackRootSpacing;
-
             conversationStage.fallbackHipHeight =
                 settings.FallbackHipHeight;
 
@@ -725,6 +780,17 @@ namespace AppV2.Runtime.Scripts.Config
 
             conversationStage.selectableNext =
                 settings.SelectableNext;
+
+            conversationStage._proceduralStepSpeed = settings.ProceduralStepSpeed;
+            conversationStage._proceduralStepLength = settings.ProceduralStepLength;
+        }
+
+        public void ApplyMenuRuntimeSettings(PresetConfig config)
+        {
+            if (conversationStage == null || config == null) return;
+            ApplyPlayerSettings(config.Player);
+            ApplyControlSettings(config.Controls);
+            ApplyConversationSettings(config.Conversation);
         }
 
         [ContextMenu("TEST - Save Current Stage As Preset")]

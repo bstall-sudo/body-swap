@@ -13,6 +13,8 @@ namespace AppV2.Runtime.Scripts.Config
 
         public string PresetId;
         public string PresetName;
+        public string PresetBaseName;
+        public string PresetSuffix;
         public int ConfigVersion = 1;
 
 
@@ -25,10 +27,30 @@ namespace AppV2.Runtime.Scripts.Config
         public PlayerSettings Player = new();
         public ControlSettings Controls = new();
         public StartRolesSettings StartRoles = new();
+        public StorageSettings Storage = new();
+        public bool StartInPlaybackFullConversationMode;
+        public PlaybackSettings Playback = new();
 
         public List<NpcGroupSettings> NpcGroups = new();
     }
 
+
+    [Serializable]
+    public class StorageSettings
+    {
+        public string StorageFolderName = "SessionRecordingData";
+        public string WorkshopFolderName;
+        public string SessionFolderName;
+        public string SessionIdName;
+    }
+
+    [Serializable]
+    public class PlaybackSettings
+    {
+        public string WorkshopFolderName;
+        public string SessionFolderName;
+        public string SessionId;
+    }
 
     // ================================================================
     // ENVIRONMENT

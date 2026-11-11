@@ -19,12 +19,12 @@ namespace AppV2.Runtime.Scripts.Config
     public static class RecordedSessionBrowser
     {
         public static List<RecordedSessionOption> FindSessions(
-            string storageFolderName = "SessionRecordingData")
+            string storageFolderName = "SessionRecordingData", string persistentDataPath = null)
         {
             var result = new List<RecordedSessionOption>();
 
             string root = Path.Combine(
-                Application.persistentDataPath,
+                persistentDataPath ?? Application.persistentDataPath,
                 storageFolderName
             );
 
@@ -67,6 +67,23 @@ namespace AppV2.Runtime.Scripts.Config
                 ));
 
             return result;
+        }
+
+        public static RecordedSessionOption FindLatestSession(
+            string storageFolderName = "SessionRecordingData", string persistentDataPath = null)
+        {
+            string root = Path.Combine(persistentDataPath ?? Application.persistentDataPath, storageFolderName);
+            RecordedSessionOption latest = null;
+            DateTime newest = DateTime.MinValue;
+            foreach (var session in FindSessions(storageFolderName, persistentDataPath))
+            {
+                string json = Path.Combine(root, session.WorkshopFolderName, session.SessionFolderName, session.SessionId, "session.json");
+                DateTime written = File.GetLastWriteTimeUtc(json);
+                if (latest != null && written <= newest) continue;
+                newest = written;
+                latest = session;
+            }
+            return latest;
         }
     }
 }

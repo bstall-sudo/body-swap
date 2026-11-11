@@ -48,6 +48,7 @@ int PreRecordedSceneCount,
 Per NpcGroup:
 bool Enabled, 
 string NpcGroupId,
+bool CanBecomeActiveConversationPartner, (dieses Feld gibt es aktuell noch nicht bei den PreRecorded ist aber sicherlich langfristig sinnvoll)
 (Im ConversationStage Unity-Editor gibt es den SessionSourcePath, aber den speichert man vielleicht besser nicht, sondern setzt ihn dann zusammen aus ApplicationPersistentDataPath/MainFolder/WorkshopFolder/SessionFolderName/SessionId?),
 string MainFolderName -> SessionRecordingData, (Der ist zwar zurzeit immer gleich, aber er kommt halt trotzdem vor...) 
 string WorkshopFolderName,

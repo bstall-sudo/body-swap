@@ -23,6 +23,21 @@ namespace AppV2.Runtime.Scripts.Rig
 
         public int RoleCount => roles?.Count ?? 0;
 
+        public void PrepareForNewCalibration()
+        {
+            if (roles == null) return;
+            foreach (var role in roles)
+            {
+                if (role == null) continue;
+                role.rigFollower?.ResetForCalibration();
+                if (role.avatar == null) continue;
+                role.avatar.SetRigModeRecordPlayback();
+                role.avatar.SetLowerBodyIKWeight(1f);
+                role.avatar.PlayBasePose(AvatarBasePose.TPose);
+                role.avatar.SetHeadVisible(true);
+            }
+        }
+
         public void SetOnlyRoleVisible(int visibleIndex)
         {
             if (roles == null) return;

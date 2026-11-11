@@ -25,6 +25,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [Header("Mode Dropdown")]
         [SerializeField]
         private TMP_Dropdown modeDropdown;
+        [SerializeField] private WorkshopConfigurationUI configurationUI;
 
         private string _currentPageId;
 
@@ -86,6 +87,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnModeChanged(int modeIndex)
         {
+            configurationUI?.SetPlaybackMode(modeIndex == 1);
             switch (modeIndex)
             {
                 case 0:
@@ -100,11 +102,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public void ShowRecordBase()
         {
+            configurationUI?.SetPlaybackMode(false);
+            if (modeDropdown != null) modeDropdown.SetValueWithoutNotify(0);
             ShowPage("RecordBase");
         }
 
         public void ShowPlayback()
         {
+            configurationUI?.SetPlaybackMode(true);
+            if (modeDropdown != null) modeDropdown.SetValueWithoutNotify(1);
             ShowPage("Playback");
         }
 

@@ -30,7 +30,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             if (_flow.ConsumePrimaryAction())
             {
                 UnityEngine.Debug.Log("[SceneConfigurationState] Consumed PrimaryAction");
-                _flow.SetState(new CalibrationState(_flow));
+                _flow.ConfigurationUI.RequestStart();
             }
 
             if (_flow.ConsumeSecondaryAction())
@@ -49,7 +49,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             // Hier deinen bisherigen Übergang zum CalibrationState aufrufen.
             // Beispiel, falls FlowController eine passende Methode anbietet:
-            _flow.SetState(new CalibrationState(_flow));
+            if (_flow.ConfigurationUI.IsPlaybackSelected)
+            {
+                _flow._data.Initialize(_flow.Stage.roles);
+                _flow.SetState(new PlaybackFullConversationState(_flow));
+            }
+            else
+                _flow.SetState(new CalibrationState(_flow));
             
         }
 

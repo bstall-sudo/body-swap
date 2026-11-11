@@ -78,8 +78,26 @@ namespace AppV2.Runtime.Scripts.Rig
 
         }
 
-        public void RefreshReferences()
+        public void RefreshReferences(bool avatarWasReplaced = false)
         {
+            if (avatarWasReplaced)
+            {
+                // Destroy is deferred until the end of the frame. The loader
+                // detaches the old avatar first, so hierarchy membership detects
+                // stale references even while Unity still considers them non-null.
+                // Keep valid slot-owned or explicitly assigned current references.
+                if (!IsCurrentRigReference(animator)) animator = null;
+                if (!IsCurrentRigReference(rigBuilder)) rigBuilder = null;
+                if (!IsCurrentRigReference(rigFollower)) rigFollower = null;
+                if (!IsCurrentRigReference(lookAtTarget)) lookAtTarget = null;
+                if (!IsCurrentRigReference(recordPlaybackModeRig)) recordPlaybackModeRig = null;
+                if (!IsCurrentRigReference(idleModeRig)) idleModeRig = null;
+                if (!IsCurrentRigReference(leftLegIK)) leftLegIK = null;
+                if (!IsCurrentRigReference(rightLegIK)) rightLegIK = null;
+                if (!IsCurrentRigReference(hipPositionConstraint)) hipPositionConstraint = null;
+                if (!IsCurrentRigReference(hipRotationConstraint)) hipRotationConstraint = null;
+            }
+
             if (animator == null)
                 animator = GetComponentInChildren<Animator>(true);
 
@@ -88,8 +106,12 @@ namespace AppV2.Runtime.Scripts.Rig
 
             if (rigFollower == null)
                 rigFollower = GetComponent<AvatarRigFollower>();
+            if (rigFollower == null)
+                rigFollower = GetComponentInChildren<AvatarRigFollower>(true);
 
-            if (renderersToToggle == null || renderersToToggle.Length == 0)
+            // The definition can live on the persistent slot while its avatar is
+            // replaced. A nonempty array may still refer to the old instance.
+            if (avatarWasReplaced || renderersToToggle == null || renderersToToggle.Length == 0)
                 renderersToToggle = GetComponentsInChildren<Renderer>(true);
 
             if (lookAtTarget == null)
@@ -127,6 +149,11 @@ namespace AppV2.Runtime.Scripts.Rig
             CacheHeadRenderers();
 
             AutoFillLowerBodyIKs();
+        }
+
+        private bool IsCurrentRigReference(Component reference)
+        {
+            return reference != null && reference.transform.IsChildOf(transform);
         }
 
         [ContextMenu("Auto Fill Lower Body IKs")]
@@ -234,6 +261,8 @@ namespace AppV2.Runtime.Scripts.Rig
         private void CacheHeadBlendShapes()
         {
             _blendShapesByLowerName.Clear();
+            _mouthOpenBlendShape = null;
+            _eyebrowRaiseBlendShape = null;
 
             if (headSkinnedMeshRenderers == null || headSkinnedMeshRenderers.Length == 0)
                 return;
@@ -519,6 +548,10 @@ namespace AppV2.Runtime.Scripts.Rig
         }
         public void SetLookAtTargetWorldPosition(Vector3 worldPosition)
         {
+            // Also recover when a target was rebuilt after the loader's refresh.
+            if (lookAtTarget == null)
+                lookAtTarget = FindDeepChild(transform, lookAtTargetName);
+
             if (lookAtTarget == null)
             {
                 // Erst den zugewiesenen Animator verwenden.

@@ -175,10 +175,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
                 return null;
             }
 
-            Array.Sort(directories, StringComparer.Ordinal);
-
-            string latestDirectory = directories[^1];
-            string latestSessionId = Path.GetFileName(latestDirectory);
+            string latestSessionId = null;
+            DateTime latestWrite = DateTime.MinValue;
+            foreach (string directory in directories)
+            {
+                string jsonPath = Path.Combine(directory, "session.json");
+                if (!File.Exists(jsonPath)) continue;
+                DateTime written = File.GetLastWriteTimeUtc(jsonPath);
+                if (latestSessionId == null || written > latestWrite)
+                {
+                    latestWrite = written;
+                    latestSessionId = Path.GetFileName(directory);
+                }
+            }
 
             //UnityEngine.Debug.Log($"Latest sessionId found: {latestSessionId}");
             return latestSessionId;

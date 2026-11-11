@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
-    public class ConversationStatusUI : MonoBehaviour
+    public partial class ConversationStatusUI : MonoBehaviour
     {
         [Header("Persistent status text")]
         [SerializeField] private TMP_Text desktopStatusText;

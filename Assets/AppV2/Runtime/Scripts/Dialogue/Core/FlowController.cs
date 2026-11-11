@@ -32,7 +32,19 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         //diese Aktionen werden bspw. von States gerufen. Sie kommen irgendwann. bspw. mitten im Frame, 
         // damit sie am Anfang des Frames ausgeführt werden => ConsumePrimary etc.
-        public void RequestPrimaryAction() => _primaryAction = true;
+        public void RequestPrimaryAction()
+        {
+            if (_returnToMenuRequested) return;
+            /* VR exit button disabled; use the desktop button instead.
+            if (CanReturnToMenu && Stage.UseXR && statusUI != null &&
+                statusUI.IsExitButtonTargeted(Stage.XrLeftHand, Stage.XrRightHand))
+            {
+                RequestReturnToMenu();
+                return;
+            }
+            */
+            _primaryAction = true;
+        }
         public void RequestSecondaryAction() => _secondaryAction = true;
         public void RequestResetAction() => _reset = true;
 
@@ -70,23 +82,43 @@ namespace AppV2.Runtime.Scripts.Dialogue
         private string _currentNpcGroupId = "";
 
         private float _maxHeightDifference;
+        private bool _returnToMenuRequested;
+        private bool _sessionStopStarted;
+        private bool CanReturnToMenu => _state is RecordSpeakerState || _state is RecordListenersState ||
+            _state is PlaybackFullPreRecordedScenes || _state is PlaybackFullConversationState ||
+            _state is RecordRemainingIdlesAfterPreRecordedEncounterState;
+
+        public void RequestReturnToMenu()
+        {
+            if (!CanReturnToMenu || _returnToMenuRequested) return;
+            _returnToMenuRequested = true;
+            _primaryAction = _secondaryAction = _reset = false;
+            statusUI?.SetDesktopExitButtonVisible(false);
+            statusUI?.SetStatusText("Aufnahme / Wiedergabe wird beendet …");
+        }
 
         private void Awake()
+        {
+            RefreshRuntimeSettings();
+            _data = new FlowStateData();
+            _data.Initialize(Stage.roles);
+        }
+
+        private void RefreshRuntimeSettings()
         {
             _simpleInputMode = Stage.simpleInputMode;
 
             _maxHeightDifference = Stage._maxHeightDifferenceForNpcTrigger;
 
-            if (_simpleInputMode)
+            if (XRInput != null && _simpleInputMode)
             {
                 XRInput.SetInputMode(XRInputEvents.InputMode.Simple);
             }
-            else
+            else if (XRInput != null)
             {
                 XRInput.SetInputMode(XRInputEvents.InputMode.Standard);
             }
-            _data = new FlowStateData();
-            _data.Initialize(Stage.roles);
+            selectableNext = Stage.selectableNext;
             _startInPlaybackFullConversationMode = Stage.StartInPlaybackFullConversationMode;
             _xrMode = Stage.UseXR;
             //UnityEngine.Debug.Log($"[FlowController] roleCount allRoles is: {Stage.roleCount} | activeRoles: {_data.ActiveRoleCount}");
@@ -100,6 +132,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
  
         private void Start()
         {
+            // VR button disabled for now:
+            // statusUI?.InitializeExitButton(Stage.XrHead, Stage.XrOrigin, RequestReturnToMenu, Stage.XrLeftHand, Stage.XrRightHand);
+            statusUI?.InitializeDesktopExitButton(RequestReturnToMenu);
             foreach (var role in _data.AllRoles)
             {
                 if (role?.root == null)
@@ -136,6 +171,28 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void Update()
         {
+            if (_returnToMenuRequested)
+            {
+                if (!_sessionStopStarted)
+                {
+                    Stage.StopSessionForMenu();
+                    _sessionStopStarted = true;
+                }
+                Stage.TickSessionSaveForMenu();
+                if (Stage.SessionSaveCompletedForMenu)
+                {
+                    // Normal state Exit methods advance dialogue or restart takes.
+                    // An explicit session stop uses the common cleanup instead.
+                    _state = null;
+                    Stage.ResetSessionForConfiguration();
+                    _data.Initialize(Stage.roles);
+                    _primaryAction = _secondaryAction = _reset = false;
+                    _sessionStopStarted = _returnToMenuRequested = false;
+                    statusUI?.ClearConversationFeedback();
+                    SetState(new SceneConfigurationState(this));
+                }
+                return;
+            }
             _state?.Tick(Time.deltaTime);
         }
 
@@ -148,7 +205,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 bool wasStarted = Stage.RecordingSessionStarted;
                 Stage.EnsureRecordingSessionStarted();
                 if (!wasStarted && Stage.RecordingSessionStarted)
+                {
                     _data.Initialize(Stage.roles);
+                    RefreshRuntimeSettings();
+                }
             }
 
             string oldStateName = _state?.GetType().Name ?? "null";
@@ -171,6 +231,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //PrintRoleLists("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
             //PrintRoleListsAndFlowStateDataWithStateInfo("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName);
             _state?.Enter();
+            // statusUI?.SetExitButtonVisible(Stage.UseXR && CanReturnToMenu);
+            statusUI?.SetDesktopExitButtonVisible(CanReturnToMenu);
             //PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
             //PrintRoleListsAndFlowStateDataWithStateInfo($"FlowController PreRecorded Debug | SetState AFTER ENTER| RoleCount is: {_data.Roles.Count}", oldStateName, newStateName);
 

@@ -61,6 +61,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         private readonly Dictionary<string, TakeMeta> _takeMetaBySceneAndRole =
         new Dictionary<string, TakeMeta>();
         private int _currentSceneCount = -1;
+        private int _currentRecordingRoleIndex = -1;
 
 
         public RecordingController( List<RoleRig> roles, int roleCount, SessionStore _storeFromConversationStage, SessionTakeIndex takeIndex, SessionModel session)
@@ -249,6 +250,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
 
             _currentSceneCount = sceneCount;
+            _currentRecordingRoleIndex = roleIndex;
 
             /*
             Debug.Log(
@@ -346,6 +348,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             }
                 
             
+        }
+
+        public void StopForMenu()
+        {
+            if (_isRecording && _currentRecordingRoleIndex >= 0)
+                EndRecording(_currentRecordingRoleIndex, _roles[_currentRecordingRoleIndex].roleId, _currentSceneCount);
+        }
+
+        public void TickSaveForMenu()
+        {
+            if (_hasPendingFinalize)
+                TickRecording(_pendingRoleIndex, _pendingRoleId, _pendingSceneCount);
         }
 
         public void EndRecording(int roleIndex, string roleId, int sceneCount)

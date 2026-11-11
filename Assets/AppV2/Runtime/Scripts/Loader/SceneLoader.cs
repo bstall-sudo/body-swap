@@ -67,9 +67,8 @@ public class SceneLoader : MonoBehaviour
 
         //Debug.Log($"[LoadSessionScene] RoleCount: {session.RoleCount}");
         // 3. RoleCount setzen
-        stage.ApplyRoleCountFromSession(session.RoleCount);
-
         stage.BuildActiveRoles();
+        stage.ApplyRoleCountFromSession(session.RoleCount);
 
         // 4. Rollen / Avatare / SpawnIds anwenden
         ApplyRolesFromSession(session);
@@ -117,6 +116,7 @@ public class SceneLoader : MonoBehaviour
             if (role.avatarLoader != null)
             {
                 role.avatarLoader.LoadAvatar(role.avatarId);
+                role.AutoResolveReferences();
             }
 
             /*Debug.Log(

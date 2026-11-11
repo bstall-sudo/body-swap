@@ -41,23 +41,36 @@ namespace AppV2.Runtime.Scripts.Loader
             if (avatarParent == null)
                 avatarParent = transform;
 
-            if (_currentAvatar != null)
-                Destroy(_currentAvatar);
-
             AvatarEntry entry = avatarCatalog.GetAvatarEntry(avatarId);
 
             if (entry == null)
                 return;
+
+            if (_currentAvatar != null)
+            {
+                // Destroy runs at the end of the frame. Detach first so reference
+                // resolution in this frame cannot select the previous avatar.
+                _currentAvatar.SetActive(false);
+                _currentAvatar.transform.SetParent(null, true);
+                Destroy(_currentAvatar);
+            }
 
             _currentAvatar = Instantiate(
                 entry.prefab,
                 avatarParent
             );
 
+            // Finish attaching/preparing the replacement before any rig caches
+            // or target maps are rebuilt.
+            _currentAvatar.name = entry.avatarId;
+            _currentAvatar.transform.localPosition = Vector3.zero;
+            _currentAvatar.transform.localRotation = Quaternion.identity;
+            _currentAvatar.transform.localScale = Vector3.one;
+
             rigDefinition = GetComponentInChildren<AvatarRigDefinition>(true);
 
             if (rigDefinition != null)
-                rigDefinition.RefreshReferences();
+                rigDefinition.RefreshReferences(avatarWasReplaced: true);
             else
                 Debug.LogError("[AvatarLoader] No AvatarRigDefinition found after loading avatar.");
 
@@ -69,11 +82,6 @@ namespace AppV2.Runtime.Scripts.Loader
             else
                 Debug.LogError("[AvatarLoader] No AvatarRigFollower found after loading avatar.");
 
-            _currentAvatar.name = entry.avatarId;
-
-            _currentAvatar.transform.localPosition = Vector3.zero;
-            _currentAvatar.transform.localRotation = Quaternion.identity;
-            _currentAvatar.transform.localScale = Vector3.one;
         }
     }
 }

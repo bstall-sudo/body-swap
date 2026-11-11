@@ -19,6 +19,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private TMP_Dropdown npcSpawnSelection;
         [SerializeField] private Toggle alignWithPlayerInput;
         [SerializeField] private Toggle canBecomeActiveRoleInput;
+        [SerializeField] private Button deleteNpcGroupButton;
 
 
         private List<string> _workshopNames = new();
@@ -31,6 +32,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
 
         public event Action Changed;
+        public event Action<NpcGroupSettings> DeleteRequested;
 
         public void Initialize(
             NpcGroupSettings settings,
@@ -38,6 +40,24 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         {
             _settings = settings;
             _sessions = sessions ?? new List<RecordedSessionOption>();
+
+            // Also support newly added prefab buttons before the field is assigned.
+            if (deleteNpcGroupButton == null)
+            {
+                foreach (var button in GetComponentsInChildren<Button>(true))
+                {
+                    if (button.name == "DeleteNpcGroup")
+                    {
+                        deleteNpcGroupButton = button;
+                        break;
+                    }
+                }
+            }
+            if (deleteNpcGroupButton != null)
+            {
+                deleteNpcGroupButton.onClick.RemoveListener(OnDeleteClicked);
+                deleteNpcGroupButton.onClick.AddListener(OnDeleteClicked);
+            }
 
             // NPC-Gruppe anzeigen
             npcGroupId.text = settings.NpcGroupId;
@@ -87,7 +107,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             List<string> options = new()
             {
-                "Bitte auswählen..."
+                "<color=#E53935>Bitte auswählen...</color>"
             };
 
             string savedSpawnId = _settings.NpcGroupSpawnId;
@@ -153,7 +173,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             List<string> options = new()
             {
-                "Bitte auswählen..."
+                "<color=#E53935>Bitte auswählen...</color>"
             };
 
             options.AddRange(values);
@@ -254,6 +274,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         }
 
 
+        public void SetGroupEnabledWithoutNotify(bool enabled)
+        {
+            if (_settings == null)
+                return;
+
+            _settings.Enabled = enabled;
+            npcEnabled.SetIsOnWithoutNotify(enabled);
+        }
+
         private void OnChanged(bool unused)
         {
             _settings.Enabled = npcEnabled.isOn;
@@ -267,8 +296,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             Changed?.Invoke();
         }
 
+        private void OnDeleteClicked()
+        {
+            if (_settings != null)
+                DeleteRequested?.Invoke(_settings);
+        }
+
         private void OnDestroy()
         {
+            if (deleteNpcGroupButton != null)
+                deleteNpcGroupButton.onClick.RemoveListener(OnDeleteClicked);
             npcEnabled.onValueChanged.RemoveListener(OnChanged);
             alignWithPlayerInput.onValueChanged.RemoveListener(OnChanged);
             canBecomeActiveRoleInput.onValueChanged.RemoveListener(OnChanged);

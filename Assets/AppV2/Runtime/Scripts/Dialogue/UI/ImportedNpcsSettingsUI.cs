@@ -13,6 +13,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private Transform rowsContainer;
         [SerializeField] private NpcSettingsRowUI rowPrefab;
         [SerializeField] private Button addNpcButton;
+        [Tooltip("Textanzeige der Anzahl aktivierter NPC-Gruppen.")]
+        [SerializeField] private TMP_Text activeNpcRolesText;
+        [SerializeField] private Toggle allNpcGroupsToggle;
 
         [SerializeField] private EnvironmentLoader environmentLoader;
 
@@ -29,16 +32,35 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         private void Awake()
         {
             addNpcButton.onClick.AddListener(AddNpcGroup);
+            BindAllGroupsToggle();
+        }
+
+        private void OnEnable()
+        {
+            BindAllGroupsToggle();
+            RefreshGroupCount();
+        }
+
+        private void BindAllGroupsToggle()
+        {
+            if (allNpcGroupsToggle != null)
+            {
+                allNpcGroupsToggle.onValueChanged.RemoveListener(SetAllNpcGroupsEnabled);
+                allNpcGroupsToggle.onValueChanged.AddListener(SetAllNpcGroupsEnabled);
+            }
         }
 
         private void OnDestroy()
         {
             addNpcButton.onClick.RemoveListener(AddNpcGroup);
+            if (allNpcGroupsToggle != null)
+                allNpcGroupsToggle.onValueChanged.RemoveListener(SetAllNpcGroupsEnabled);
         }
 
         public void Display(PresetConfig config)
         {
             _config = config;
+            BindAllGroupsToggle();
 
             if (_config == null)
                 return;
@@ -95,7 +117,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             foreach (var row in _rows)
             {
                 if (row != null)
+                {
+                    row.Changed -= RefreshGroupCount;
+                    row.DeleteRequested -= RemoveNpcGroup;
+                    row.gameObject.SetActive(false);
                     Destroy(row.gameObject);
+                }
             }
 
             _rows.Clear();
@@ -110,9 +137,74 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
                 row.Initialize(settings, _sessions);
                 row.SetSpawnOptions(spawnIds);
+                row.Changed += RefreshGroupCount;
+                row.DeleteRequested += RemoveNpcGroup;
 
                 _rows.Add(row);
             }
+
+            RefreshGroupCount();
+        }
+
+        private void RemoveNpcGroup(NpcGroupSettings settings)
+        {
+            if (_config?.NpcGroups == null || !_config.NpcGroups.Remove(settings))
+                return;
+
+            // Keep the existing zero-based naming convention contiguous.
+            for (int i = 0; i < _config.NpcGroups.Count; i++)
+            {
+                if (_config.NpcGroups[i] != null)
+                    _config.NpcGroups[i].NpcGroupId = $"NpcGroup{i}";
+            }
+
+            RebuildRows();
+        }
+
+        private void SetAllNpcGroupsEnabled(bool enabled)
+        {
+            if (_config?.NpcGroups == null)
+                return;
+
+            foreach (var npc in _config.NpcGroups)
+            {
+                if (npc != null)
+                    npc.Enabled = enabled;
+            }
+
+            // Keep current rows and dropdown selections intact.
+            foreach (var row in _rows)
+            {
+                if (row != null)
+                    row.SetGroupEnabledWithoutNotify(enabled);
+            }
+
+            RefreshGroupCount();
+        }
+
+        private void RefreshGroupCount()
+        {
+            int enabled = 0;
+            int total = 0;
+            if (_config?.NpcGroups != null)
+            {
+                foreach (var npc in _config.NpcGroups)
+                {
+                    if (npc == null)
+                        continue;
+                    total++;
+                    if (npc.Enabled)
+                        enabled++;
+                }
+            }
+
+            if (activeNpcRolesText != null)
+                activeNpcRolesText.text = $"Aktivierte NPC-Gruppen: {enabled}";
+
+            // Mixed selections appear unchecked. Avoid triggering a bulk change
+            // when a single row changes or a preset is displayed.
+            if (allNpcGroupsToggle != null)
+                allNpcGroupsToggle.SetIsOnWithoutNotify(total > 0 && enabled == total);
         }
 
         public List<string> GetMissingSessions()

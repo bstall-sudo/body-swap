@@ -188,6 +188,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
         }
 
+        public void StopAll()
+        {
+            if (players == null) return;
+            foreach (var takePlayer in players) takePlayer.Stop();
+            allStoppedPlaying = true;
+        }
+
         public void StopClipsForIndices(List<int> roleIndices)
         {
             foreach (var roleIndex in roleIndices)

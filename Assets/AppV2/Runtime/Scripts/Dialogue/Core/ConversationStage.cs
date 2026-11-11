@@ -878,6 +878,92 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private bool _recordingSessionStarted;
         public bool RecordingSessionStarted => _recordingSessionStarted;
+        public bool SessionSaveCompletedForMenu => _recordingController == null || _recordingController.SaveCompleted();
+
+        public void StopSessionForMenu()
+        {
+            _playbackController?.StopAll();
+            _recordingController?.StopForMenu();
+        }
+
+        public void TickSessionSaveForMenu() => _recordingController?.TickSaveForMenu();
+
+        public void ResetSessionForConfiguration()
+        {
+            // Called only after the take has finished persisting.
+            _playerAlignActive = false;
+            ResetEmbodimentHeight();
+            MirrorSetVisibility?.ActivateMirror(false);
+            avatarCalibration?.SetAllAvatarHeadsVisible(true);
+            avatarCalibration?.ShowAllRoles();
+            rolesVisualsVisibilityHandler?.SetAllVisible(false);
+            roles.RemoveAll(role => importedNpcRoles.Contains(role));
+            importedNpcRoles.Clear();
+            roleCount = roles.Count;
+            _recordingSessionStarted = false;
+            _recordingController = null;
+            _preRecordedTakeImporter = null;
+            _session = null;
+            _sessionFolder = "";
+            _takeIndex = new SessionTakeIndex();
+            _playbackSourcesByRoleIndex.Clear();
+        }
+        private List<AppV2.Runtime.Scripts.Config.StartRoleSettings> _configuredStartRoles;
+
+        public bool ConfigureStartRoles(List<AppV2.Runtime.Scripts.Config.StartRoleSettings> settings)
+        {
+            if (_recordingSessionStarted || settings == null || settings.Count < 1 || settings.Count > maxRoleCount)
+            {
+                Debug.LogError("[ConversationStage] Cannot change start roles: invalid count or session already started.", this);
+                return false;
+            }
+            for (int i = 0; i < settings.Count; i++)
+            {
+                if (settings[i] == null || rolesRoot == null || rolesRoot.Find($"Role{DefaultRoleId(i)}") == null)
+                {
+                    Debug.LogError($"[ConversationStage] Missing role settings or slot Role{DefaultRoleId(i)}.", this);
+                    return false;
+                }
+            }
+            _configuredStartRoles = settings;
+            return true;
+        }
+
+        private void ApplyConfiguredStartRoles()
+        {
+            if (_configuredStartRoles == null) return;
+            var configured = new List<RoleRig>();
+            var avatarsToLoad = new List<RoleRig>();
+            for (int i = 0; i < _configuredStartRoles.Count; i++)
+            {
+                var settings = _configuredStartRoles[i];
+                var role = i < roles.Count ? roles[i] : new RoleRig();
+                role.roleId = role.slotId = role.sourceRoleId = DefaultRoleId(i);
+                role.roleIndex = role.sourceRoleIndex = i;
+                role.hasPreRecordedTakes = false;
+                role.isActiveConversationPartner = true;
+                role.avatarId = string.IsNullOrWhiteSpace(settings.AvatarId) ? "default" : settings.AvatarId;
+                role.heightOfRoleCm = settings.HeightOfRoleCm;
+                role.heightOfSeatedRoleCm = settings.HeightOfSeatedRoleCm;
+                role.usePlayerHeightAsDefault = settings.HeightOfRoleCm <= 0;
+                role.hasInitialStartPose = settings.HasInitialStartPose;
+                role.initialStartPos = settings.InitialStartPos;
+                role.initialStartYawDeg = settings.InitialStartYawDeg;
+                BindRoleToSlot(role, role.slotId);
+                // Activate before loading so the slot's Awake references are ready.
+                role.roleRoot.gameObject.SetActive(true);
+                if (role.avatarLoader != null && (role.avatarLoader.CurrentAvatar == null ||
+                    role.avatarLoader.CurrentAvatar.name != role.avatarId))
+                    avatarsToLoad.Add(role);
+                configured.Add(role);
+            }
+            roles.Clear();
+            roles.AddRange(configured);
+            roleCount = roles.Count;
+            _playbackSourcesByRoleIndex.Clear();
+            sceneLoader.LoadAvatarsForRoles(avatarsToLoad);
+            foreach (var role in roles) role.AutoResolveReferences();
+        }
 
         /// <summary>
         /// Starts once, after configuration has been applied. Also used by flows
@@ -892,6 +978,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _store = new SessionStore(
                 _storageFolderName, _workshopFolderName, _personalFolderName, _sessionIdName);
 
+            ApplyConfiguredStartRoles();
             // Import only now: START has applied the UI's selected source sessions.
             AddImportedNpcRolesToFreeSlots();
             BuildAllRoleRoots();
@@ -919,6 +1006,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             chooseSpeakerController.Initialize(roles);
             avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
             rolesVisualsVisibilityHandler.Initialize(roles);
+            if (UseXR && xRLocomotionToggle != null)
+                xRLocomotionToggle.SetLocomotionEnabled(allowTeleportation);
 
             string roleName = roles.Count > 0 ? roles[0].GetAvatarName() : "";
             _sessionFolder = _store.CreateNewSessionFolder(stageSpawnId, roleName, out string sessionId);
@@ -939,6 +1028,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
             _calibrationDataProvider = new RoleCalibrationDataProvider();
             _calibrationDataProvider.Initialize(roles);
             _recordingSessionStarted = true;
+            string lastRecordingKey = $"BodySwap.LastRecording.{_storageFolderName}.";
+            PlayerPrefs.SetString(lastRecordingKey + "Workshop", _workshopFolderName);
+            PlayerPrefs.SetString(lastRecordingKey + "Folder", _personalFolderName);
+            PlayerPrefs.SetString(lastRecordingKey + "Session", sessionId);
+            PlayerPrefs.Save();
             Debug.Log($"[ConversationStage] Started recording session: {sessionId}", this);
         }
 
@@ -1774,7 +1868,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             if (string.IsNullOrEmpty(latestSessionId))
             {
                 UnityEngine.Debug.LogError("ConversationStage.InitializePlaybackFromLatestSession: No latest session found.");
-                
+                return;
             }
             //UnityEngine.Debug.Log($"startIn Playback Full Conversation Mode. InitializeFromSession : {latestSessionId}");
             InitializePlaybackFromSession(latestSessionId);
@@ -1806,6 +1900,63 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _session,
                 groundHeightProvider
             );
+        }
+
+        public bool TryStartPlaybackSession(string workshop, string folder, string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(workshop) || string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(sessionId))
+            {
+                Debug.LogError("[Playback] Bitte Workshop, Session-Ordner und Aufnahme auswählen.", this);
+                return false;
+            }
+            var store = new SessionStore(_storageFolderName, workshop, folder);
+            try
+            {
+                var model = store.LoadSessionModel(sessionId);
+                if (model == null || model.RoleCount < 1 || model.RoleCount > maxRoleCount ||
+                    model.Takes == null || model.Takes.Count == 0)
+                {
+                    Debug.LogError("[Playback] Die Aufnahme enthält keine abspielbaren Takes oder eine ungültige Rollenanzahl.", this);
+                    return false;
+                }
+                for (int i = 0; i < model.RoleCount; i++)
+                {
+                    if (rolesRoot == null || rolesRoot.Find($"Role{DefaultRoleId(i)}") == null)
+                    {
+                        Debug.LogError($"[Playback] Missing slot Role{DefaultRoleId(i)}.", this);
+                        return false;
+                    }
+                }
+
+                _workshopFolderName = workshop;
+                _personalFolderName = folder;
+                _sessionFolder = sessionId;
+                _store = store;
+                _takeIndex = new SessionTakeIndex();
+                roles.Clear();
+                importedNpcRoles.Clear();
+                _playbackSourcesByRoleIndex.Clear();
+                InitializePlaybackFromSession(sessionId);
+                _input?.SetAnchorFromTakeRoot(_stageRoot);
+                _calibrationDataApplier = new RoleCalibrationDataApplier();
+                _calibrationDataApplier.Initialize(roles);
+                _calibrationDataApplier.ApplyRoleMetasToScene(roles, _session);
+                _blendShapeAudioAnimator.Initialize(roles);
+                _reactiveIdleController.Initialize(roles, _blendShapeAudioAnimator);
+                avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
+                rolesVisualsVisibilityHandler.Initialize(roles);
+                chooseSpeakerController.Initialize(roles);
+                ApplyAllRoleVisualScales();
+                MirrorSetVisibility.ActivateMirror(false);
+                TurnOffVisibilityOfVisualRig();
+                StartInPlaybackFullConversationMode = true;
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException)
+            {
+                Debug.LogError($"[Playback] Aufnahme konnte nicht geladen werden: {store.GetSessionJsonPath(sessionId)}\n{ex.Message}", this);
+                return false;
+            }
         }
                         
         //Diese Funktion stellt die Execution-Order sicher.
