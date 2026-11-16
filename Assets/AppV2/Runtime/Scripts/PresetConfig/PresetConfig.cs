@@ -157,6 +157,14 @@ namespace AppV2.Runtime.Scripts.Config
         public int HeightOfRoleCm = 180;
         public int HeightOfSeatedRoleCm = 133;
 
+        // Empty IDs follow the selected StageSpawnPoint / existing circle facing.
+        public string SpawnPointId = "";
+        public string LookAtSpawnPointId = "";
+        public bool IsActiveConversationPartner = true;
+        // Legacy presets omit the toggle; absence must keep the old active default.
+        public bool HasConversationPartnerSetting;
+        public bool StartsActive => !HasConversationPartnerSetting || IsActiveConversationPartner;
+
         public bool HasInitialStartPose = false;
 
         public Vector3 InitialStartPos = Vector3.zero;

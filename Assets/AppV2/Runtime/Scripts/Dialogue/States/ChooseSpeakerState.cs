@@ -27,6 +27,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private int currentlySelected;
 
         private List<int> _selectableRoles;
+        private bool _waitingForActivation;
         private int actionCounter;
        
 
@@ -101,34 +102,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 Debug.LogWarning("[ChooseSpeakerState] _playbacks was null, creating empty list.");
                 _playbacks = new List<int>();
             }
-            //alle Rollen, die noch nicht in _playbacks sind, werden zu den _selectableRoles hinzugefügt.
-            if(_playbacks.Count < _roleCount)
-            {
-                for (int i = 0; i < _roleCount; i++)
-                {
-                    if (!_playbacks.Contains(i))
-                    {
-                        _selectableRoles.Add(i);
-                        //Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is smaller than _roleCount.");
-                    }
-                    
-                    
-                }
-
-            }
-            else
-            {
-                for (int i = 0; i < _roleCount; i++)
-                {
-                    _selectableRoles.Add(i);
-                    //Debug.Log($"[ChooseSpeakerState] role {i} added to selectableRoles because _playbacks.Count is NOT smaller than _roleCount.");  
-                }
-
-                
-            }
-            currentlySelected = _selectableRoles[0];
-
- 
+            _flow._data.RefreshMembership();
+            RefreshSelectableRoles();
 
             _toBeRecorded = _flow._data.ToBeRecorded;
             _stageRoot = _flow.Stage._stageRoot;
@@ -136,8 +111,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             sceneCount = _flow._data.SceneCount;
 
             _flow.Stage.ChooseSpeakerController.MoveXrOriginBackFromStage();
-            _flow.Stage.ChooseSpeakerController.SelectNextCylinderVisible(true);
-            _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
+            _flow.Stage.ChooseSpeakerController.SelectNextCylinderVisible(currentlySelected >= 0);
+            if (currentlySelected >= 0) _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
             if (sceneCount > -1 && _playbacks.Count>0)
             {
                 //hier zweimal sceneCount, weil es den SceneCount für die aktuelle Session und SceneCount PreRecorded gibt. 
@@ -149,8 +124,32 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
         }
 
+        private void RefreshSelectableRoles()
+        {
+            _roleCount = _flow._data.ActiveRoleCount;
+            var next = _flow._data.GetSelectableRoleIndices(_playbacks);
+            bool changed = next.Count != _selectableRoles.Count;
+            if (!changed) for (int i = 0; i < next.Count; i++) if (next[i] != _selectableRoles[i]) changed = true;
+            _selectableRoles = next;
+            if (!_selectableRoles.Contains(currentlySelected))
+                currentlySelected = _selectableRoles.Count > 0 ? _selectableRoles[0] : -1;
+            if (changed)
+            {
+                actionCounter = Mathf.Max(0, _selectableRoles.IndexOf(currentlySelected));
+                _flow.Stage.ChooseSpeakerController.SelectNextCylinderVisible(currentlySelected >= 0);
+                if (currentlySelected >= 0) _flow.Stage.ChooseSpeakerController.SetCylinderToSelected(currentlySelected);
+            }
+            if (currentlySelected < 0 && !_waitingForActivation)
+                _flow.StatusUI?.ShowCustomCue("Noch keine aktive Rolle. Bitte zuerst einen Gespraechspartner aktivieren.",
+                    new Vector2(0f,180f),new Vector2(500f,0f),Color.white);
+            _waitingForActivation = currentlySelected < 0;
+        }
+
         public void Tick(float dt)
         {
+            // Also reflects flags changed through the runtime inspector while choosing.
+            _flow._data.RefreshMembership();
+            RefreshSelectableRoles();
 
 
             if (_playbacks.Count > 0)
@@ -159,6 +158,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
             
 
+            if (currentlySelected < 0)
+            {
+                _flow.ConsumePrimaryAction(); _flow.ConsumeSecondaryAction();
+                return;
+            }
             if (_flow.ConsumePrimaryAction())
             {
                 actionCounter ++;
@@ -286,8 +290,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private void ResetPlaybacksReactiveIdlesIncSceneCount()
         {
-            _playbacks = new List<int>();
             _flow.Stage.PlaybackStop(_playbacks);
+            _playbacks = new List<int>();
             //hier müssen dann playbacks wieder auf 0 gesetzt werden. 
             _flow._data.Playbacks = _playbacks;
              _reactiveIdles = AllRoleIndices(_roleCount);
@@ -304,13 +308,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             {
                 _flow.Stage.PlaybackStop(_playbacks);
             }
-            if(_playbacks.Count == _roleCount)
+            if (_roleCount > 0 && _flow._data.Roles.TrueForAll(r => _playbacks.Contains(r.roleIndex)))
             {
                 ResetPlaybacksReactiveIdlesIncSceneCount();
             }
 
             _flow._data.SelectedNext = currentlySelected;
-            _flow._data.ToBeRecorded = currentlySelected;
+            if (currentlySelected >= 0) _flow._data.ToBeRecorded = currentlySelected;
             _flow.Stage.ChooseSpeakerController.SelectNextCylinderVisible(false);
             //UnityEngine.Debug.Log("[ChooseSpeakerState] Exit");
         }
@@ -318,10 +322,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private List<int> AllRoleIndices(int roleCount){
             List<int> allRoleIndices =new List<int>();
 
-            for(int i = 0; i < roleCount; i++)
-                {
-                    allRoleIndices.Add(i);   
-                }
+            foreach (var role in _flow._data.Roles) allRoleIndices.Add(role.roleIndex);
             return allRoleIndices;
         }
 

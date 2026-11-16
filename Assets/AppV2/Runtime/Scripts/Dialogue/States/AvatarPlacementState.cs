@@ -39,10 +39,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _currentRoleIndexForPlacement = 0;
             _stageRoot = _flow.Stage._stageRoot;
 
+            var poses = RolePlacementUtility.BuildStartPoses(_flow.Stage.roles, _stageRoot,
+                _flow.Stage.StageSpawnId, _flow.Stage.environmentLoader.FindSpawnTransform,
+                _flow.Stage.GetGroundYStageLocal);
             for (int i = 0; i < _roleCount; i++)
             {
                 _allRolesIndices.Add(i);
-                PlaceCurrentRoleAndAdvance();
+                if (_flow.Stage.roles[i].hasPreRecordedTakes) PlacePreRecordedRole(i);
+                else if (poses.TryGetValue(i, out var pose))
+                    _flow.Stage.AvatarCalibration.PlaceRoleAt(i, pose.Position, pose.Rotation, _stageRoot);
             }
 
             _flow.Stage.RigUpdatePipeline(
@@ -78,77 +83,6 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         }
 
 
-
-        private void PlaceCurrentRoleAndAdvance()
-        {
-            if (_currentRoleIndexForPlacement >= _flow.Stage.roleCount)
-            {
-                return;
-            }
-
-            RoleRig role = _flow.Stage.roles[_currentRoleIndexForPlacement];
-
-            int activeRoleCount = 0;
-            int activePlacementIndex = 0;
-
-            for (int i = 0; i < _flow.Stage.roles.Count; i++)
-            {
-                RoleRig r = _flow.Stage.roles[i];
-
-                if (r.hasPreRecordedTakes)
-                    continue;
-
-                if (i < _currentRoleIndexForPlacement)
-                    activePlacementIndex++;
-
-                activeRoleCount++;
-            }
-
-            if (role.hasPreRecordedTakes)
-            {
-                PlacePreRecordedRole(_currentRoleIndexForPlacement);
-            }
-            else
-            {
-                Vector3 placement;
-                Quaternion rotation;
-
-                if (activeRoleCount == 1)
-                {
-                    placement = Vector3.zero;
-                    rotation = Quaternion.identity;
-                    //UnityEngine.Debug.Log($"[AvatarPlacementState] placement is: {placement.x}, {placement.y}, {placement.z}"); 
-                }
-                else
-                {
-                    placement = RolePlacementUtility.GetCirclePlacementPosition(
-                        activePlacementIndex,
-                        activeRoleCount
-                    );
-
-                    Vector3 flatPlacement = placement;
-                    flatPlacement.y = 0f;
-
-                    rotation =
-                        RolePlacementUtility.GetCirclePlacementRotation(flatPlacement);
-                }
-
-                placement.y =
-                    _flow.Stage.GetGroundYStageLocal(placement);
-
-                _flow.Stage.AvatarCalibration.PlaceRoleAt(
-                    _currentRoleIndexForPlacement,
-                    placement,
-                    rotation,
-                    _flow.Stage._stageRoot
-                );
-            }
-
-            // Immer weitergehen, egal ob normal oder prerecorded
-            _currentRoleIndexForPlacement++;
-
-
-        }
 
         public void PlacePreRecordedRole(int roleIndex)
         {
@@ -260,12 +194,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 $"rootBeforeLocal={role.root.localPosition}, " +
                 $"rootBeforeWorld={role.root.position}"
             );*/
-            _flow.Stage.AvatarCalibration.PlaceRoleAt(
-                roleIndex,
-                placement,
-                rotation,
-                _stageRoot
-            );
+            // Placement is already resolved in stage space. PlaceRoleAt would resolve
+            // an imported NPC a second time and discard this ground-adjusted pose.
+            role.root.SetLocalPositionAndRotation(placement, rotation);
+            role.initialStartPos = placement;
+            role.initialStartYawDeg = rotation.eulerAngles.y;
+            role.hasInitialStartPose = true;
 
             /*Debug.Log(
                 $"[NPC PLACEMENT AFTER] " +
@@ -299,7 +233,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
         private void GoToNextState()
         {
-            if (selectableNext)
+            _flow._data.RefreshMembership();
+            if (selectableNext || _flow._data.ActiveRoleCount == 0)
             {
                 _flow.SetState(new ChooseSpeakerState(_flow));
             }

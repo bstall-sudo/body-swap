@@ -161,6 +161,7 @@ namespace AppV2.Runtime.Scripts.Loader
 
                         hasPreRecordedTakes = true,
                         isActiveConversationPartner = false,
+                        initialIsActiveConversationPartner = false,
 
                         npcGroupId = npcGroupId,
                         sourceRoleId = meta.RoleId,

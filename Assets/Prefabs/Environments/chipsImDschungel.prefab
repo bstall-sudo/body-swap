@@ -46,6 +46,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb1f567dbec4e7745b9ee94c3cb29f66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaia.GaiaSceneLighting
+--- !u!1 &3814997564672595211
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1911435421605862844}
+  - component: {fileID: 4279462927588023473}
+  m_Layer: 3
+  m_Name: StageSpawn_02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1911435421605862844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3814997564672595211}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -7.93, y: 12.072958, z: -14.799999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8144416792248712998}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4279462927588023473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3814997564672595211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a6133c4b4304a42811c5e713f45ea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
+  spawnId: vor_chipsstand_links
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  searchUp: 2
+  searchDown: 5
 --- !u!1 &4524623785583790595
 GameObject:
   m_ObjectHideFlags: 0
@@ -176,6 +226,7 @@ Transform:
   m_Children:
   - {fileID: 1453929330469172329}
   - {fileID: 2375801252603825060}
+  - {fileID: 1911435421605862844}
   m_Father: {fileID: 6698769495387827050}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5431877498887767832

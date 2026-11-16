@@ -57,6 +57,14 @@ namespace AppV2.Runtime.Scripts.Loader
             
         }
 
+        public Transform FindSpawnTransform(string spawnId)
+        {
+            if (_currentEnvironment == null || string.IsNullOrWhiteSpace(spawnId)) return null;
+            foreach (var point in _currentEnvironment.GetComponentsInChildren<StageSpawnPoint>(true))
+                if (point.spawnId == spawnId) return point.transform;
+            return null;
+        }
+
         public StageSpawnPoint GetSpawnPoint(string spawnId = "default")
         {
             if (_currentEnvironment == null)

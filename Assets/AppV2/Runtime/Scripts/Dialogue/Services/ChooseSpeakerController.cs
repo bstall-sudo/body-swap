@@ -86,7 +86,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         {
 
             //Debug.Log("[SetCylinderToSelection] was called.");
-            _selectNextSpeakerCylinder.localPosition = _roles[roleIndex].avatarRoot.localPosition;
+            if (_roles == null || roleIndex < 0 || roleIndex >= _roles.Count || _roles[roleIndex].avatarRoot == null) return;
+            _selectNextSpeakerCylinder.position = _roles[roleIndex].avatarRoot.position;
         }
     }
 }

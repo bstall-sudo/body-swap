@@ -110,6 +110,10 @@ public class SceneLoader : MonoBehaviour
             role.avatarId = roleMeta.AvatarId;
             
             role.roleSpawnId = roleMeta.RoleSpawnId;
+            role.startSpawnPointId = roleMeta.StartSpawnPointId ?? "";
+            role.lookAtSpawnPointId = roleMeta.LookAtSpawnPointId ?? "";
+            role.initialIsActiveConversationPartner = !roleMeta.HasInitialConversationPartnerSetting || roleMeta.InitialIsActiveConversationPartner;
+            role.isActiveConversationPartner = role.initialIsActiveConversationPartner;
 
             UnityEngine.Debug.Log($"[ApplyRolesFromSession] role with Index: {roleMeta.RoleIndex}, roleId: {role.roleId}, roleSpawnId: {role.roleSpawnId}");
             // Avatar laden
@@ -127,7 +131,15 @@ public class SceneLoader : MonoBehaviour
             );*/
 
             // RoleRoot platzieren
-            PlaceRoleRoot(role);
+            if (roleMeta.StartRootPose != null)
+            {
+                // Already stage-local, including any off-stage spawn and circle offset.
+                role.root.SetLocalPositionAndRotation(roleMeta.StartRootPose.LocalPosition, roleMeta.StartRootPose.LocalRotation);
+                role.initialStartPos = roleMeta.StartRootPose.LocalPosition;
+                role.initialStartYawDeg = roleMeta.StartRootPose.LocalRotation.eulerAngles.y;
+                role.hasInitialStartPose = true;
+            }
+            else PlaceRoleRoot(role);
         }
     }
 

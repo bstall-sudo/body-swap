@@ -345,7 +345,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             if (activeRolesSettingsUI != null)
             {
-                activeRolesSettingsUI.Display(config);
+                activeRolesSettingsUI.Display(config, environmentLoader);
             }
 
             // ============================================================
@@ -602,6 +602,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             dropdown.RefreshShownValue();
         }
 
+        public List<string> GetRoleSpawnIds(string environmentId)
+            => environmentLoader != null ? environmentLoader.GetSpawnIds(
+                string.IsNullOrWhiteSpace(environmentId) ? "default" : environmentId) : new List<string>();
+
         private void OnEnvironmentChanged(int index)
         {
             if (_displayedConfig == null)
@@ -616,6 +620,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             // SpawnIds aktualisieren, ohne gespeicherte Werte zu löschen
             RefreshStageSpawnDropdown();
+            activeRolesSettingsUI?.RefreshSpawnOptions(environmentId);
 
             if (importedNpcsSettingsUI != null)
             {
@@ -640,6 +645,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 _displayedConfig.Environment.StageSpawnId = selectedValue;
             }
+            activeRolesSettingsUI?.RefreshSpawnOptions(_displayedConfig.Environment.EnvironmentId);
             // Bei "Nicht gefunden: ..." bleibt der alte Wert erhalten
         }
     }

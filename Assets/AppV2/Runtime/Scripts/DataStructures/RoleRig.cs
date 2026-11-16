@@ -38,6 +38,9 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public bool hasPreRecordedTakes = false;
         public bool hasPlayedBackPreRecordedTakes = false;
         public bool isActiveConversationPartner = true;
+        public string startSpawnPointId = "";
+        public string lookAtSpawnPointId = "";
+        public bool initialIsActiveConversationPartner = true;
 
 
         public string takeSource; // Pfad zur importierten Session / Take-Datei

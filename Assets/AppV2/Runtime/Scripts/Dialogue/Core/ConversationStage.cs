@@ -267,9 +267,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     role.slotId = role.roleId;
                 }
 
-                role.roleIndex = i;  
-                role.sourceRoleIndex = i; 
-                role.isActiveConversationPartner = true; 
+                role.roleIndex = i;
+                if (!role.hasPreRecordedTakes) role.sourceRoleIndex = i;
+                // Rebuilding references must preserve configured/runtime membership.
+                // New RoleRig instances already default to active.
 
                 if (rolesRoot != null)
                 {
@@ -949,7 +950,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 role.roleId = role.slotId = role.sourceRoleId = DefaultRoleId(i);
                 role.roleIndex = role.sourceRoleIndex = i;
                 role.hasPreRecordedTakes = false;
-                role.isActiveConversationPartner = true;
+                role.isActiveConversationPartner = settings.StartsActive;
+                role.initialIsActiveConversationPartner = settings.StartsActive;
+                role.startSpawnPointId = settings.SpawnPointId ?? "";
+                role.lookAtSpawnPointId = settings.LookAtSpawnPointId ?? "";
+                role.roleSpawnId = ""; // Authored role placement is stored stage-local, not as an NPC import anchor.
                 role.avatarId = string.IsNullOrWhiteSpace(settings.AvatarId) ? "default" : settings.AvatarId;
                 role.heightOfRoleCm = settings.HeightOfRoleCm;
                 role.heightOfSeatedRoleCm = settings.HeightOfSeatedRoleCm;
@@ -1004,6 +1009,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 role.AutoResolveReferences();
                 role.ResolveAvatarName(false);
             }
+
+            foreach (var role in roles)
+                if (role != null) role.initialIsActiveConversationPartner = role.isActiveConversationPartner;
 
             // These services cache per-role state; include the final NPC roster.
             _blendShapeAudioAnimator.Initialize(roles);

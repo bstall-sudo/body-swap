@@ -34,6 +34,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
 
         public int HeightOfRoleCm;
         public bool SittingIdle;
+        public string StartSpawnPointId;
+        public string LookAtSpawnPointId;
+        public bool InitialIsActiveConversationPartner = true;
+        public bool HasInitialConversationPartnerSetting;
 
         
 

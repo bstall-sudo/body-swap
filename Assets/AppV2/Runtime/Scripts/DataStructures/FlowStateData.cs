@@ -45,7 +45,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
             IndicesOfPassiveRoles = GetPassiveRolesIndices();
             ActiveRoleCount = Roles.Count;
             AllRoleCount = roles.Count;
-            ToBeRecorded = 0;
+            ToBeRecorded = Roles.Count > 0 ? Roles[0].roleIndex : -1;
             SelectedNext = -1;
             SceneCount = -1;
             CurrentPreRecordedPlaybacks = new List<int>();
@@ -55,6 +55,31 @@ namespace AppV2.Runtime.Scripts.DataStructures
             GoToRecordRemainingState = false;
             GoToPlaybackPreRecordedState = false;
             //FromPreRecordedToSpeaker = false;
+        }
+
+        public void RefreshMembership()
+        {
+            Roles = GetActiveRoles();
+            IndicesOfPassiveRoles = GetPassiveRolesIndices();
+            ActiveRoleCount = Roles.Count;
+            AllRoleCount = AllRoles.Count;
+            if (!Roles.Exists(r => r.roleIndex == ToBeRecorded))
+                ToBeRecorded = Roles.Count > 0 ? Roles[0].roleIndex : -1;
+            if (SelectedNext >= 0 && !Roles.Exists(r => r.roleIndex == SelectedNext)) SelectedNext = -1;
+        }
+
+        public List<int> GetSelectableRoleIndices(IReadOnlyList<int> alreadyRecorded)
+        {
+            var result = new List<int>();
+            foreach (var role in Roles)
+            {
+                bool recorded = false;
+                if (alreadyRecorded != null)
+                    for (int i = 0; i < alreadyRecorded.Count; i++) if (alreadyRecorded[i] == role.roleIndex) recorded = true;
+                if (!recorded) result.Add(role.roleIndex);
+            }
+            if (result.Count == 0) foreach (var role in Roles) result.Add(role.roleIndex);
+            return result;
         }
 
         public List<RoleRig> GetActiveRoles()

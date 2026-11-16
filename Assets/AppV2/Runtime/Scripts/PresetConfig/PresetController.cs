@@ -478,7 +478,7 @@ namespace AppV2.Runtime.Scripts.Config
                     continue;
                 }
 
-                if (role.isActiveConversationPartner == false)
+                if (role.hasPreRecordedTakes)
                 {
                     continue;
                 }
@@ -489,6 +489,10 @@ namespace AppV2.Runtime.Scripts.Config
                         RoleId = role.roleId,
 
                         AvatarId = role.avatarId,
+                        SpawnPointId = role.startSpawnPointId,
+                        LookAtSpawnPointId = role.lookAtSpawnPointId,
+                        IsActiveConversationPartner = role.isActiveConversationPartner,
+                        HasConversationPartnerSetting = true,
 
                         HeightOfRoleCm =
                             role.heightOfRoleCm,

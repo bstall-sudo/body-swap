@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using AppV2.Runtime.Scripts.Config;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
@@ -13,6 +14,69 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private TMP_InputField heightInput;
         [SerializeField] private TMP_InputField seatedHeightInput;
         [SerializeField] private Button removeRoleButton;
+        [SerializeField] private TMP_Dropdown spawnPointDropdown;
+        [SerializeField] private TMP_Dropdown lookAtSpawnPointDropdown;
+        [SerializeField] private Toggle isActiveConversationPartnerToggle;
+        private readonly List<string> _spawnValues = new();
+        private readonly List<string> _lookValues = new();
+        public event Action<int, string, string, bool> PlacementChanged;
+
+        public void ConfigurePlacement(List<string> spawnIds, string stageSpawnId, StartRoleSettings settings)
+        {
+            // The prefab originally gives both dropdowns the same name. Resolve by
+            // their owning row label for old scene/prefab instances without new bindings.
+            foreach (var dropdown in GetComponentsInChildren<TMP_Dropdown>(true))
+            {
+                string parent = dropdown.transform.parent != null ? dropdown.transform.parent.name : "";
+                if (spawnPointDropdown == null && parent == "AvatarSpawnPoint_Text") spawnPointDropdown = dropdown;
+                if (lookAtSpawnPointDropdown == null && parent == "AvatarLookingDirection_Text") lookAtSpawnPointDropdown = dropdown;
+            }
+            if (isActiveConversationPartnerToggle == null)
+                foreach (var toggle in GetComponentsInChildren<Toggle>(true))
+                    if (toggle.name == "isActiveConversationPartnerToggle") isActiveConversationPartnerToggle = toggle;
+            if (spawnPointDropdown != null)
+            {
+                spawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
+                SetSpawnOptions(spawnPointDropdown, _spawnValues, spawnIds, settings.SpawnPointId,
+                    "StageSpawnPoint (" + (string.IsNullOrWhiteSpace(stageSpawnId) ? "default" : stageSpawnId) + ")");
+                spawnPointDropdown.onValueChanged.AddListener(OnPlacementChanged);
+            }
+            if (lookAtSpawnPointDropdown != null)
+            {
+                lookAtSpawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
+                SetSpawnOptions(lookAtSpawnPointDropdown, _lookValues, spawnIds, settings.LookAtSpawnPointId, "Standardausrichtung");
+                lookAtSpawnPointDropdown.onValueChanged.AddListener(OnPlacementChanged);
+            }
+            if (isActiveConversationPartnerToggle != null)
+            {
+                isActiveConversationPartnerToggle.onValueChanged.RemoveListener(OnPartnerChanged);
+                isActiveConversationPartnerToggle.SetIsOnWithoutNotify(settings.StartsActive);
+                isActiveConversationPartnerToggle.onValueChanged.AddListener(OnPartnerChanged);
+            }
+        }
+
+        private static void SetSpawnOptions(TMP_Dropdown dropdown, List<string> values,
+            List<string> ids, string selected, string defaultLabel)
+        {
+            values.Clear(); values.Add("");
+            var labels = new List<string> { defaultLabel };
+            if (ids != null) foreach (var id in ids)
+                if (!string.IsNullOrWhiteSpace(id) && !values.Contains(id)) { values.Add(id); labels.Add(id); }
+            selected ??= "";
+            if (!values.Contains(selected)) { values.Add(selected); labels.Add(selected + " (nicht im Environment)"); }
+            dropdown.ClearOptions(); dropdown.AddOptions(labels);
+            dropdown.SetValueWithoutNotify(values.IndexOf(selected)); dropdown.RefreshShownValue();
+        }
+
+        private void OnPlacementChanged(int _) => NotifyPlacementChanged();
+        private void OnPartnerChanged(bool _) => NotifyPlacementChanged();
+        private void NotifyPlacementChanged()
+        {
+            PlacementChanged?.Invoke(_roleIndex,
+                spawnPointDropdown != null && _spawnValues.Count > spawnPointDropdown.value ? _spawnValues[spawnPointDropdown.value] : "",
+                lookAtSpawnPointDropdown != null && _lookValues.Count > lookAtSpawnPointDropdown.value ? _lookValues[lookAtSpawnPointDropdown.value] : "",
+                isActiveConversationPartnerToggle == null || isActiveConversationPartnerToggle.isOn);
+        }
 
         private int _roleIndex;
 
@@ -149,6 +213,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnDestroy()
         {
+            if (spawnPointDropdown != null) spawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
+            if (lookAtSpawnPointDropdown != null) lookAtSpawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
+            if (isActiveConversationPartnerToggle != null) isActiveConversationPartnerToggle.onValueChanged.RemoveListener(OnPartnerChanged);
             if (removeRoleButton != null) removeRoleButton.onClick.RemoveListener(RemoveRole);
             if (avatarDropdown != null) avatarDropdown.onValueChanged.RemoveListener(OnChanged);
             if (heightInput != null) heightInput.onEndEdit.RemoveListener(OnChanged);

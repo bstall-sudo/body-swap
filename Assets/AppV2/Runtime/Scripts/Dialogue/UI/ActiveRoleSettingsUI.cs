@@ -16,6 +16,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private RoleSettingsRowUI rowPrefab;
         [SerializeField] private TMP_Dropdown firstRoleAvatarDropdown;
         private PresetConfig _config;
+        private EnvironmentLoader _environmentLoader;
         private readonly List<RoleSettingsRowUI> _rows = new();
         private List<string> _availableAvatarIds = new();
 
@@ -44,9 +45,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 firstRoleAvatarDropdown.onValueChanged.RemoveListener(OnFirstRoleAvatarChanged);
         }
 
-        public void Display(PresetConfig config)
+        public void Display(PresetConfig config, EnvironmentLoader environmentLoader = null)
         {
             _config = config;
+            _environmentLoader = environmentLoader ?? _environmentLoader;
             BindButtons();
             if (_config == null) return;
             _config.StartRoles ??= new StartRolesSettings();
@@ -80,6 +82,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             _config.StartRoles.Roles.RemoveAt(index);
             var removedRow = _rows[index];
             removedRow.Changed -= OnRoleChanged;
+            removedRow.PlacementChanged -= OnRolePlacementChanged;
             removedRow.RemoveRequested -= RemoveRole;
             removedRow.gameObject.SetActive(false);
             Destroy(removedRow.gameObject);
@@ -96,6 +99,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 var row = _rows[_rows.Count - 1];
                 row.Changed -= OnRoleChanged;
+                row.PlacementChanged -= OnRolePlacementChanged;
                 row.RemoveRequested -= RemoveRole;
                 row.gameObject.SetActive(false);
                 Destroy(row.gameObject);
@@ -116,18 +120,48 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                     _rows.Add(row);
                 }
                 row.Changed -= OnRoleChanged;
+                row.PlacementChanged -= OnRolePlacementChanged;
                 row.RemoveRequested -= RemoveRole;
                 row.Initialize(i, role.AvatarId,
                     role.HeightOfRoleCm > 0 ? role.HeightOfRoleCm.ToString() : "",
                     role.HeightOfSeatedRoleCm > 0 ? role.HeightOfSeatedRoleCm.ToString() : "",
                     _availableAvatarIds);
+                row.ConfigurePlacement(GetSpawnIds(_config.Environment.EnvironmentId), _config.Environment.StageSpawnId, role);
+                row.PlacementChanged += OnRolePlacementChanged;
                 row.SetRemoveAllowed(settings.RoleCount > 1);
                 row.Changed += OnRoleChanged;
                 row.RemoveRequested += RemoveRole;
             }
-            if (activeRoleCountText != null) activeRoleCountText.text = $"Aktive Rollen: {settings.RoleCount}";
+            if (activeRoleCountText != null)
+                activeRoleCountText.text = $"Rollen: {settings.RoleCount}, davon aktiv: {settings.Roles.FindAll(r => r.StartsActive).Count}";
             if (addRoleButton != null) addRoleButton.interactable = settings.RoleCount < 20;
             RefreshFirstRoleAvatarDropdown();
+        }
+
+        private List<string> GetSpawnIds(string environmentId)
+        {
+            if (_environmentLoader != null)
+                return _environmentLoader.GetSpawnIds(string.IsNullOrWhiteSpace(environmentId) ? "default" : environmentId);
+            var ui = GetComponentInParent<WorkshopConfigurationUI>(true);
+            return ui != null ? ui.GetRoleSpawnIds(environmentId) : new List<string>();
+        }
+
+        public void RefreshSpawnOptions(string environmentId)
+        {
+            if (_config?.StartRoles?.Roles == null) return;
+            var ids = GetSpawnIds(environmentId);
+            for (int i = 0; i < _rows.Count && i < _config.StartRoles.Roles.Count; i++)
+                _rows[i].ConfigurePlacement(ids, _config.Environment.StageSpawnId, _config.StartRoles.Roles[i]);
+        }
+
+        private void OnRolePlacementChanged(int index, string spawnId, string lookAtId, bool active)
+        {
+            if (_config?.StartRoles?.Roles == null || index < 0 || index >= _config.StartRoles.Roles.Count) return;
+            var role = _config.StartRoles.Roles[index];
+            role.SpawnPointId = spawnId;
+            role.LookAtSpawnPointId = lookAtId;
+            role.IsActiveConversationPartner = active;
+            role.HasConversationPartnerSetting = true;
         }
 
         private void OnRoleChanged(int index, string avatarId, string height, string seatedHeight)

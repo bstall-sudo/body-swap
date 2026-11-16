@@ -334,6 +334,22 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
 
+        // Runtime entry point for scene interactions or inspector/debug controls.
+        // Existing proximity activation continues to use the same RoleRig flag.
+        public bool SetConversationPartnerActive(int roleIndex, bool active)
+        {
+            if (_data?.AllRoles == null || roleIndex < 0 || roleIndex >= _data.AllRoles.Count) return false;
+            var role = _data.AllRoles[roleIndex];
+            if (active && role.hasPreRecordedTakes && !role.hasPlayedBackPreRecordedTakes) return false;
+            role.isActiveConversationPartner = active;
+            _data.RefreshMembership();
+            if (active && roleIndex != _data.ToBeRecorded &&
+                !_data.Playbacks.Contains(roleIndex) && !_data.ReactiveIdles.Contains(roleIndex))
+                _data.ReactiveIdles.Add(roleIndex);
+            if (!active) _data.ReactiveIdles.Remove(roleIndex);
+            return true;
+        }
+
         public void IncrementSceneCount()
         {
             _data.SceneCount++;
@@ -434,6 +450,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         public void SpeakerStateEnter(){
+            _data.RefreshMembership();
             int nextSpeaker;
             int nextSpeakerIndex;
             int selected = _data.SelectedNext;

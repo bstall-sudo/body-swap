@@ -1,0 +1,21 @@
+Unity 6000.3.8f1 isolated Play Mode regression.
+Exercises RolePlacementUtility, AvatarCalibrationController.PlaceRoleAt,
+AvatarPlacementState.PlacePreRecordedRole, FlowStateData, runtime activation,
+BuildActiveRoles reference rebuild, PresetStore save/load under workspace Temp,
+RoleCalibrationDataProvider, SceneLoader.ApplyRolesFromSession, TakePlayer.ApplyFrame,
+and the actual extended RoleSettingsRolePrefab plus ActiveRolesSettingsUI.
+Stage translated to (20,3,-10) and rotated 37 degrees; remote group rotated 90 degrees.
+Configured passive roles are included in placement but excluded from selection.
+Assertions include imported source-index and active flag preservation on reference rebuild,
+legacy preset defaults, original activation metadata after runtime activation, no doubled
+spawn transform on load, row event wiring and environment options without UI ancestry.
+
+Limits: synthetic spawn/terrain function and direct production UI/frame calls. No complete
+headset/audio recording, VR ray interaction or visual QA of all environment-specific terrain.
+No user scene saved. Play Mode stopped afterwards. Temporary fixture removed from Assets.
+
+PlayMode=True
+PASS grouped placement, rotated/translated StageRoot, ground height, look target, initial yaw, NPC composition, sparse/all-passive membership and runtime activation
+PASS preset/session JSON, legacy default, inactive metadata, loaded off-stage pose and TakePlayer frame playback
+PASS actual extended row prefab: separate spawn/look bindings, toggle, events, environment refresh/missing IDs, default selection, idempotent listeners
+PASS integrated ActiveRolesSettingsUI receives EnvironmentLoader independently of canvas ancestry and refreshes spawn options/config
