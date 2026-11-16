@@ -955,6 +955,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 97f6e7deeec0e92478a5808217cd45ad, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4468789954967692196}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 97f6e7deeec0e92478a5808217cd45ad, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 657057132051013074}
   m_SourcePrefab: {fileID: 100100000, guid: 97f6e7deeec0e92478a5808217cd45ad, type: 3}
 --- !u!4 &49161037126819380 stripped
 Transform:
@@ -1099,3 +1102,20 @@ MonoBehaviour:
   - m_Rig: {fileID: 3376434588368238308}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &657057132051013074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9020908024229155621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e5b7b91c5b4007bab54850882032ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Rig.AvatarHandCalibrationSettings
+  overrideReferenceRotations: 0
+  leftReferenceRotation: {x: 0, y: -90, z: 0}
+  rightReferenceRotation: {x: 0, y: 90, z: 0}
+  leftTargetRotationCorrection: {x: 0, y: 0, z: 0}
+  rightTargetRotationCorrection: {x: 0, y: 0, z: 0}

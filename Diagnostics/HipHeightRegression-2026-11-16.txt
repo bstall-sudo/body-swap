@@ -1,0 +1,19 @@
+Unity 6000.3.8f1 Play Mode regression.
+Production ConversationStage.DriveActiveRoleFromInputStandingMode ->
+ApplyProceduralLowerBodyIfNeeded -> ApplyFollower, 300 simulated ticks at 60Hz.
+Synthetic standing XR input, no body trackers, active role height override enabled.
+Actual prefab instances and automatic calibration at 130/180 cm, avatarBaseHeightCm=200.
+Assertions: hip target retains calibrated height (<2mm error), remains above foot target.
+The test checks driver/target heights; it does not evaluate final skeletal pose across
+rendered animation frames or replace headset testing. Foot solvers/ground raycasts are
+not part of this fixture. All 8 final cases passed; source prefabs/scene not saved.
+
+PlayMode=True
+Bart@T-Pose height=130 success=True hipDriver=(0.0000, 0.6500, -0.0800) targetExpected=0.5243 targetActual=0.5243 leftFootTarget=0.0918 errorCm=0.0000
+Bart@T-Pose height=180 success=True hipDriver=(0.0000, 0.9000, -0.0800) targetExpected=0.7259 targetActual=0.7259 leftFootTarget=0.1271 errorCm=0.0000
+Ritter_Ohne_Schwert@T-Pose height=130 success=True hipDriver=(0.0000, 0.6500, -0.0800) targetExpected=0.3794 targetActual=0.3794 leftFootTarget=0.1262 errorCm=0.0000
+Ritter_Ohne_Schwert@T-Pose height=180 success=True hipDriver=(0.0000, 0.9000, -0.0800) targetExpected=0.5254 targetActual=0.5254 leftFootTarget=0.1748 errorCm=0.0000
+SchneeMann_001 height=130 success=True hipDriver=(0.0000, 0.6500, -0.0800) targetExpected=0.3274 targetActual=0.3274 leftFootTarget=0.1171 errorCm=0.0000
+SchneeMann_001 height=180 success=True hipDriver=(0.0000, 0.9000, -0.0800) targetExpected=0.4533 targetActual=0.4533 leftFootTarget=0.1621 errorCm=0.0000
+BaerSchweinchen height=130 success=True hipDriver=(0.0000, 0.6500, -0.0800) targetExpected=0.5560 targetActual=0.5560 leftFootTarget=0.0817 errorCm=0.0000
+BaerSchweinchen height=180 success=True hipDriver=(0.0000, 0.9000, -0.0800) targetExpected=0.7698 targetActual=0.7698 leftFootTarget=0.1132 errorCm=0.0000

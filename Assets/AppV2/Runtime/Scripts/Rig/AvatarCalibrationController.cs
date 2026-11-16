@@ -12,6 +12,18 @@ namespace AppV2.Runtime.Scripts.Rig
         private IReadOnlyList<RoleRig> roles;
 
         private bool _usePreRecordedCalibrationData;
+        private float _playerHeightCm = 180f;
+        private float _hipHeight = 0.9f;
+        private float _footSpacing = 0.2f;
+        private bool _proceduralLowerBody;
+
+        public void SetCalibrationContext(float playerHeightCm, float hipHeight, float footSpacing, bool proceduralLowerBody)
+        {
+            _playerHeightCm = playerHeightCm;
+            _hipHeight = hipHeight;
+            _footSpacing = footSpacing;
+            _proceduralLowerBody = proceduralLowerBody;
+        }
 
         [SerializeField] public EnvironmentLoader environmentLoader;
 
@@ -30,6 +42,10 @@ namespace AppV2.Runtime.Scripts.Rig
             {
                 if (role == null) continue;
                 role.rigFollower?.ResetForCalibration();
+                role.hipSolver?.ClearCalibrationHeight();
+                role.liveCalibrationProfile = null;
+                role.activeCalibrationProfile = null;
+                role.usePreRecordedCalibrationData = _usePreRecordedCalibrationData;
                 if (role.avatar == null) continue;
                 role.avatar.SetRigModeRecordPlayback();
                 role.avatar.SetLowerBodyIKWeight(1f);
@@ -153,17 +169,71 @@ namespace AppV2.Runtime.Scripts.Rig
             }
 
             avatar.RigFollower.BuildMap();
-            if (_usePreRecordedCalibrationData &&
-                role.hasPreRecordedTakes &&
-                role.preRecordedCalibration != null)
+            if (role.hasPreRecordedTakes)
             {
-                ApplyPreRecordedCalibration(role);
+                CalibrateImportedRole(role);
             }
             else
             {
                 role.rigFollower.CalibrateTargetsFromAvatar();
+                role.liveCalibrationProfile = RoleCalibrationProfiles.Capture(role, _playerHeightCm, _proceduralLowerBody);
             }
             //Debug.Log($"CalibrateRole({roleIndex}) was called.");
+        }
+
+        public bool CalibrateAutomatically(float playerHeightCm, float hipHeight, float footSpacing, bool proceduralLowerBody)
+        {
+            if (roles == null) return false;
+            SetCalibrationContext(playerHeightCm, hipHeight, footSpacing, proceduralLowerBody);
+            var automatic = new AutomaticAvatarCalibration();
+            foreach (var role in roles)
+            {
+                role.usePreRecordedCalibrationData = _usePreRecordedCalibrationData;
+                if (role.hasPreRecordedTakes)
+                {
+                    if (!CalibrateImportedRole(role)) return false;
+                }
+                else
+                {
+                    if (!automatic.TryCalibrate(role, playerHeightCm, hipHeight, footSpacing, proceduralLowerBody)) return false;
+                    role.liveCalibrationProfile = RoleCalibrationProfiles.Capture(role, playerHeightCm, proceduralLowerBody);
+                }
+            }
+            return true;
+        }
+
+        public bool RefreshImportedLiveCalibrations()
+        {
+            if (roles == null) return false;
+            foreach (var role in roles)
+                if (role.hasPreRecordedTakes && !CalibrateImportedRole(role)) return false;
+            return true;
+        }
+
+        private bool CalibrateImportedRole(RoleRig role)
+        {
+            // Restore authored avatar targets before sampling, never calibrate against
+            // targets last driven by imported motion. Tracking drivers are rebuilt here.
+            role.rigFollower?.ResetForCalibration();
+            if (!new AutomaticAvatarCalibration().TryCalibrate(role, _playerHeightCm, _hipHeight,
+                _footSpacing, _proceduralLowerBody)) return false;
+            role.liveCalibrationProfile = RoleCalibrationProfiles.Capture(role, _playerHeightCm, _proceduralLowerBody);
+            role.usePreRecordedCalibrationData = _usePreRecordedCalibrationData;
+            if (_usePreRecordedCalibrationData && role.preRecordedCalibration != null)
+            {
+                if (role.preRecordedCalibrationProfile == null)
+                {
+                    // Legacy sessions lack tracking/scale metadata. Preserve the previous
+                    // playback scale rather than invent a source player's height.
+                    role.preRecordedCalibrationProfile = RoleCalibrationProfiles.Capture(role, 0f);
+                    role.preRecordedCalibrationProfile.Calibration = role.preRecordedCalibration;
+                    role.preRecordedCalibrationProfile.HipReferenceHeightM = 0f;
+                }
+                role.preRecordedCalibrationProfile = RoleCalibrationProfiles.ForRoleHeight(
+                    role.preRecordedCalibrationProfile, role.heightOfRoleCm);
+                RoleCalibrationProfiles.Apply(role, role.preRecordedCalibrationProfile);
+            }
+            return role.liveCalibrationProfile != null;
         }
 
         public void ShowAllRoles()
@@ -333,77 +403,5 @@ namespace AppV2.Runtime.Scripts.Rig
             };
         }
 
-        private void ApplyPreRecordedCalibration(RoleRig role)
-        {
-            if (role == null ||
-                role.visualRigRoot == null ||
-                role.preRecordedCalibration == null)
-            {
-                return;
-            }
-
-            RoleCalibrationData data = role.preRecordedCalibration;
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "headTarget"),
-                data.headTarget);
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "leftHandTarget"),
-                data.leftHandTarget);
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "rightHandTarget"),
-                data.rightHandTarget);
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "hipTarget"),
-                data.hipTarget);
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "leftFootTarget"),
-                data.leftFootTarget);
-
-            ApplyLocalTransform(
-                FindDeepChildByName(role.visualRigRoot, "rightFootTarget"),
-                data.rightFootTarget);
-
-            
-            role.rigFollower.SetCalibrated(true);
-        }
-
-        private void ApplyLocalTransform(
-            Transform target,
-            TransformData data)
-        {
-            if (target == null || data == null)
-                return;
-
-            target.localPosition = data.LocalPosition;
-            target.localRotation = data.LocalRotation;
-        }
-
-        
-        private Transform FindDeepChildByName(Transform root, string targetName)
-        {
-            if (root == null)
-                return null;
-
-            if (root.name == targetName)
-                return root;
-
-            for (int i = 0; i < root.childCount; i++)
-            {
-                Transform found = FindDeepChildByName(root.GetChild(i), targetName);
-
-                if (found != null)
-                    return found;
-            }
-
-            return null;
-        }
-
     }
-
-
 }

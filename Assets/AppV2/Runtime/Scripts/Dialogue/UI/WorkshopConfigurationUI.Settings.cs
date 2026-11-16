@@ -12,7 +12,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
     public partial class WorkshopConfigurationUI
     {
         private enum FloatSetting { PlayerHeight, SeatedPlayerHeight, FallbackHipHeight, FallbackFootSpacing, AvatarBaseHeight, StepSpeed, StepLength, SmoothAlign, LosePartnerDistance, ReactivateDistance, NpcRadius, NpcHeightDifference }
-        private enum ToggleSetting { SimpleInput, FullBodyTrackers, SeatedMode, AllowTeleportation, ProceduralHipAndFeetMove, SelectableNext, LosePartners }
+        private enum ToggleSetting { AutomatedPlayerHeightRecognition, AutomatedCalibration, ActiveRolesHeightOverwrites, NpcHeightOverwrites, SimpleInput, FullBodyTrackers, SeatedMode, AllowTeleportation, ProceduralHipAndFeetMove, SelectableNext, LosePartners }
         [Serializable] private class FloatBinding
         {
             public FloatSetting setting;
@@ -23,6 +23,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             public ToggleSetting setting;
             public Toggle[] fields;
         }
+        // Keep incomplete edits across page changes without feeding invalid heights to the rig.
+        private readonly Dictionary<FloatSetting, string> _floatSettingDrafts = new();
         private readonly List<FloatBinding> floatSettingBindings = new();
         private readonly List<ToggleBinding> toggleSettingBindings = new();
         private readonly List<Action> _settingsListenerCleanup = new();
@@ -37,29 +39,30 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 foreach (var field in binding.fields)
                 {
                     if (field == null) continue;
+                    if (binding.setting == FloatSetting.FallbackHipHeight)
+                    {
+                        field.readOnly = true;
+                        continue;
+                    }
                     UnityAction<string> changed = text =>
                     {
-                        if (_displayedConfig == null || !TryParseSettingFloat(text, out float value) ||
-                            !IsValidSetting(binding.setting, value)) return;
-                        SetFloatSetting(binding.setting, value);
+                        if (_displayedConfig == null) return;
+                        _floatSettingDrafts[binding.setting] = text;
                         foreach (var mirror in binding.fields)
                             if (mirror != null && mirror != field) mirror.SetTextWithoutNotify(text);
+                        if (!TryParseSettingFloat(text, out float value) ||
+                            !IsValidSetting(binding.setting, value)) return;
+                        SetFloatSetting(binding.setting, value);
                         ApplyEditedRuntimeSettings();
-                    };
-                    UnityAction<string> finished = text =>
-                    {
-                        if (_displayedConfig == null) return;
-                        // Restore the last valid value after an incomplete/invalid edit.
-                        foreach (var mirror in binding.fields)
-                            if (mirror != null) mirror.SetTextWithoutNotify(GetFloatSetting(binding.setting).ToString(CultureInfo.CurrentCulture));
+                        if (binding.setting == FloatSetting.PlayerHeight)
+                            RefreshDerivedHipHeight();
                     };
                     field.onValueChanged.AddListener(changed);
-                    field.onEndEdit.AddListener(finished);
                     _settingsListenerCleanup.Add(() =>
                     {
                         if (field == null) return;
                         field.onValueChanged.RemoveListener(changed);
-                        field.onEndEdit.RemoveListener(finished);
+
                     });
                 }
             }
@@ -155,6 +158,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private ToggleSetting? ResolveToggleSetting(Toggle field)
         {
+            if (field == automatedPlayerHeightRecognition) return ToggleSetting.AutomatedPlayerHeightRecognition;
+            if (field == automatedCalibrationToggle) return ToggleSetting.AutomatedCalibration;
+            if (field == activeRolesHeightOverwrites) return ToggleSetting.ActiveRolesHeightOverwrites;
+            if (field == npcHeightOverwritesToggle) return ToggleSetting.NpcHeightOverwrites;
             if (field == simpleInputModeToggle) return ToggleSetting.SimpleInput;
             if (field == fullBodyTrackersToggle) return ToggleSetting.FullBodyTrackers;
             if (field == seatedModeToggle) return ToggleSetting.SeatedMode;
@@ -164,6 +171,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (field == loseConversationPartnersToggle) return ToggleSetting.LosePartners;
             switch (SettingName(field.name))
             {
+                case "automatedplayerheightrecognition": return ToggleSetting.AutomatedPlayerHeightRecognition;
+                case "automatedcalibration": return ToggleSetting.AutomatedCalibration;
+                case "activerolesheightoverwrites": return ToggleSetting.ActiveRolesHeightOverwrites;
+                case "npcheightoverwrites": return ToggleSetting.NpcHeightOverwrites;
                 case "simpleinput": case "simpleinputmode": return ToggleSetting.SimpleInput;
                 case "fullbodytrackers": return ToggleSetting.FullBodyTrackers;
                 case "seatedmode": return ToggleSetting.SeatedMode;
@@ -189,11 +200,34 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             foreach (var binding in floatSettingBindings)
                 if (binding.fields != null)
                     foreach (var field in binding.fields)
-                        if (field != null) field.SetTextWithoutNotify(GetFloatSetting(binding.setting).ToString(CultureInfo.CurrentCulture));
+                        if (field != null) field.SetTextWithoutNotify(
+                            _floatSettingDrafts.TryGetValue(binding.setting, out var draft)
+                                ? draft : GetFloatSetting(binding.setting).ToString(CultureInfo.CurrentCulture));
             foreach (var binding in toggleSettingBindings)
                 if (binding.fields != null)
                     foreach (var field in binding.fields)
                         if (field != null) field.SetIsOnWithoutNotify(GetToggleSetting(binding.setting));
+        }
+
+        public void DisplayMeasuredPlayerHeight(float heightCm)
+        {
+            if (_displayedConfig == null) return;
+            _displayedConfig.Player.HeightOfPlayerCm = heightCm;
+            _floatSettingDrafts.Remove(FloatSetting.PlayerHeight);
+            foreach (var binding in floatSettingBindings)
+                if (binding.setting == FloatSetting.PlayerHeight && binding.fields != null)
+                    foreach (var field in binding.fields)
+                        if (field != null) field.SetTextWithoutNotify(heightCm.ToString("0.##", CultureInfo.CurrentCulture));
+            RefreshDerivedHipHeight();
+        }
+
+        private void RefreshDerivedHipHeight()
+        {
+            foreach (var binding in floatSettingBindings)
+                if (binding.setting == FloatSetting.FallbackHipHeight && binding.fields != null)
+                    foreach (var field in binding.fields)
+                        if (field != null) field.SetTextWithoutNotify(
+                            _displayedConfig.Player.FallbackHipHeight.ToString(CultureInfo.CurrentCulture));
         }
 
         private static bool TryParseSettingFloat(string text, out float value)
@@ -235,7 +269,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 case FloatSetting.PlayerHeight: _displayedConfig.Player.HeightOfPlayerCm = value; break;
                 case FloatSetting.SeatedPlayerHeight: _displayedConfig.Player.HeightOfSeatedPlayerCm = value; break;
-                case FloatSetting.FallbackHipHeight: _displayedConfig.Player.FallbackHipHeight = value; break;
+                case FloatSetting.FallbackHipHeight: break; // Derived, read-only.
                 case FloatSetting.FallbackFootSpacing: _displayedConfig.Player.FallbackFootSpacing = value; break;
                 case FloatSetting.AvatarBaseHeight: _displayedConfig.Player.AvatarBaseHeightCm = value; break;
                 case FloatSetting.StepSpeed: _displayedConfig.Controls.ProceduralStepSpeed = value; break;
@@ -251,6 +285,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         {
             switch (setting)
             {
+                case ToggleSetting.AutomatedPlayerHeightRecognition: return _displayedConfig.Controls.AutomatedPlayerHeightRecognition;
+                case ToggleSetting.AutomatedCalibration: return _displayedConfig.Controls.AutomatedCalibration;
+                case ToggleSetting.ActiveRolesHeightOverwrites: return _displayedConfig.Controls.ActiveRolesHeightOverwrites;
+                case ToggleSetting.NpcHeightOverwrites: return _displayedConfig.Controls.NpcHeightOverwrites;
                 case ToggleSetting.SimpleInput: return _displayedConfig.Controls.SimpleInputMode;
                 case ToggleSetting.FullBodyTrackers: return _displayedConfig.Controls.FullBodyTrackers;
                 case ToggleSetting.SeatedMode: return _displayedConfig.Controls.SeatedMode;
@@ -265,6 +303,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         {
             switch (setting)
             {
+                case ToggleSetting.AutomatedPlayerHeightRecognition: _displayedConfig.Controls.AutomatedPlayerHeightRecognition = value; break;
+                case ToggleSetting.AutomatedCalibration: _displayedConfig.Controls.AutomatedCalibration = value; break;
+                case ToggleSetting.ActiveRolesHeightOverwrites: _displayedConfig.Controls.ActiveRolesHeightOverwrites = value; break;
+                case ToggleSetting.NpcHeightOverwrites: _displayedConfig.Controls.NpcHeightOverwrites = value; break;
                 case ToggleSetting.SimpleInput: _displayedConfig.Controls.SimpleInputMode = value; break;
                 case ToggleSetting.FullBodyTrackers: _displayedConfig.Controls.FullBodyTrackers = value; break;
                 case ToggleSetting.SeatedMode: _displayedConfig.Controls.SeatedMode = value; break;

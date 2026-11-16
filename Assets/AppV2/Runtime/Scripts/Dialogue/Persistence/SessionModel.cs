@@ -11,7 +11,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string SessionId;
         public string CreatedUtc;
 
-        public int SessionVersion = 1;
+        public int SessionVersion = 2;
         public string EnvironmentId = "default";
         public int RoleCount = 2;
 
@@ -43,7 +43,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         //das bezieht sich bspw. auf RoleA/RoleB... nützlich für die Begegnung mit zuvor eingespielten Figuren.
         public TransformData StartRoleRootPose;
 
+        // Legacy default retained for old session readers.
         public RoleCalibrationData Calibration = new();
+        public RoleCalibrationProfile LiveCalibration;
+        public RoleCalibrationProfile PreRecordedCalibration;
     }
 
     [Serializable]
@@ -55,6 +58,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public TransformData hipTarget;
         public TransformData leftFootTarget;
         public TransformData rightFootTarget;
+    }
+
+    [Serializable]
+    public class RoleCalibrationProfile
+    {
+        public RoleCalibrationData Calibration;
+        public bool HasScale;
+        public Vector3 VisualScale = Vector3.one;
+        public Vector3 AvatarScale = Vector3.one;
+        public float PlayerHeightCm;
+        public int RoleHeightCm;
+        public float HipReferenceHeightM;
+        public bool UsesProceduralLowerBody;
     }
 
     [Serializable]
@@ -76,6 +92,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public int RoleIndex;
 
         public bool usesPreRecordedCalibration = false;
+        // Snapshot makes each take independent of later role switches/re-imports.
+        public RoleCalibrationProfile CalibrationProfile;
         public string sourceRoleId;
         public string npcGroupId;
         public string FramesFile;

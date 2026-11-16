@@ -114,6 +114,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     //UnityEngine.Debug.Log($"[PlaybackForIndexBegin] sessionId is: {sessionId}");
 
                     TakeData take = _store.LoadTakeData(takeMeta, sessionId);
+                    RoleCalibrationProfiles.ApplyForTake(roles[roleIndex], takeMeta);
 
                     if (playerHeightCM > 0.01f)
                     {
@@ -159,6 +160,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 $"role={targetRoleIndex}"
             );*/
             TakeData take = store.LoadTakeData(takeMeta, sessionId);
+            RoleCalibrationProfiles.ApplyForTake(roles[targetRoleIndex], takeMeta);
 
             float roleScale = 1f;
 

@@ -1,0 +1,25 @@
+AutomaticAvatarCalibration pose sampling regression, Unity 6000.3.8f1.
+Executed in the running editor's Play Mode on isolated prefab instances.
+The production TryCalibrate method was called twice per model, with active
+Animator/RigBuilder components and synthetic visual drivers (180 cm, no headset input).
+Assertions: hand offsets <10 cm, rig weights restored, no accumulated positional offset.
+Original left-hand bone position restored exactly in all three cases.
+This validates reference-pose sampling/offset generation, not final headset embodiment.
+No source prefab or scene saved. Play Mode stopped after testing.
+
+PlayMode=True
+MODEL Bart@T-Pose
+success=True restoredLeftBoneCm=0.0000
+leftHand offsetCm=0.245 offset=(-0.0007, 0.0000, -0.0024) rotation=(87.35, 294.57, 294.77)
+rightHand offsetCm=0.945 offset=(0.0090, 0.0001, 0.0028) rotation=(88.55, 34.99, 34.01)
+repeatOffsetDifferenceCm=0.0000
+MODEL Ritter_Ohne_Schwert@T-Pose
+success=True restoredLeftBoneCm=0.0000
+leftHand offsetCm=0.590 offset=(0.0053, -0.0001, -0.0025) rotation=(69.67, 84.13, 85.67)
+rightHand offsetCm=2.835 offset=(-0.0282, 0.0001, 0.0030) rotation=(275.71, 255.18, 285.26)
+repeatOffsetDifferenceCm=0.0000
+MODEL SchneeMann_001
+success=True restoredLeftBoneCm=0.0000
+leftHand offsetCm=4.347 offset=(0.0434, 0.0000, -0.0015) rotation=(81.55, 90.00, 90.00)
+rightHand offsetCm=4.347 offset=(-0.0434, 0.0000, 0.0015) rotation=(279.61, 90.00, 90.00)
+repeatOffsetDifferenceCm=0.0000

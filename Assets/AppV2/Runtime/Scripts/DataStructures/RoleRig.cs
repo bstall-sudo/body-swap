@@ -110,6 +110,11 @@ namespace AppV2.Runtime.Scripts.DataStructures
 
         //das ist im SessionModel definiert
         public RoleCalibrationData preRecordedCalibration;
+        [NonSerialized] public RoleCalibrationProfile liveCalibrationProfile;
+        [NonSerialized] public RoleCalibrationProfile preRecordedCalibrationProfile;
+        [NonSerialized] public bool usePreRecordedCalibrationData = true;
+        [NonSerialized] public RoleCalibrationProfile lastTrackingCalibrationProfile;
+        [NonSerialized] public RoleCalibrationProfile activeCalibrationProfile;
 
     
         public void AutoResolveReferences()

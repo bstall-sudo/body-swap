@@ -1,3 +1,4 @@
+using AppV2.Runtime.Scripts.Rig;
 using System.Collections.Generic;
 using System.IO;
 using System;
@@ -167,7 +168,8 @@ namespace AppV2.Runtime.Scripts.Loader
 
                         //takeSource = import.sessionSourcePath,
 
-                        preRecordedCalibration = meta.Calibration,
+                        preRecordedCalibration = meta.LiveCalibration?.Calibration ?? meta.Calibration,
+                        preRecordedCalibrationProfile = RoleCalibrationProfiles.Copy(meta.LiveCalibration),
 
                         // falls diese Felder in RoleRig existieren:
                         avatarId = meta.AvatarId,

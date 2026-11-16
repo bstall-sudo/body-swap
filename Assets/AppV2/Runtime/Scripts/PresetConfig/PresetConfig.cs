@@ -97,7 +97,7 @@ namespace AppV2.Runtime.Scripts.Config
         public float HeightOfSeatedPlayerCm = 133;
 
         public float FallbackRootSpacing = 0.25f;
-        public float FallbackHipHeight = 1f;
+        public float FallbackHipHeight => HeightOfPlayerCm / 200f;
         public float FallbackFootSpacing = 0.2f;
 
         public float AvatarBaseHeightCm = 180;
@@ -111,6 +111,11 @@ namespace AppV2.Runtime.Scripts.Config
     [Serializable]
     public class ControlSettings
     {
+        public bool AutomatedPlayerHeightRecognition = true;
+        public bool AutomatedCalibration = true;
+        public bool ActiveRolesHeightOverwrites = true;
+        public bool NpcHeightOverwrites = true;
+
         public bool SimpleInputMode = false;
 
         public bool FullBodyTrackers = false;

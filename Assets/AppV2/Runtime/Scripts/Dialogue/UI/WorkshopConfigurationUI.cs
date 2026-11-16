@@ -57,6 +57,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         // ============================================================
 
         [Header("Player")]
+
+        [SerializeField] private Toggle automatedPlayerHeightRecognition;
         [SerializeField] private TMP_InputField playerHeightInput;
         [SerializeField] private TMP_InputField seatedPlayerHeightInput;
         [SerializeField] private TMP_InputField fallbackHipHeightInput;
@@ -71,6 +73,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         [Header("Controls")]
         [SerializeField] private Toggle simpleInputModeToggle;
+
+        [SerializeField] private Toggle automatedCalibrationToggle;
+
+        [SerializeField] private Toggle npcHeightOverwritesToggle;
+        [SerializeField] private Toggle activeRolesHeightOverwrites;
         [SerializeField] private Toggle fullBodyTrackersToggle;
         [SerializeField] private Toggle seatedModeToggle;
         [SerializeField] private Toggle allowTeleportationToggle;
@@ -223,6 +230,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (config == null)
                 return;
 
+            if (!ReferenceEquals(_displayedConfig, config)) _floatSettingDrafts.Clear();
             _displayedConfig = config;
             InitializeSettingsBindings();
             DisplayStorageSettings(config);
@@ -306,6 +314,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             );
 
             // ============================================================
+            // Toggle values are displayed by RefreshSettingsBindings below.
+
             // CONVERSATION
             // ============================================================
 
@@ -385,9 +395,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
 
 
-            TryReadFloat(
-                fallbackHipHeightInput,
-                ref config.Player.FallbackHipHeight);
+            // Hip height is derived from the standing player height.
 
             TryReadFloat(
                 fallbackFootSpacingInput,
@@ -432,6 +440,15 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 ref config.Controls.ProceduralStepLength
             );
 
+
+            if (automatedPlayerHeightRecognition != null)
+                config.Controls.AutomatedPlayerHeightRecognition = automatedPlayerHeightRecognition.isOn;
+            if (automatedCalibrationToggle != null)
+                config.Controls.AutomatedCalibration = automatedCalibrationToggle.isOn;
+            if (activeRolesHeightOverwrites != null)
+                config.Controls.ActiveRolesHeightOverwrites = activeRolesHeightOverwrites.isOn;
+            if (npcHeightOverwritesToggle != null)
+                config.Controls.NpcHeightOverwrites = npcHeightOverwritesToggle.isOn;
 
             // CONVERSATION
 
@@ -493,7 +510,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (input == null)
                 return;
 
-            if (TryParseSettingFloat(input.text, out float value))
+            FloatSetting? setting = ResolveFloatSetting(input);
+            if (TryParseSettingFloat(input.text, out float value) &&
+                (!setting.HasValue || IsValidSetting(setting.Value, value)))
                 target = value;
         }
 

@@ -35,11 +35,13 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public string StageSpawnId => stageSpawnId;
 
         [Header("Grösse des Spielers")]
+        public bool automatedPlayerHeightRecognition = true;
         public float heightOfPlayerCm = 180f;
         public float heightOfSeatedPlayerCm = 133f;
 
         [SerializeField] public float fallbackFootSpacing = 0.2f;
-        [SerializeField] public float fallbackHipHeight = 0.9f;
+        // Derived in metres from the configured standing height in centimetres.
+        public float fallbackHipHeight => heightOfPlayerCm / 200f;
 
         public bool simpleInputMode=true;
         public bool loseConversationPartnersIfTooFarAway= true;
@@ -51,6 +53,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         [Header("Verwende PreRecorded CalibrationData für die NPCs?")]
         [SerializeField] private bool usesPreRecordedCalibrationData = true;
+        public bool automatedCalibration = true;
+
+        public bool activeRolesHeightOverwrites= true;
+        public bool npcHeightOverwrites = true;
 
         [Header("Wie schnell sind die Schritte")]
         [SerializeField] public float _proceduralStepSpeed = 5f;
@@ -148,7 +154,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
 
         public float avatarBaseHeightCm = 200f;
-        public bool autoPlayerSizeRecognition = true;
+        // Legacy serialized flag. Measurement is now explicitly confirmed in CalibrationState.
+        [HideInInspector] public bool autoPlayerSizeRecognition = true;
 
         //damit der Player immer auf dem Boden steht, auch wenn der Boden mal nicht postion.y = 0 ist
         [SerializeField] private GroundHeightProvider groundHeightProvider;
@@ -429,6 +436,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 return;
             }
 
+            RoleCalibrationProfiles.ApplyLive(roles[roleIndex]);
             _playbackSourcesByRoleIndex[roleIndex] =
                 new RolePlaybackSource
                 {
@@ -1005,6 +1013,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
             ApplyAllRoleVisualScales();
             chooseSpeakerController.Initialize(roles);
             avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
+            avatarCalibration.SetCalibrationContext(heightOfPlayerCm, fallbackHipHeight, fallbackFootSpacing,
+                ProceduralHipAndFeetMove && !FullBodyTrackers);
             rolesVisualsVisibilityHandler.Initialize(roles);
             if (UseXR && xRLocomotionToggle != null)
                 xRLocomotionToggle.SetLocomotionEnabled(allowTeleportation);
@@ -1134,6 +1144,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             // used in CalibrationState
             avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
+            avatarCalibration.SetCalibrationContext(heightOfPlayerCm, fallbackHipHeight, fallbackFootSpacing,
+                ProceduralHipAndFeetMove && !FullBodyTrackers);
             // used in CalibrationState to toggle visibility of the (Debug-) cubes of RolesVisuals
             rolesVisualsVisibilityHandler.Initialize(roles);
 
@@ -1403,6 +1415,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR HEAD WORLD Y before recording: {XrHead.position.y}");
             //UnityEngine.Debug.Log($"[BeginnRecording] RoleIndex: {roleIndex} XR ORIGIN WORLD POS before recording: {XrOrigin.position}");
             RoleRig role = roles[roleIndex];
+            RoleCalibrationProfiles.ApplyLive(role);
             float roleScale = (float)roles[roleIndex].heightOfRoleCm / heightOfPlayerCm;
             avatarCalibration.SetAvatarHeadVisible(roleIndex,false);
             //damit die Figur entweder sitting oder standing Idle als Grundposition hat.
@@ -1944,6 +1957,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 _blendShapeAudioAnimator.Initialize(roles);
                 _reactiveIdleController.Initialize(roles, _blendShapeAudioAnimator);
                 avatarCalibration.Initialize(roles, usesPreRecordedCalibrationData);
+                avatarCalibration.SetCalibrationContext(heightOfPlayerCm, fallbackHipHeight, fallbackFootSpacing,
+                    ProceduralHipAndFeetMove && !FullBodyTrackers);
                 rolesVisualsVisibilityHandler.Initialize(roles);
                 chooseSpeakerController.Initialize(roles);
                 ApplyAllRoleVisualScales();
@@ -2213,7 +2228,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
             else
             {
                 // Fallback: lower body bleibt unter dem Kopf / Root.
-                if (rig.hip)
+                // The solver owns hip position while procedural motion is enabled.
+                // Resetting to fallback on every input tick prevents its smoothing from
+                // ever reaching the reference used to calibrate the IK target offset.
+                if (rig.hip && !(ProceduralHipAndFeetMove && rig.hipSolver != null))
                 {
                     rig.hip.localPosition = new Vector3(0f, fallbackHipHeight, 0f);
                     rig.hip.localRotation = Quaternion.identity;
@@ -2347,6 +2365,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void StartPlayerAlignToActor(int roleIndex, float duration)
         {
+            RoleCalibrationProfiles.ApplyLive(roles[roleIndex]);
             RoleRig targetRole = roles[roleIndex];
             
             /*Debug.Log(
@@ -2446,7 +2465,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
        
             }
             // 2) Head-Offset relativ zum Body skalieren
-            Vector3 scaledHeadPosBodyLocal = targetHeadPosBodyLocal * roleScale;
+            var previousTrackingProfile = roles[roleIndex].lastTrackingCalibrationProfile;
+            Vector3 scaledHeadPosBodyLocal = previousTrackingProfile != null && previousTrackingProfile.HasScale
+                ? Vector3.Scale(targetHeadPosBodyLocal, previousTrackingProfile.VisualScale)
+                : targetHeadPosBodyLocal * roleScale;
 
             // 3) Head aus body-local in stage-local rekonstruieren
             Vector3 targetHeadPosStageLocal =
@@ -2863,16 +2885,37 @@ namespace AppV2.Runtime.Scripts.Dialogue
         }
 
         //Grösse des Spielers, entweder aufgrund von XR Headset zu Boden Distanz, oder die definierte Variable
-        public float GetCurrentPlayerHeightCm()
+        public event Action<float> PlayerHeightMeasured;
+
+        // Use the confirmed snapshot everywhere; moving/crouching must not resize roles.
+        public float GetCurrentPlayerHeightCm() => heightOfPlayerCm;
+
+        public bool PrepareCalibrationHeight()
         {
-
-            if (UseXR && XrHead != null && _stageRoot != null && autoPlayerSizeRecognition)
+            if (automatedPlayerHeightRecognition)
             {
-                float heightMeters = XrHead.position.y - _stageRoot.position.y;
-                return heightMeters * 100f;
+                // Remove role embodiment offsets before sampling real tracking height.
+                ResetEmbodimentHeight();
+                if (!UseXR || XrHead == null || _stageRoot == null)
+                {
+                    Debug.LogWarning("[Calibration] Player height measurement requires XR head tracking.");
+                    return false;
+                }
+                Vector3 headStage = _stageRoot.InverseTransformPoint(XrHead.position);
+                float eyeHeightM = headStage.y - GetGroundYStageLocal(headStage);
+                // Same eye/body ratio as standing embodiment and automatic calibration.
+                float measuredHeightCm = eyeHeightM * 100f / 0.92f;
+                if (float.IsNaN(measuredHeightCm) || float.IsInfinity(measuredHeightCm) ||
+                    measuredHeightCm <= 0f)
+                    return false;
+                heightOfPlayerCm = measuredHeightCm;
+                PlayerHeightMeasured?.Invoke(heightOfPlayerCm);
             }
-
-            return heightOfPlayerCm;
+            InitializeRoleHeightsFromPlayerIfNeeded();
+            ApplyAllRoleVisualScales();
+            avatarCalibration?.SetCalibrationContext(heightOfPlayerCm, fallbackHipHeight, fallbackFootSpacing,
+                ProceduralHipAndFeetMove && !FullBodyTrackers);
+            return true;
         }
 
         // Anpassung der Einträge im RoleRig auf SpielerGrösse, wenn keine anderen Werte existieren, ansonsten sind die Rollen so gross, wie im Inspector vermerkt.
@@ -2882,7 +2925,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             foreach (var role in roles)
             {
-                if (role != null && role.usePlayerHeightAsDefault && role.heightOfRoleCm <= 0)
+                if (role != null &&
+                    ((role.hasPreRecordedTakes ? npcHeightOverwrites : activeRolesHeightOverwrites) ||
+                     (role.usePlayerHeightAsDefault && role.heightOfRoleCm <= 0)))
                 {
                     role.heightOfRoleCm = playerHeightCm;
                     role.heightOfSeatedRoleCm = (int)heightOfSeatedPlayerCm;

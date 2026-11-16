@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace AppV2.Runtime.Scripts.Config
@@ -91,8 +92,17 @@ namespace AppV2.Runtime.Scripts.Config
             if (!ValidName(id)) return null;
             try
             {
-                var config = JsonUtility.FromJson<PresetConfig>(File.ReadAllText(GetPresetPath(id)));
-                if (config != null) config.PresetId = id;
+                string json = File.ReadAllText(GetPresetPath(id));
+                var config = JsonUtility.FromJson<PresetConfig>(json);
+                if (config != null)
+                {
+                    if (config.Controls == null) config.Controls = new ControlSettings();
+                    // Older presets have no entry. Do not confuse a missing value with
+                    // an explicitly saved false, regardless of JsonUtility defaults.
+                    if (!Regex.IsMatch(json, "\"AutomatedPlayerHeightRecognition\"\\s*:"))
+                        config.Controls.AutomatedPlayerHeightRecognition = true;
+                    config.PresetId = id;
+                }
                 return config;
             }
             catch (Exception ex) { Debug.LogError($"[PresetStore] Load failed: {ex.Message}"); return null; }

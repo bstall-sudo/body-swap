@@ -75,7 +75,9 @@ namespace AppV2.Runtime.Scripts.Rig
                     HeightOfRoleCm = role.heightOfRoleCm,
                     SittingIdle = role.sittingIdle,
                     StartRootPose= startRootPose,
-                    Calibration = CaptureCalibration(role)
+                    Calibration = role.liveCalibrationProfile?.Calibration ?? CaptureCalibration(role),
+                    LiveCalibration = RoleCalibrationProfiles.Copy(role.liveCalibrationProfile),
+                    PreRecordedCalibration = RoleCalibrationProfiles.Copy(role.preRecordedCalibrationProfile)
                 });
             }
 
@@ -142,7 +144,9 @@ namespace AppV2.Runtime.Scripts.Rig
                     StartRootPose = startRootPose,
                     StartRoleRootPose = startRoleRootPose,
 
-                    Calibration = CaptureCalibration(role)
+                    Calibration = role.liveCalibrationProfile?.Calibration ?? CaptureCalibration(role),
+                    LiveCalibration = RoleCalibrationProfiles.Copy(role.liveCalibrationProfile),
+                    PreRecordedCalibration = RoleCalibrationProfiles.Copy(role.preRecordedCalibrationProfile)
                 });
             }
 

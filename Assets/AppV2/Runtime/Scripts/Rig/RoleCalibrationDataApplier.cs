@@ -31,7 +31,11 @@ namespace AppV2.Runtime.Scripts.Rig
 
                 RoleRig role = roles[meta.RoleIndex];
 
-                ApplyCalibration(role, meta.Calibration);
+                role.liveCalibrationProfile = RoleCalibrationProfiles.Copy(meta.LiveCalibration);
+                role.preRecordedCalibrationProfile = RoleCalibrationProfiles.Copy(meta.PreRecordedCalibration);
+                role.preRecordedCalibration = meta.PreRecordedCalibration?.Calibration;
+                if (!RoleCalibrationProfiles.Apply(role, role.liveCalibrationProfile))
+                    ApplyCalibration(role, meta.Calibration);
 
                 if(role.avatarName != meta.RoleName)
                 {

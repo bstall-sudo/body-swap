@@ -1,0 +1,18 @@
+Unity 6000.3.8f1 Play Mode regression for dual calibration profiles.
+Isolated real prefab instances; production AvatarCalibrationController, AutomaticAvatarCalibration,
+RoleCalibrationProfiles, RoleCalibrationDataProvider/Applier, and SwitchRoleToCurrentSession.
+Source tracking height 180 cm; live tracking height 130 cm; role height remains 180 cm.
+Checks: source/live/source head IK target continuity; role metadata and per-take JSON roundtrip;
+source vs live tracking scales; legacy flag selection/source metadata fallback; disabled source
+calibration; immutable source snapshots; NPC height override to 130 cm; actual session switch;
+procedural hip snaps to live reference (0.65m) on takeover.
+
+Limits: synthetic tracking poses and target-space assertions. No headset use, microphone/audio
+recording, complete NPC encounter, or rendered skeletal animation verification in this test.
+Session schema v2 is additive; old source-player scale metadata cannot be recovered exactly.
+No source prefab or user scene saved. Play Mode stopped after tests.
+
+PlayMode=True
+PASS Bart@T-Pose source180=1.4480 live130=1.4480 oldAgain=1.4480 scaledNPC130=1.0458 JSON/legacy/flag/immutability OK
+PASS Ritter_Ohne_Schwert@T-Pose source180=1.4492 live130=1.4492 oldAgain=1.4492 scaledNPC130=1.0466 JSON/legacy/flag/immutability OK
+PASS SchneeMann_001 source180=1.3517 live130=1.3517 oldAgain=1.3517 scaledNPC130=0.9763 JSON/legacy/flag/immutability OK

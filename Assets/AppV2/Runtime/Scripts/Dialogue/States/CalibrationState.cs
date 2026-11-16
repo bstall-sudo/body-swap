@@ -10,6 +10,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private bool selectableNext;
        
 
+        private bool _automaticCalibrationAttempted;
         private bool _seatedMode;
 
         //neu für ausrichtung an XR-Camera
@@ -33,6 +34,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         {
             _flow.Stage.AvatarCalibration.PrepareForNewCalibration();
             _flow.Stage.MirrorSetVisibility.ActivateMirror(true);
+            _automaticCalibrationAttempted = false;
+            _currentRoleIndexForCalibration = 0;
+            _rolesSetToPlayerPosition = false;
+            _isCalibrationFinished = false;
             //UnityEngine.Debug.Log("[CalibrationState] Enter");
 
             selectableNext = _flow.Stage.selectableNext;
@@ -95,11 +100,36 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
 
 
-            ShowCurrentRoleOrFinish();
+            if (!_flow.Stage.automatedCalibration) ShowCurrentRoleOrFinish();
+            else
+            {
+                _flow.Stage.ResetEmbodimentHeight();
+                _flow.StatusUI?.ShowCustomCue(
+                    "Bitte gerade hinstellen und mit Primary Action die Kalibrierung starten.",
+                    new Vector2(0f, 180f), new Vector2(500f, 0f), Color.white);
+            }
         }
 
         public void Tick(float dt)
         {
+            if (_flow.Stage.automatedCalibration)
+            {
+                if (_automaticCalibrationAttempted || !_flow.ConsumePrimaryAction()) return;
+                if (!PrepareHeight()) return;
+                _automaticCalibrationAttempted = true;
+                // Height and scales are confirmed before generating target offsets.
+                if (_flow.Stage.AvatarCalibration.CalibrateAutomatically(
+                    _flow.Stage.heightOfPlayerCm, _flow.Stage.fallbackHipHeight,
+                    _flow.Stage.fallbackFootSpacing,
+                    _flow.Stage.ProceduralHipAndFeetMove && !_flow.Stage.FullBodyTrackers))
+                    FinishCalibration();
+                else
+                    _flow.StatusUI?.ShowCustomCue(
+                        "Automatische Kalibrierung fehlgeschlagen. Avatar-Rig prüfen und Kalibrierung neu starten.",
+                        new Vector2(0f, 180f), new Vector2(500f, 0f), Color.red);
+                return;
+            }
+
             // Sicherheit:
             // _currentRoleIndexForCalibration sollte hier immer
             // auf eine normale Rolle zeigen.
@@ -133,6 +163,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
 
                 if (!_rolesSetToPlayerPosition)
                 {
+                    if (!PrepareHeight()) return;
+                    _flow.Stage.ApplyActiveRoleEmbodimentHeight(_currentRoleIndexForCalibration, true);
                     _flow.Stage.PlayerAlignForCalibration(
                         _currentRoleIndexForCalibration);
 
@@ -277,6 +309,19 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             _flow.Stage.ApplyActiveRoleEmbodimentHeight(
                 _currentRoleIndexForCalibration,
                 true);
+        }
+
+        private bool PrepareHeight()
+        {
+            if (_flow.Stage.PrepareCalibrationHeight())
+            {
+                if (_flow.Stage.automatedCalibration || _flow.Stage.AvatarCalibration.RefreshImportedLiveCalibrations())
+                    return true;
+            }
+            _flow.StatusUI?.ShowCustomCue(
+                "Groessenmessung fehlgeschlagen. Headset-Tracking und Bodenhoehe pruefen, dann erneut Primary Action druecken.",
+                new Vector2(0f, 180f), new Vector2(500f, 0f), Color.red);
+            return false;
         }
 
         private void FinishCalibration()

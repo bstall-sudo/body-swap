@@ -33,6 +33,7 @@ namespace AppV2.Runtime.Scripts.Config
         private void Awake()
         {
             _presetStore = new PresetStore();
+            if (conversationStage != null) conversationStage.PlayerHeightMeasured += OnPlayerHeightMeasured;
 
             if (conversationStage == null)
             {
@@ -40,6 +41,17 @@ namespace AppV2.Runtime.Scripts.Config
                     "[PresetController] ConversationStage is not assigned."
                 );
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (conversationStage != null) conversationStage.PlayerHeightMeasured -= OnPlayerHeightMeasured;
+        }
+
+        private void OnPlayerHeightMeasured(float heightCm)
+        {
+            if (_currentConfig != null) _currentConfig.Player.HeightOfPlayerCm = heightCm;
+            configurationUI?.DisplayMeasuredPlayerHeight(heightCm);
         }
 
         private void OnEnable()
@@ -390,8 +402,6 @@ namespace AppV2.Runtime.Scripts.Config
                 conversationStage.heightOfSeatedPlayerCm;
 
 
-            settings.FallbackHipHeight =
-                conversationStage.fallbackHipHeight;
 
             settings.FallbackFootSpacing =
                 conversationStage.fallbackFootSpacing;
@@ -419,6 +429,11 @@ namespace AppV2.Runtime.Scripts.Config
 
             settings.AllowTeleportation =
                 conversationStage.allowTeleportation;
+
+            settings.AutomatedPlayerHeightRecognition = conversationStage.automatedPlayerHeightRecognition;
+            settings.AutomatedCalibration = conversationStage.automatedCalibration;
+            settings.ActiveRolesHeightOverwrites = conversationStage.activeRolesHeightOverwrites;
+            settings.NpcHeightOverwrites = conversationStage.npcHeightOverwrites;
 
             settings.ProceduralHipAndFeetMove =
                 conversationStage.ProceduralHipAndFeetMove;
@@ -734,8 +749,6 @@ namespace AppV2.Runtime.Scripts.Config
             conversationStage.heightOfSeatedPlayerCm =
                 settings.HeightOfSeatedPlayerCm;
 
-            conversationStage.fallbackHipHeight =
-                settings.FallbackHipHeight;
 
             conversationStage.fallbackFootSpacing =
                 settings.FallbackFootSpacing;
@@ -771,6 +784,11 @@ namespace AppV2.Runtime.Scripts.Config
 
             conversationStage.allowTeleportation =
                 settings.AllowTeleportation;
+
+            conversationStage.automatedPlayerHeightRecognition = settings.AutomatedPlayerHeightRecognition;
+            conversationStage.automatedCalibration = settings.AutomatedCalibration;
+            conversationStage.activeRolesHeightOverwrites = settings.ActiveRolesHeightOverwrites;
+            conversationStage.npcHeightOverwrites = settings.NpcHeightOverwrites;
 
             conversationStage.ProceduralHipAndFeetMove =
                 settings.ProceduralHipAndFeetMove;

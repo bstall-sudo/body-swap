@@ -1,3 +1,4 @@
+using AppV2.Runtime.Scripts.Rig;
 using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
@@ -413,6 +414,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 DurationSec = sourceTakeMeta.DurationSec,
 
                 usesPreRecordedCalibration = true,
+                CalibrationProfile = RoleCalibrationProfiles.ForRoleHeight(
+                    !targetRole.usePreRecordedCalibrationData ? targetRole.liveCalibrationProfile :
+                    sourceTakeMeta.CalibrationProfile ??
+                    (sourceTakeMeta.usesPreRecordedCalibration ? sourceRoleMeta?.PreRecordedCalibration : sourceRoleMeta?.LiveCalibration) ??
+                    targetRole.preRecordedCalibrationProfile ?? targetRole.liveCalibrationProfile, targetRole.heightOfRoleCm),
 
                 sourceRoleId = targetRole.sourceRoleId,
                 npcGroupId = targetRole.npcGroupId,

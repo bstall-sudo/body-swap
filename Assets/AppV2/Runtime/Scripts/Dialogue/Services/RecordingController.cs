@@ -1,3 +1,4 @@
+using AppV2.Runtime.Scripts.Rig;
 using UnityEngine;
 using System;
 using System.Collections;
@@ -14,6 +15,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
     public class RecordingController 
     {
         private TakeRecorder _takeRecorder;
+        private RoleCalibrationProfile _recordingCalibrationProfile;
   
         private bool _isRecording = false;
         private bool _isSaving = false;
@@ -251,6 +253,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             _currentSceneCount = sceneCount;
             _currentRecordingRoleIndex = roleIndex;
+            _recordingCalibrationProfile = RoleCalibrationProfiles.Copy(_roles[roleIndex].liveCalibrationProfile);
+            _roles[roleIndex].lastTrackingCalibrationProfile = _recordingCalibrationProfile;
 
             /*
             Debug.Log(
@@ -495,6 +499,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                     RoleIndex = roleIndex,
                     SceneCount = sceneCount,
                     DurationSec = take.DurationSec,
+                    usesPreRecordedCalibration = false,
+                    CalibrationProfile = RoleCalibrationProfiles.Copy(_recordingCalibrationProfile),
                     FramesFile = framesName,
                     AudioFile = take.AudioClip != null ? audioName : null
                 };

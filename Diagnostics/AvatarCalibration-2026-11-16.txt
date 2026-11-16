@@ -1,0 +1,125 @@
+Unity 6000.3.8f1 Play Mode diagnostic, 2026-11-16
+
+Scope: isolated instantiated prefabs, existing AutomaticAvatarCalibration invoked with
+synthetic visual drivers at 180 cm; no headset/controller interaction, no workshop started.
+No prefab/scene saved. Play Mode stopped afterwards.
+
+Reliable finding: bind-pose hand positions differ from the played T-pose by about
+176/178 cm for Ritter (left/right sides reversed) and 30/35 cm for SchneeMann.
+Bart differs by about 6-8 cm. Authored targets match authored bones initially.
+Generated hand target positional offsets inherit those mismatches.
+The Ritter's 180-degree head/hip target rotations match its bone rotations; their
+presence alone does not establish a rig error.
+
+Limitations: test instances were placed far from the scene, so sub-centimetre readings
+are subject to floating-point precision. Manual graph rebuild/evaluation produced a common
+vertical displacement even for Bart; the AUTO_WITH_IK phase is not evidence of a
+model-specific fault and needs a frame-driven follow-up. Adding the diagnostic follower
+before assigning its roots emitted transient visualRoot-null setup errors, not production
+calibration errors. The inspection establishes the pose mismatch, not final headset quality.
+
+RAW MEASUREMENTS
+
+PlayMode=True
+
+MODEL Bart@T-Pose
+Humanoid=True scale=(1.00, 1.00, 1.00)
+AUTHORED
+head bone=(0.0000, 1.6089, 0.0117) target=(0.0000, 1.6089, 0.0117) distanceCm=0.00 boneRot=(0.0000, 0.0000, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.6045, 1.3506, -0.0352) target=(-0.6045, 1.3506, -0.0352) distanceCm=0.00 boneRot=(87.5909, 180.0002, 270.0002) targetRot=(87.5909, 180.0002, 270.0002)
+rightHand bone=(0.6074, 1.3506, 0.0137) target=(0.6074, 1.3506, 0.0137) distanceCm=0.00 boneRot=(89.1696, 180.0036, 90.0038) targetRot=(89.1701, 180.0036, 90.0038)
+hip bone=(0.0000, 0.8066, -0.0029) target=(0.0000, 0.8066, -0.0029) distanceCm=0.00 boneRot=(0.0354, 0.0065, 359.8630) targetRot=(0.0354, 0.0065, 359.8630)
+leftFoot bone=(-0.1123, 0.1412, -0.0215) target=(-0.1123, 0.1412, -0.0215) distanceCm=0.00 boneRot=(319.7553, 20.3984, 168.3547) targetRot=(319.7553, 20.3984, 168.3547)
+rightFoot bone=(0.1123, 0.1413, -0.0215) target=(0.1123, 0.1413, -0.0215) distanceCm=0.00 boneRot=(315.7226, 337.6832, 194.2523) targetRot=(315.7226, 337.6832, 194.2523)
+TPOSE_NO_IK
+head bone=(-0.0029, 1.6089, 0.0156) target=(0.0000, 1.6089, 0.0117) distanceCm=0.49 boneRot=(0.0000, 359.6077, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.6074, 1.3506, -0.0342) target=(-0.6045, 1.3506, -0.0352) distanceCm=0.31 boneRot=(87.5909, 179.6073, 269.9996) targetRot=(87.5909, 180.0002, 270.0002)
+rightHand bone=(0.6045, 1.3506, 0.0225) target=(0.6074, 1.3506, 0.0137) distanceCm=0.93 boneRot=(89.1691, 179.6100, 90.0023) targetRot=(89.1701, 180.0036, 90.0038)
+hip bone=(-0.0029, 0.8066, 0.0020) target=(0.0000, 0.8066, -0.0029) distanceCm=0.57 boneRot=(0.0354, 359.6143, 359.8630) targetRot=(0.0354, 0.0065, 359.8630)
+leftFoot bone=(-0.1152, 0.1412, -0.0176) target=(-0.1123, 0.1412, -0.0215) distanceCm=0.49 boneRot=(319.7553, 19.9908, 168.3547) targetRot=(319.7553, 20.3984, 168.3547)
+rightFoot bone=(0.1094, 0.1411, -0.0166) target=(0.1123, 0.1413, -0.0215) distanceCm=0.57 boneRot=(315.7226, 337.2919, 194.2523) targetRot=(315.7226, 337.6832, 194.2523)
+BIND head=(-0.0215, 1.6049, -0.0020) bindToAnimatedCm=2.59
+BIND leftHand=(-0.6230, 1.3874, -0.0986) bindToAnimatedCm=7.59
+BIND rightHand=(0.5801, 1.3874, 0.0605) bindToAnimatedCm=5.83
+AUTO_RESULT=True
+OFFSET head pos=(0.0000, -0.0471, 0.0117) rot=(0.0000, 0.0000, 0.0000)
+OFFSET leftHand pos=(0.0614, -0.0351, -0.0269) rot=(85.6866, 213.8010, 208.2242)
+OFFSET rightHand pos=(0.0487, -0.0383, 0.0214) rot=(86.0126, 167.9997, 163.9419)
+OFFSET hip pos=(0.0000, -0.0934, -0.0029) rot=(0.0354, 0.0065, 359.8630)
+OFFSET leftFoot pos=(0.0877, 0.1412, -0.0215) rot=(319.7553, 20.3984, 168.3547)
+OFFSET rightFoot pos=(-0.0877, 0.1413, -0.0215) rot=(315.7226, 337.6832, 194.2523)
+AUTO_WITH_IK
+head bone=(0.0000, 0.6657, -0.0244) target=(0.0000, 1.6089, 0.0117) distanceCm=94.38 boneRot=(0.0000, 0.0000, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.6045, 0.4109, -0.0664) target=(-0.6045, 1.3506, -0.0352) distanceCm=94.02 boneRot=(87.5911, 179.9993, 269.9992) targetRot=(87.5909, 180.0002, 270.0002)
+rightHand bone=(0.6074, 0.4101, -0.0186) target=(0.6074, 1.3506, 0.0137) distanceCm=94.10 boneRot=(89.1701, 180.0052, 90.0053) targetRot=(89.1701, 180.0036, 90.0038)
+hip bone=(0.0000, -0.1366, -0.0381) target=(0.0000, 0.8066, -0.0029) distanceCm=94.38 boneRot=(0.0354, 0.0065, 359.8630) targetRot=(0.0354, 0.0065, 359.8630)
+leftFoot bone=(-0.1094, -0.8023, -0.0596) target=(-0.1123, 0.1412, -0.0215) distanceCm=94.43 boneRot=(319.7552, 20.3946, 168.3547) targetRot=(319.7553, 20.3984, 168.3547)
+rightFoot bone=(0.1123, -0.8012, -0.0566) target=(0.1123, 0.1413, -0.0215) distanceCm=94.32 boneRot=(315.7226, 337.6892, 194.2522) targetRot=(315.7226, 337.6832, 194.2523)
+
+MODEL Ritter_Ohne_Schwert@T-Pose
+Humanoid=True scale=(1.00, 1.00, 1.00)
+AUTHORED
+head bone=(0.0000, 1.6102, 0.0508) target=(0.0000, 1.6102, 0.0508) distanceCm=0.00 boneRot=(0.0000, 180.0000, 0.0000) targetRot=(0.0000, 180.0000, 0.0000)
+leftHand bone=(-0.9170, 1.1895, 0.0088) target=(-0.9170, 1.1895, 0.0088) distanceCm=0.00 boneRot=(69.7682, 0.0002, 90.0002) targetRot=(69.7682, 0.0002, 90.0002)
+rightHand bone=(0.9170, 1.1895, 0.0596) target=(0.9170, 1.1895, 0.0596) distanceCm=0.00 boneRot=(275.5190, 0.0012, 269.9988) targetRot=(275.5190, 0.0013, 269.9987)
+hip bone=(0.0000, 0.5837, 0.0000) target=(0.0000, 0.5837, 0.0000) distanceCm=0.00 boneRot=(0.0026, 180.0095, 0.0430) targetRot=(0.0026, 180.0095, 0.0430)
+leftFoot bone=(-0.1250, 0.1942, -0.0146) target=(-0.1250, 0.1942, -0.0146) distanceCm=0.00 boneRot=(317.4938, 9.7811, 165.8209) targetRot=(317.4938, 9.7811, 165.8209)
+rightFoot bone=(0.1250, 0.1942, -0.0146) target=(0.1250, 0.1942, -0.0146) distanceCm=0.00 boneRot=(310.5890, 347.5601, 196.0991) targetRot=(310.5890, 347.5601, 196.0991)
+TPOSE_NO_IK
+head bone=(-0.0020, 1.6102, 0.0332) target=(0.0000, 1.6102, 0.0508) distanceCm=1.77 boneRot=(0.0000, 180.7183, 0.0000) targetRot=(0.0000, 180.0000, 0.0000)
+leftHand bone=(-0.9189, 1.1895, 0.0029) target=(-0.9170, 1.1895, 0.0088) distanceCm=0.62 boneRot=(69.7682, 0.7184, 90.0002) targetRot=(69.7682, 0.0002, 90.0002)
+rightHand bone=(0.9141, 1.1895, 0.0313) target=(0.9170, 1.1895, 0.0596) distanceCm=2.85 boneRot=(275.5191, 0.7198, 269.9985) targetRot=(275.5190, 0.0013, 269.9987)
+hip bone=(-0.0029, 0.5837, -0.0166) target=(0.0000, 0.5837, 0.0000) distanceCm=1.69 boneRot=(0.0026, 180.7277, 0.0430) targetRot=(0.0026, 180.0095, 0.0430)
+leftFoot bone=(-0.1279, 0.1942, -0.0303) target=(-0.1250, 0.1942, -0.0146) distanceCm=1.59 boneRot=(317.4938, 10.5096, 165.8209) targetRot=(317.4938, 9.7811, 165.8209)
+rightFoot bone=(0.1211, 0.1942, -0.0332) target=(0.1250, 0.1942, -0.0146) distanceCm=1.90 boneRot=(310.5889, 348.2673, 196.0991) targetRot=(310.5890, 347.5601, 196.0991)
+BIND head=(-0.0146, 1.5224, 0.0840) bindToAnimatedCm=10.22
+BIND leftHand=(0.8223, 0.9299, 0.0537) bindToAnimatedCm=176.12
+BIND rightHand=(-0.8516, 0.9299, 0.0146) bindToAnimatedCm=178.47
+AUTO_RESULT=True
+OFFSET head pos=(0.0000, -0.0458, 0.0508) rot=(0.0000, 180.0000, 0.0000)
+OFFSET leftHand pos=(0.2675, 0.4410, -1.6818) rot=(68.1646, 247.2348, 73.5164)
+OFFSET rightHand pos=(-0.2232, 0.4443, -1.7176) rot=(277.5663, 46.2194, 322.7731)
+OFFSET hip pos=(0.0000, -0.3163, 0.0000) rot=(0.0026, 180.0095, 0.0430)
+OFFSET leftFoot pos=(0.0750, 0.1942, -0.0146) rot=(317.4938, 9.7811, 165.8209)
+OFFSET rightFoot pos=(-0.0750, 0.1942, -0.0146) rot=(310.5890, 347.5601, 196.0991)
+AUTO_WITH_IK
+head bone=(-0.0020, 0.8099, -0.0010) target=(0.0000, 1.6102, 0.0508) distanceCm=80.19 boneRot=(0.0000, 180.0000, 0.0000) targetRot=(0.0000, 180.0000, 0.0000)
+leftHand bone=(-0.9189, 0.3883, -0.0449) target=(-0.9170, 1.1895, 0.0088) distanceCm=80.29 boneRot=(69.7682, 0.0000, 90.0001) targetRot=(69.7682, 0.0002, 90.0002)
+rightHand bone=(0.9150, 0.3890, 0.0068) target=(0.9170, 1.1895, 0.0596) distanceCm=80.22 boneRot=(275.5189, 0.0014, 269.9986) targetRot=(275.5190, 0.0013, 269.9987)
+hip bone=(-0.0020, -0.2165, -0.0527) target=(0.0000, 0.5837, 0.0000) distanceCm=80.19 boneRot=(0.0026, 180.0095, 0.0430) targetRot=(0.0026, 180.0095, 0.0430)
+leftFoot bone=(-0.1289, -0.6060, -0.0645) target=(-0.1250, 0.1942, -0.0146) distanceCm=80.18 boneRot=(317.4938, 9.7979, 165.8209) targetRot=(317.4938, 9.7811, 165.8209)
+rightFoot bone=(0.1240, -0.6068, -0.0654) target=(0.1250, 0.1942, -0.0146) distanceCm=80.26 boneRot=(310.5890, 347.5357, 196.0991) targetRot=(310.5890, 347.5601, 196.0991)
+
+MODEL SchneeMann_001
+Humanoid=True scale=(1.00, 1.00, 1.00)
+AUTHORED
+head bone=(0.0010, 1.5019, 0.0303) target=(0.0010, 1.5019, 0.0303) distanceCm=0.00 boneRot=(0.0000, 0.0000, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.7969, 1.1354, 0.0762) target=(-0.7969, 1.1354, 0.0762) distanceCm=0.00 boneRot=(81.5456, 0.0002, 90.0002) targetRot=(81.5455, 0.0001, 90.0002)
+rightHand bone=(0.8057, 1.1353, 0.1689) target=(0.8057, 1.1353, 0.1689) distanceCm=0.00 boneRot=(279.6094, 179.9995, 90.0004) targetRot=(279.6094, 179.9995, 90.0004)
+hip bone=(0.0010, 0.5037, -0.0225) target=(0.0010, 0.5037, -0.0225) distanceCm=0.00 boneRot=(-0.0006, 0.0187, 359.9706) targetRot=(-0.0006, 0.0187, 359.9706)
+leftFoot bone=(-0.2402, 0.1801, -0.0195) target=(-0.2402, 0.1801, -0.0195) distanceCm=0.00 boneRot=(319.0362, 12.4303, 150.3757) targetRot=(319.0362, 12.4303, 150.3757)
+rightFoot bone=(0.2402, 0.1802, -0.0195) target=(0.2402, 0.1802, -0.0195) distanceCm=0.00 boneRot=(315.3211, 341.4613, 212.8987) targetRot=(315.3211, 341.4613, 212.8987)
+TPOSE_NO_IK
+head bone=(-0.0010, 1.5019, -0.0137) target=(0.0010, 1.5019, 0.0303) distanceCm=4.40 boneRot=(0.0000, 0.0000, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.7988, 1.1354, 0.0332) target=(-0.7969, 1.1354, 0.0762) distanceCm=4.30 boneRot=(81.5454, 0.0005, 90.0005) targetRot=(81.5455, 0.0001, 90.0002)
+rightHand bone=(0.8047, 1.1353, 0.1260) target=(0.8057, 1.1353, 0.1689) distanceCm=4.30 boneRot=(279.6094, 179.9993, 90.0007) targetRot=(279.6094, 179.9995, 90.0004)
+hip bone=(-0.0010, 0.5037, -0.0664) target=(0.0010, 0.5037, -0.0225) distanceCm=4.40 boneRot=(-0.0006, 0.0187, 359.9706) targetRot=(-0.0006, 0.0187, 359.9706)
+leftFoot bone=(-0.2422, 0.1801, -0.0635) target=(-0.2402, 0.1801, -0.0195) distanceCm=4.40 boneRot=(319.0363, 12.5022, 150.3755) targetRot=(319.0362, 12.4303, 150.3757)
+rightFoot bone=(0.2393, 0.1802, -0.0625) target=(0.2402, 0.1802, -0.0195) distanceCm=4.30 boneRot=(315.3210, 341.3622, 212.8985) targetRot=(315.3211, 341.4613, 212.8987)
+BIND head=(-0.0420, 1.4960, -0.0078) bindToAnimatedCm=4.19
+BIND leftHand=(-0.7070, 1.4216, 0.0371) bindToAnimatedCm=30.06
+BIND rightHand=(0.6240, 1.4216, 0.2227) bindToAnimatedCm=35.21
+AUTO_RESULT=True
+OFFSET head pos=(0.0010, -0.1541, 0.0303) rot=(0.0000, 0.0000, 0.0000)
+OFFSET leftHand pos=(0.0165, -0.2172, -0.2099) rot=(29.0363, 170.6012, 189.3519)
+OFFSET rightHand pos=(0.1321, -0.2593, -0.1821) rot=(326.3497, 10.2215, 202.3876)
+OFFSET hip pos=(0.0010, -0.3963, -0.0225) rot=(-0.0006, 0.0187, 359.9706)
+OFFSET leftFoot pos=(-0.0402, 0.1801, -0.0195) rot=(319.0362, 12.4303, 150.3757)
+OFFSET rightFoot pos=(0.0402, 0.1802, -0.0195) rot=(315.3211, 341.4613, 212.8987)
+AUTO_WITH_IK
+head bone=(0.0000, 0.7735, -0.0439) target=(0.0010, 1.5019, 0.0303) distanceCm=73.22 boneRot=(0.0000, 0.0000, 0.0000) targetRot=(0.0000, 0.0000, 0.0000)
+leftHand bone=(-0.7979, 0.4070, 0.0020) target=(-0.7969, 1.1354, 0.0762) distanceCm=73.22 boneRot=(81.5456, 0.0002, 90.0002) targetRot=(81.5455, 0.0001, 90.0002)
+rightHand bone=(0.8047, 0.4095, 0.0967) target=(0.8057, 1.1353, 0.1689) distanceCm=72.94 boneRot=(279.6093, 179.9994, 90.0006) targetRot=(279.6094, 179.9995, 90.0004)
+hip bone=(0.0000, -0.2247, -0.0967) target=(0.0010, 0.5037, -0.0225) distanceCm=73.22 boneRot=(-0.0006, 0.0187, 359.9706) targetRot=(-0.0006, 0.0187, 359.9706)
+leftFoot bone=(-0.2432, -0.5481, -0.0908) target=(-0.2402, 0.1801, -0.0195) distanceCm=73.17 boneRot=(319.0362, 12.1975, 150.3757) targetRot=(319.0362, 12.4303, 150.3757)
+rightFoot bone=(0.2402, -0.5485, -0.0938) target=(0.2402, 0.1802, -0.0195) distanceCm=73.24 boneRot=(315.3212, 341.5811, 212.8987) targetRot=(315.3211, 341.4613, 212.8987)
