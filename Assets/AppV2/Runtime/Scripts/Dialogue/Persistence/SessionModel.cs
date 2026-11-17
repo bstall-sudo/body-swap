@@ -18,6 +18,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string StageSpawnId = "default";
         public List<ConversationRoleMeta> Roles = new();
         public List<TakeMeta> Takes = new();
+        public List<AppV2.Runtime.Scripts.DataStructures.PreRecordedSceneImport> NpcGroups = new();
     }
 
     [Serializable]
@@ -33,6 +34,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
         public string RoleName;
 
         public int HeightOfRoleCm;
+        // Zero in legacy recordings: use the standing-height estimate.
+        public int HeightOfSeatedRoleCm;
         public bool SittingIdle;
         public string StartSpawnPointId;
         public string LookAtSpawnPointId;

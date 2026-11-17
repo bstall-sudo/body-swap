@@ -10,6 +10,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
     public class ActiveRolesSettingsUI : MonoBehaviour
     {
         [SerializeField] private AvatarCatalog avatarCatalog;
+        public AvatarCatalog Catalog => avatarCatalog;
         [SerializeField] private TMP_Text activeRoleCountText;
         [SerializeField] private Button addRoleButton;
         [SerializeField] private Transform rowsContainer;

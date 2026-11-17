@@ -1,0 +1,1 @@
+PASS: uneven takes A0/B0/B1; multi-role round deletion; media+JSON consistency; empty sessions; save-as full copy and SessionId; original retained; collision/path validation; session-only deletion; actual panel controls; empty/duplicate/valid name gating; red warning; dependent folder dropdowns; completed recording panel registration and navigation.

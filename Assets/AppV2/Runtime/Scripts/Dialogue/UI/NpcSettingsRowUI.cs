@@ -20,6 +20,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private Toggle alignWithPlayerInput;
         [SerializeField] private Toggle canBecomeActiveRoleInput;
         [SerializeField] private Button deleteNpcGroupButton;
+        [SerializeField] private Button npcOverwritesButton;
 
 
         private List<string> _workshopNames = new();
@@ -33,6 +34,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         public event Action Changed;
         public event Action<NpcGroupSettings> DeleteRequested;
+        public event Action<NpcGroupSettings> OverridesRequested;
 
         public void Initialize(
             NpcGroupSettings settings,
@@ -57,6 +59,12 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 deleteNpcGroupButton.onClick.RemoveListener(OnDeleteClicked);
                 deleteNpcGroupButton.onClick.AddListener(OnDeleteClicked);
+            }
+
+            if (npcOverwritesButton != null)
+            {
+                npcOverwritesButton.onClick.RemoveListener(OnOverridesClicked);
+                npcOverwritesButton.onClick.AddListener(OnOverridesClicked);
             }
 
             // NPC-Gruppe anzeigen
@@ -191,6 +199,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnWorkshopChanged(int index)
         {
+            _settings.AvatarOverrides?.Clear();
             _settings.WorkshopFolderName =
                 index > 0 ? _workshopNames[index - 1] : "";
 
@@ -206,6 +215,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnSessionFolderChanged(int index)
         {
+            _settings.AvatarOverrides?.Clear();
             _settings.SessionFolderName =
                 index > 0 ? _sessionFolderNames[index - 1] : "";
 
@@ -218,6 +228,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnSessionChanged(int index)
         {
+            _settings.AvatarOverrides?.Clear();
             _settings.SessionId =
                 index > 0 ? _sessionIds[index - 1] : "";
 
@@ -296,6 +307,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             Changed?.Invoke();
         }
 
+        private void OnOverridesClicked() => OverridesRequested?.Invoke(_settings);
+
         private void OnDeleteClicked()
         {
             if (_settings != null)
@@ -304,6 +317,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnDestroy()
         {
+            if (npcOverwritesButton != null) npcOverwritesButton.onClick.RemoveListener(OnOverridesClicked);
             if (deleteNpcGroupButton != null)
                 deleteNpcGroupButton.onClick.RemoveListener(OnDeleteClicked);
             npcEnabled.onValueChanged.RemoveListener(OnChanged);

@@ -183,6 +183,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 {
                     // Normal state Exit methods advance dialogue or restart takes.
                     // An explicit session stop uses the common cleanup instead.
+                    var completedRecording = Stage.CompletedRecordingForMenu();
                     _state = null;
                     Stage.ResetSessionForConfiguration();
                     _data.Initialize(Stage.roles);
@@ -190,6 +191,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     _sessionStopStarted = _returnToMenuRequested = false;
                     statusUI?.ClearConversationFeedback();
                     SetState(new SceneConfigurationState(this));
+                    if (completedRecording != null) configurationUI.ShowRecordingEnd(completedRecording);
                 }
                 return;
             }

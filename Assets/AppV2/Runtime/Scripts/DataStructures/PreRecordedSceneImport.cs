@@ -21,6 +21,7 @@ namespace AppV2.Runtime.Scripts.DataStructures
         
 
         public string npcGroupSpawnId = "default";
+        public System.Collections.Generic.List<AppV2.Runtime.Scripts.Config.AvatarOverride> avatarOverrides = new();
     }
     
 }

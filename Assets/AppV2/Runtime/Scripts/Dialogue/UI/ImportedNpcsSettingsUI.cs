@@ -23,6 +23,23 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField]
         private string storageFolderName = "SessionRecordingData";
 
+        [SerializeField] private SingleNpcSettingsUI singleNpcSettingsUI;
+        private AvatarCatalog _avatarCatalog;
+        public void SetAvatarCatalog(AvatarCatalog catalog) => _avatarCatalog = catalog;
+
+        private void OpenOverrides(NpcGroupSettings group)
+        {
+            if (singleNpcSettingsUI == null)
+            {
+                Debug.LogError("SingleNpcSettingsPanel ist nicht zugewiesen.", this);
+                return;
+            }
+            singleNpcSettingsUI.Display(group, storageFolderName, _avatarCatalog);
+            var navigation = GetComponentInParent<MenuNavigation>();
+            if (navigation != null) navigation.ShowPage("SingleNpcRolesSettingsPanel");
+            else { gameObject.SetActive(false); singleNpcSettingsUI.gameObject.SetActive(true); }
+        }
+
         private PresetConfig _config;
 
         private List<RecordedSessionOption> _sessions = new();
@@ -60,6 +77,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         public void Display(PresetConfig config)
         {
             _config = config;
+            if (!string.IsNullOrWhiteSpace(config?.Storage?.StorageFolderName))
+                storageFolderName = config.Storage.StorageFolderName;
             BindAllGroupsToggle();
 
             if (_config == null)
@@ -120,6 +139,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 {
                     row.Changed -= RefreshGroupCount;
                     row.DeleteRequested -= RemoveNpcGroup;
+                    row.OverridesRequested -= OpenOverrides;
                     row.gameObject.SetActive(false);
                     Destroy(row.gameObject);
                 }
@@ -139,6 +159,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 row.SetSpawnOptions(spawnIds);
                 row.Changed += RefreshGroupCount;
                 row.DeleteRequested += RemoveNpcGroup;
+                row.OverridesRequested += OpenOverrides;
 
                 _rows.Add(row);
             }

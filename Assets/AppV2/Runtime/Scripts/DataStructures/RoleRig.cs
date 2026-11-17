@@ -72,6 +72,8 @@ namespace AppV2.Runtime.Scripts.DataStructures
         public int heightOfRoleCm = 180;
      
         public int heightOfSeatedRoleCm = 133;
+        [System.NonSerialized] public bool hasNpcStandingHeightOverride;
+        [System.NonSerialized] public bool hasNpcSeatedHeightOverride;
 
         public float SeatedHeadYOffsetM
         {

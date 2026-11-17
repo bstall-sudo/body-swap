@@ -889,6 +889,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
         public bool RecordingSessionStarted => _recordingSessionStarted;
         public bool SessionSaveCompletedForMenu => _recordingController == null || _recordingController.SaveCompleted();
 
+        public RecordingSessionEditor CompletedRecordingForMenu() => _recordingSessionStarted && _session != null
+            ? new RecordingSessionEditor(_storageFolderName, _workshopFolderName, _personalFolderName, _session.SessionId)
+            : null;
+
         public void StopSessionForMenu()
         {
             _playbackController?.StopAll();
@@ -1036,7 +1040,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 EnvironmentId = environmentId,
                 StageSpawnId = stageSpawnId,
                 RoleCount = roleCount,
-                SessionVersion = 1
+                SessionVersion = 2,
+                // Snapshot includes source identity and explicit per-role overwrites.
+                NpcGroups = preRecordedScenes == null ? new() : preRecordedScenes.ConvertAll(import =>
+                    import == null ? null : JsonUtility.FromJson<PreRecordedSceneImport>(JsonUtility.ToJson(import)))
             };
 
             BuildPreRecordedTakeImporter();
@@ -2937,8 +2944,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                     ((role.hasPreRecordedTakes ? npcHeightOverwrites : activeRolesHeightOverwrites) ||
                      (role.usePlayerHeightAsDefault && role.heightOfRoleCm <= 0)))
                 {
-                    role.heightOfRoleCm = playerHeightCm;
-                    role.heightOfSeatedRoleCm = (int)heightOfSeatedPlayerCm;
+                    if (!role.hasNpcStandingHeightOverride) role.heightOfRoleCm = playerHeightCm;
+                    if (!role.hasNpcSeatedHeightOverride) role.heightOfSeatedRoleCm = (int)heightOfSeatedPlayerCm;
                 }
                 if (role != null && role.heightOfRoleCm > 0 && role.heightOfSeatedRoleCm <= 0)
                 {

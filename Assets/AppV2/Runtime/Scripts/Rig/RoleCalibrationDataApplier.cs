@@ -47,6 +47,8 @@ namespace AppV2.Runtime.Scripts.Rig
                 }
                 
                 role.heightOfRoleCm = meta.HeightOfRoleCm;
+                role.heightOfSeatedRoleCm = meta.HeightOfSeatedRoleCm > 0
+                    ? meta.HeightOfSeatedRoleCm : (int)(meta.HeightOfRoleCm / 1.35f);
                 role.sittingIdle = meta.SittingIdle;
 
                 role.rigFollower?.BuildMapAndEnableFollow();

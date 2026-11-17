@@ -53,6 +53,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             }
         }
 
+        public void RegisterPage(string pageId, GameObject panel)
+        {
+            var page = pages.Find(p => p.pageId == pageId);
+            if (page == null) pages.Add(new MenuPage { pageId = pageId, panel = panel });
+            else page.panel = panel;
+        }
+
         public void ShowPage(string pageId)
         {
             bool found = false;

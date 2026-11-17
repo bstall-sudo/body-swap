@@ -180,6 +180,16 @@ namespace AppV2.Runtime.Scripts.Loader
                         alignWithPlayer = import.alignWithPlayer
                     };
 
+                    role.heightOfSeatedRoleCm = AppV2.Runtime.Scripts.Config.NpcRoleOverrides.SeatedHeight(meta);
+                    var overwrite = import.avatarOverrides?.Find(o => o != null && o.RoleId == meta.RoleId);
+                    if (overwrite != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(overwrite.AvatarId)) role.avatarId = overwrite.AvatarId;
+                        role.hasNpcStandingHeightOverride = overwrite.HeightOfRoleCm > 0;
+                        role.hasNpcSeatedHeightOverride = overwrite.HeightOfSeatedRoleCm > 0;
+                        if (role.hasNpcStandingHeightOverride) role.heightOfRoleCm = overwrite.HeightOfRoleCm;
+                        if (role.hasNpcSeatedHeightOverride) role.heightOfSeatedRoleCm = overwrite.HeightOfSeatedRoleCm;
+                    }
                     result.Add(role);
                 }
 

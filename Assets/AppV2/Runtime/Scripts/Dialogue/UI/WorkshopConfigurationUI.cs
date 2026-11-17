@@ -137,6 +137,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void Awake()
         {
+            InitializeRecordingEndUI();
             InitializeStorageUI();
             InitializePlaybackUI();
             InitializeSettingsBindings();
@@ -354,6 +355,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
             if (importedNpcsSettingsUI != null)
             {
+                importedNpcsSettingsUI.SetAvatarCatalog(activeRolesSettingsUI != null ? activeRolesSettingsUI.Catalog : null);
                 importedNpcsSettingsUI.Display(config);
             }
             RefreshSettingsBindings();

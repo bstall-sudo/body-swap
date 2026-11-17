@@ -166,7 +166,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             _currentPresetBaseName = !string.IsNullOrWhiteSpace(config.PresetBaseName) ? config.PresetBaseName
                 : !string.IsNullOrWhiteSpace(config.PresetName) ? config.PresetName : "Preset";
             foreach (var input in _presetNameInputs) input.SetTextWithoutNotify("");
-            if (presetVersionNameInput != null) presetVersionNameInput.SetTextWithoutNotify("");
+            if (presetVersionNameInput != null) presetVersionNameInput.SetTextWithoutNotify(presetSuffix);
             foreach (var button in _presetSaveButtons) button.interactable = _hasLoadedPreset;
             RefreshPresetNamePreview();
         }

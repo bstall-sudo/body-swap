@@ -1,0 +1,1 @@
+PASS: prefab bindings, UI edit/empty height/reset, source switching, group button, preset/controller roundtrip, importer, global height precedence, seated legacy fallback, recording JSON, source immutability, scene panel content/navigation/back button, renamed NPC dropdown contains every actual scene catalog ID without injected catalog.

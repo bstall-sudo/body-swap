@@ -559,7 +559,8 @@ namespace AppV2.Runtime.Scripts.Config
                             npc.alignWithPlayer,
 
                         NpcGroupSpawnId =
-                            npc.npcGroupSpawnId
+                            npc.npcGroupSpawnId,
+                        AvatarOverrides = NpcRoleOverrides.Copy(npc.avatarOverrides)
                     };
 
                 settings.Add(npcSettings);
@@ -673,7 +674,8 @@ namespace AppV2.Runtime.Scripts.Config
                         sessionId = npc.SessionId,
                         npcGroupSpawnId = npc.NpcGroupSpawnId,
                         alignWithPlayer = npc.AlignWithPlayer,
-                        canBecomeActiveConversationPartner = npc.CanBecomeActiveConversationPartner
+                        canBecomeActiveConversationPartner = npc.CanBecomeActiveConversationPartner,
+                        avatarOverrides = NpcRoleOverrides.Copy(npc.AvatarOverrides)
                     });
                 }
             }
