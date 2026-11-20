@@ -113615,8 +113615,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1094611204}
   m_HandleRect: {fileID: 1094611203}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.7331616
+  m_Value: 1.0000002
+  m_Size: 0.48616624
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -119327,6 +119327,8 @@ MonoBehaviour:
     prefab: {fileID: 9038906056174042635, guid: 9a622dd918a45614f968531e6aab9541, type: 3}
   - environmentId: ChipsImDschungel
     prefab: {fileID: 5431877498887767832, guid: 3a5d15cd8c0a63340b3a74cb90732f9a, type: 3}
+  - environmentId: BeschwerdeStelle_01
+    prefab: {fileID: 888953961253849248, guid: bfb29fb1050efd24caefc6d8f9199c98, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0
