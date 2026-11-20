@@ -446,6 +446,7 @@ namespace AppV2.Runtime.Scripts.Config
 
             settings.SmoothAlignSeconds =
                 conversationStage.SmoothAlignSeconds;
+            settings.StopRecordingDelaySeconds = conversationStage.StopRecordingDelaySeconds;
 
             settings.SelectableNext =
                 conversationStage.selectableNext;
@@ -801,6 +802,7 @@ namespace AppV2.Runtime.Scripts.Config
 
             conversationStage.SmoothAlignSeconds =
                 settings.SmoothAlignSeconds;
+            conversationStage.StopRecordingDelaySeconds = Mathf.Max(0f, settings.StopRecordingDelaySeconds);
 
             conversationStage.selectableNext =
                 settings.SelectableNext;

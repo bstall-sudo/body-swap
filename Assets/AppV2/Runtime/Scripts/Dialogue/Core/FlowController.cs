@@ -175,6 +175,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
             {
                 if (!_sessionStopStarted)
                 {
+                    (_state as RecordSpeakerState)?.CancelDelayedRecordingStop();
                     Stage.StopSessionForMenu();
                     _sessionStopStarted = true;
                 }

@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using AppV2.Runtime.Scripts.Config;
+using AppV2.Runtime.Scripts.Loader;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
@@ -17,12 +18,22 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private TMP_Dropdown spawnPointDropdown;
         [SerializeField] private TMP_Dropdown lookAtSpawnPointDropdown;
         [SerializeField] private Toggle isActiveConversationPartnerToggle;
+        [SerializeField] private Image avatarPreviewImage;
+        [SerializeField] private Image spawnPreviewImage;
+        private AvatarCatalog _avatarCatalog;
+        private EnvironmentLoader _environmentLoader;
+        private string _environmentId;
+        private string _stageSpawnId;
         private readonly List<string> _spawnValues = new();
         private readonly List<string> _lookValues = new();
         public event Action<int, string, string, bool> PlacementChanged;
 
-        public void ConfigurePlacement(List<string> spawnIds, string stageSpawnId, StartRoleSettings settings)
+        public void ConfigurePlacement(List<string> spawnIds, string stageSpawnId, StartRoleSettings settings,
+            EnvironmentLoader environmentLoader = null, string environmentId = null)
         {
+            _environmentLoader = environmentLoader;
+            _environmentId = string.IsNullOrWhiteSpace(environmentId) ? "default" : environmentId;
+            _stageSpawnId = string.IsNullOrWhiteSpace(stageSpawnId) ? "default" : stageSpawnId;
             // The prefab originally gives both dropdowns the same name. Resolve by
             // their owning row label for old scene/prefab instances without new bindings.
             foreach (var dropdown in GetComponentsInChildren<TMP_Dropdown>(true))
@@ -38,9 +49,10 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 spawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
                 SetSpawnOptions(spawnPointDropdown, _spawnValues, spawnIds, settings.SpawnPointId,
-                    "StageSpawnPoint (" + (string.IsNullOrWhiteSpace(stageSpawnId) ? "default" : stageSpawnId) + ")");
+                    $"StageSpawnPoint ({_stageSpawnId})");
                 spawnPointDropdown.onValueChanged.AddListener(OnPlacementChanged);
             }
+            RefreshSpawnPreview();
             if (lookAtSpawnPointDropdown != null)
             {
                 lookAtSpawnPointDropdown.onValueChanged.RemoveListener(OnPlacementChanged);
@@ -68,12 +80,32 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             dropdown.SetValueWithoutNotify(values.IndexOf(selected)); dropdown.RefreshShownValue();
         }
 
-        private void OnPlacementChanged(int _) => NotifyPlacementChanged();
+        private string SelectedSpawnId =>
+            spawnPointDropdown != null && _spawnValues.Count > spawnPointDropdown.value
+                ? _spawnValues[spawnPointDropdown.value]
+                : "";
+
+        private void RefreshSpawnPreview()
+        {
+            string spawnId = SelectedSpawnId;
+            if (string.IsNullOrEmpty(spawnId))
+                spawnId = _stageSpawnId;
+
+            SetPreview(spawnPreviewImage, _environmentLoader != null
+                ? _environmentLoader.GetSpawnPreview(_environmentId, spawnId)
+                : null);
+        }
+
+        private void OnPlacementChanged(int _)
+        {
+            RefreshSpawnPreview();
+            NotifyPlacementChanged();
+        }
         private void OnPartnerChanged(bool _) => NotifyPlacementChanged();
         private void NotifyPlacementChanged()
         {
             PlacementChanged?.Invoke(_roleIndex,
-                spawnPointDropdown != null && _spawnValues.Count > spawnPointDropdown.value ? _spawnValues[spawnPointDropdown.value] : "",
+                SelectedSpawnId,
                 lookAtSpawnPointDropdown != null && _lookValues.Count > lookAtSpawnPointDropdown.value ? _lookValues[lookAtSpawnPointDropdown.value] : "",
                 isActiveConversationPartnerToggle == null || isActiveConversationPartnerToggle.isOn);
         }
@@ -96,6 +128,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (index < 0) return;
             avatarDropdown.SetValueWithoutNotify(index);
             avatarDropdown.RefreshShownValue();
+            RefreshAvatarPreview();
         }
 
         public void Initialize(
@@ -103,9 +136,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             string avatarId,
             string height,
             string seatedHeight,
-            List<string> avatarIds)
+            List<string> avatarIds,
+            AvatarCatalog avatarCatalog = null)
         {
             _roleIndex = roleIndex;
+            _avatarCatalog = avatarCatalog;
             // Rows are reused; detach before updating dropdowns and input values.
             avatarDropdown.onValueChanged.RemoveListener(OnChanged);
             heightInput.onEndEdit.RemoveListener(OnChanged);
@@ -134,6 +169,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                     "[RoleSettingsRowUI] No avatars available."
                 );
 
+                SetPreview(avatarPreviewImage, null);
                 avatarDropdown.interactable = false;
                 return;
             }
@@ -161,6 +197,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             );
 
             avatarDropdown.RefreshShownValue();
+            RefreshAvatarPreview();
 
             heightInput.SetTextWithoutNotify(height);
             seatedHeightInput.SetTextWithoutNotify(seatedHeight);
@@ -186,8 +223,24 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             );
         }
 
+        private void RefreshAvatarPreview()
+        {
+            string avatarId = avatarDropdown.options[avatarDropdown.value].text;
+            SetPreview(avatarPreviewImage, _avatarCatalog != null ? _avatarCatalog.GetAvatarPreview(avatarId) : null);
+        }
+
+        private static void SetPreview(Image image, Sprite sprite)
+        {
+            if (image == null)
+                return;
+
+            image.sprite = sprite;
+            image.enabled = sprite != null;
+        }
+
         private void OnChanged(int value)
         {
+            RefreshAvatarPreview();
             NotifyChanged();
         }
 

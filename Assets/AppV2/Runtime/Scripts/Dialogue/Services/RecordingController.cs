@@ -404,14 +404,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
 
             if (take.Frames != null && take.Frames.Count > 0)
             {
-                var lastFrame = take.Frames[^1];
-
-                _lastEndPosList[roleIndex] = lastFrame.Body.Pos;
-                _lastEndYawList[roleIndex] = lastFrame.Body.YawDeg;
-                _lastHeadEndPosList[roleIndex] = lastFrame.Head.Pos;
-                _lastHeadEndYawList[roleIndex] = lastFrame.Head.Rot.eulerAngles.y;
-
-                _hasLastFrameList[roleIndex] = true;
+                SetLastEndFrame(roleIndex, take.Frames[^1]);
             }
 
             if (info.HasValue)
@@ -537,8 +530,16 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
         
     }
 
-    // das wird im ConversationStage gebraucht, damit man an die richtige Stelle Lerpen kann.
-    // die Funktion gibt also den letzten EndPos/Ywa pro roleIndex zurück.
+    public void SetLastEndFrame(int roleIndex, Frame lastFrame)
+    {
+        _lastEndPosList[roleIndex] = lastFrame.Body.Pos;
+        _lastEndYawList[roleIndex] = lastFrame.Body.YawDeg;
+        _lastHeadEndPosList[roleIndex] = lastFrame.Head.Pos;
+        _lastHeadEndYawList[roleIndex] = lastFrame.Head.Rot.eulerAngles.y;
+        _hasLastFrameList[roleIndex] = true;
+    }
+
+    // ConversationStage uses this pose as the target for player alignment.
     public bool TryGetLastEndPose(int roleIndex, out Vector3 pos, out float yaw)
     {
         pos = default;

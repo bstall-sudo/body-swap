@@ -11,7 +11,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
     public partial class WorkshopConfigurationUI
     {
-        private enum FloatSetting { PlayerHeight, SeatedPlayerHeight, FallbackHipHeight, FallbackFootSpacing, AvatarBaseHeight, StepSpeed, StepLength, SmoothAlign, LosePartnerDistance, ReactivateDistance, NpcRadius, NpcHeightDifference }
+        private enum FloatSetting { PlayerHeight, SeatedPlayerHeight, FallbackHipHeight, FallbackFootSpacing, AvatarBaseHeight, StepSpeed, StepLength, SmoothAlign, StopRecordingDelay, LosePartnerDistance, ReactivateDistance, NpcRadius, NpcHeightDifference }
         private enum ToggleSetting { AutomatedPlayerHeightRecognition, AutomatedCalibration, ActiveRolesHeightOverwrites, NpcHeightOverwrites, SimpleInput, FullBodyTrackers, SeatedMode, AllowTeleportation, ProceduralHipAndFeetMove, SelectableNext, LosePartners }
         [Serializable] private class FloatBinding
         {
@@ -148,6 +148,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 case "proceduralstepspeed": return FloatSetting.StepSpeed;
                 case "proceduralsteplength": return FloatSetting.StepLength;
                 case "smoothalign": return FloatSetting.SmoothAlign;
+                case "stoprecordingdelay": return FloatSetting.StopRecordingDelay;
                 case "distancetoloseconversationpartner": case "distancetoloseparter": case "distancetolosepartner": return FloatSetting.LosePartnerDistance;
                 case "distancetoreactivatepassiverole": return FloatSetting.ReactivateDistance;
                 case "npcradiusstarttalking": case "npctriggerradius": return FloatSetting.NpcRadius;
@@ -256,6 +257,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 case FloatSetting.StepSpeed: return _displayedConfig.Controls.ProceduralStepSpeed;
                 case FloatSetting.StepLength: return _displayedConfig.Controls.ProceduralStepLength;
                 case FloatSetting.SmoothAlign: return _displayedConfig.Controls.SmoothAlignSeconds;
+                case FloatSetting.StopRecordingDelay: return _displayedConfig.Controls.StopRecordingDelaySeconds;
                 case FloatSetting.LosePartnerDistance: return _displayedConfig.Conversation.DistanceToLoseConversationPartner;
                 case FloatSetting.ReactivateDistance: return _displayedConfig.Conversation.DistanceToReactivatePassiveRole;
                 case FloatSetting.NpcRadius: return _displayedConfig.Conversation.RadiusNpcStartTalking;
@@ -275,6 +277,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 case FloatSetting.StepSpeed: _displayedConfig.Controls.ProceduralStepSpeed = value; break;
                 case FloatSetting.StepLength: _displayedConfig.Controls.ProceduralStepLength = value; break;
                 case FloatSetting.SmoothAlign: _displayedConfig.Controls.SmoothAlignSeconds = value; break;
+                case FloatSetting.StopRecordingDelay: _displayedConfig.Controls.StopRecordingDelaySeconds = value; break;
                 case FloatSetting.LosePartnerDistance: _displayedConfig.Conversation.DistanceToLoseConversationPartner = value; break;
                 case FloatSetting.ReactivateDistance: _displayedConfig.Conversation.DistanceToReactivatePassiveRole = value; break;
                 case FloatSetting.NpcRadius: _displayedConfig.Conversation.RadiusNpcStartTalking = value; break;

@@ -29,7 +29,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         private Action _presetConfirmationAction;
         public string SaveAsBaseName => _presetNameInputs.Count > 0 && !string.IsNullOrWhiteSpace(_presetNameInputs[0].text)
             ? _presetNameInputs[0].text.Trim() : _currentPresetBaseName;
-        public string SaveAsSuffix => presetVersionNameInput != null && !string.IsNullOrWhiteSpace(presetVersionNameInput.text)
+        public string SaveAsSuffix => presetVersionNameInput != null
             ? presetVersionNameInput.text.Trim() : presetSuffix;
         public string SaveAsPresetName { get; private set; }
 

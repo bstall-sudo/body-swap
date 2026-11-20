@@ -43,8 +43,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [Header("Environment")]
         [SerializeField] private TMP_Dropdown environmentIdDropdown;
         [SerializeField] private TMP_Dropdown stageSpawnIdDropdown;
+        [SerializeField] private Image environmentImage;
+        [SerializeField] private Image stageSpawnPointImage;
 
         [SerializeField] private EnvironmentLoader environmentLoader;
+        internal EnvironmentLoader EnvironmentLoader => environmentLoader;
 
         private PresetConfig _displayedConfig;
 
@@ -137,6 +140,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void Awake()
         {
+            BindEnvironmentPreviewImages();
             InitializeRecordingEndUI();
             InitializeStorageUI();
             InitializePlaybackUI();
@@ -533,6 +537,44 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             );
         }
 
+        private void BindEnvironmentPreviewImages()
+        {
+            foreach (var image in GetComponentsInChildren<Image>(true))
+            {
+                if (environmentImage == null && image.name == "EnvironmentImage")
+                    environmentImage = image;
+                if (stageSpawnPointImage == null && image.name == "StageSpawnPointImage")
+                    stageSpawnPointImage = image;
+            }
+
+            SetEnvironmentPreviewImage(environmentImage, null);
+            SetEnvironmentPreviewImage(stageSpawnPointImage, null);
+        }
+
+        private void RefreshEnvironmentPreviews()
+        {
+            var settings = _displayedConfig?.Environment;
+            string environmentId = settings?.EnvironmentId;
+            string spawnId = settings?.StageSpawnId;
+            bool hasEnvironment = environmentLoader != null && !string.IsNullOrWhiteSpace(environmentId);
+
+            SetEnvironmentPreviewImage(environmentImage,
+                hasEnvironment ? environmentLoader.GetEnvironmentPreview(environmentId) : null);
+            SetEnvironmentPreviewImage(stageSpawnPointImage,
+                hasEnvironment && !string.IsNullOrWhiteSpace(spawnId)
+                    ? environmentLoader.GetSpawnPreview(environmentId, spawnId)
+                    : null);
+        }
+
+        private static void SetEnvironmentPreviewImage(Image image, Sprite sprite)
+        {
+            if (image == null)
+                return;
+
+            image.sprite = sprite;
+            image.enabled = sprite != null;
+        }
+
         private void RefreshEnvironmentDropdown()
         {
             if (_displayedConfig == null || environmentLoader == null)
@@ -563,6 +605,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 _availableStageSpawnIds,
                 _displayedConfig.Environment.StageSpawnId
             );
+            RefreshEnvironmentPreviews();
         }
 
         private void SetDropdownOptions(
@@ -613,10 +656,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (_displayedConfig == null)
                 return;
 
-            string environmentId =
-                index > 0 && index <= _availableEnvironmentIds.Count
-                    ? _availableEnvironmentIds[index - 1]
-                    : "";
+            string environmentId = index == 0 ? "" : environmentIdDropdown.options[index].text;
+            if (index != 0 && !_availableEnvironmentIds.Contains(environmentId))
+                return;
 
             _displayedConfig.Environment.EnvironmentId = environmentId;
 
@@ -647,7 +689,9 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             {
                 _displayedConfig.Environment.StageSpawnId = selectedValue;
             }
+            RefreshEnvironmentPreviews();
             activeRolesSettingsUI?.RefreshSpawnOptions(_displayedConfig.Environment.EnvironmentId);
+            RefreshRecordingSessionNamePreview();
             // Bei "Nicht gefunden: ..." bleibt der alte Wert erhalten
         }
     }

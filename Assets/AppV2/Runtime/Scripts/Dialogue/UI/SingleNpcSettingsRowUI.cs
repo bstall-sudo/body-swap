@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using AppV2.Runtime.Scripts.Config;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
+using AppV2.Runtime.Scripts.Loader;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
@@ -12,15 +13,18 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
     {
         [SerializeField] private TMP_Text npcNameText;
         [SerializeField] private TMP_Dropdown avatarDropdown;
+        [SerializeField] private Image avatarPreviewImage;
         [SerializeField] private TMP_InputField heightInput;
         [SerializeField] private TMP_InputField seatedHeightInput;
         [SerializeField] private Button resetToOriginButton;
+        private AvatarCatalog _avatarCatalog;
         private NpcGroupSettings _group;
         private ConversationRoleMeta _source;
         private bool _displaying;
 
-        public void Initialize(NpcGroupSettings group, ConversationRoleMeta source, List<string> avatarIds)
+        public void Initialize(NpcGroupSettings group, ConversationRoleMeta source, List<string> avatarIds, AvatarCatalog avatarCatalog)
         {
+            _avatarCatalog = avatarCatalog;
             _group = group;
             _source = source;
             avatarDropdown.onValueChanged.RemoveListener(AvatarChanged);
@@ -53,12 +57,27 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             string avatar = string.IsNullOrWhiteSpace(v?.AvatarId) ? _source.AvatarId : v.AvatarId;
             avatarDropdown.SetValueWithoutNotify(Mathf.Max(0, avatarDropdown.options.FindIndex(o => o.text == avatar)));
             avatarDropdown.RefreshShownValue();
+            RefreshAvatarPreview(avatar);
             heightInput.SetTextWithoutNotify((v != null && v.HeightOfRoleCm > 0 ? v.HeightOfRoleCm : _source.HeightOfRoleCm).ToString());
             seatedHeightInput.SetTextWithoutNotify((v != null && v.HeightOfSeatedRoleCm > 0 ? v.HeightOfSeatedRoleCm : NpcRoleOverrides.SeatedHeight(_source)).ToString());
             _displaying = false;
         }
 
-        private void AvatarChanged(int _) => StoreValues();
+        private void RefreshAvatarPreview(string avatarId)
+        {
+            if (avatarPreviewImage == null)
+                return;
+
+            var sprite = _avatarCatalog != null ? _avatarCatalog.GetAvatarPreview(avatarId) : null;
+            avatarPreviewImage.sprite = sprite;
+            avatarPreviewImage.enabled = sprite != null;
+        }
+
+        private void AvatarChanged(int index)
+        {
+            StoreValues();
+            RefreshAvatarPreview(avatarDropdown.options[index].text);
+        }
         private void HeightChanged(string _) => StoreValues();
         private void EndEdit(string _) { StoreValues(); DisplayValues(); }
 

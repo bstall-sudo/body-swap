@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace AppV2.Runtime.Scripts.Dialogue.States
@@ -22,6 +23,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
         private bool goingToPlaybackPreRecordedScenesState = false;
         private bool _waitingForRecordingSave = false;
         private bool _isRecording;
+        private Coroutine _delayedRecordingStop;
         private List<int> reactiveIdles;
         private List<int> indicesOfPassiveRoles;
 
@@ -152,14 +154,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.Stage.DriveActiveRoleFromInput(toBeRecorded);
                 //_flow.Stage.RecordingTick(toBeRecorded,sceneCount);
                 //IsPlayerNearNpc(int roleIndex, Transform player, float radius)
-                if(_flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
+                if (_delayedRecordingStop == null &&
+                    _flow.PlayerNearNpcs(indicesOfPassiveRoles, toBeRecorded, _radiusNpcStartTalking))
                 {
                     
                     //UnityEngine.Debug.Log($"[RecordSpeakerState] [PlayerCameNearNpc] toBeRecorded {toBeRecorded}, sceneCount: {sceneCount} GoToPlaybackPreRecordedState: {_flow._data.GoToPlaybackPreRecordedState}");
                     
-                    _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
-                    _isRecording = false;
-                    _waitingForRecordingSave = true;
+                    EndSpeakerRecording();
                     goingToPlaybackPreRecordedScenesState = true;
                     
                 }
@@ -221,15 +222,13 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             
 
 
-            if (_flow.ConsumePrimaryAction())
+            if (_flow.ConsumePrimaryAction() && _isRecording && _delayedRecordingStop == null)
             {
-                if(_isRecording){
-                    //UnityEngine.Debug.Log("[RecordSpeakerState] Consumed PrimaryAction");
-                    _flow.Stage.RecordingEnd(toBeRecorded,sceneCount);
-                    _isRecording = false;
-                    _waitingForRecordingSave = true;
-
-                }
+                float delay = _flow.Stage.StopRecordingDelaySeconds;
+                if (delay > 0f)
+                    _delayedRecordingStop = _flow.StartCoroutine(EndSpeakerRecordingAfterDelay(delay));
+                else
+                    EndSpeakerRecording();
                 if (_flow.Stage.loseConversationPartnersIfTooFarAway)
                 {
                     //das passt die FlowStateData auch schon an, daher muss das hier sein, damit entsprechend der Daten der richtige State angesteuert wird
@@ -255,8 +254,30 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
             }
         }
 
+        private IEnumerator EndSpeakerRecordingAfterDelay(float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            _delayedRecordingStop = null;
+            EndSpeakerRecording();
+        }
+
+        private void EndSpeakerRecording()
+        {
+            _isRecording = false;
+            _waitingForRecordingSave = true;
+            _flow.Stage.RecordingEnd(toBeRecorded, sceneCount);
+        }
+
+        internal void CancelDelayedRecordingStop()
+        {
+            if (_delayedRecordingStop == null) return;
+            _flow.StopCoroutine(_delayedRecordingStop);
+            _delayedRecordingStop = null;
+        }
+
         public void Exit()
         {
+            CancelDelayedRecordingStop();
             //UnityEngine.Debug.Log("[RecordSpeakerState] Exit Start");
             _flow.Stage.ReactiveIdleEnd(reactiveIdles);
 

@@ -31,8 +31,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
             RolePlaybackSource source,
             Transform stageRoot,
             Transform roleSpawn,
-            Transform player)
+            Transform player,
+            out Frame endFrame)
         {
+            endFrame = default;
+
             if (targetRole == null)
             {
                 Debug.LogError("[PreRecordedTakeImporter] targetRole is null.");
@@ -487,6 +490,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.Services
                 $"targetScene={targetSceneCount}"
             );
             */
+            endFrame = frames[^1];
             return true;
         }
 

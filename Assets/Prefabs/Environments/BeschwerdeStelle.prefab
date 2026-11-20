@@ -270,6 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: Tisch
+  previewSprite: {fileID: 21300000, guid: b8d946e3a73f69847bbbde3212e16e97, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1216,6 +1217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: sitz_01
+  previewSprite: {fileID: 21300000, guid: a61a94e642a3dab4d95fb668208e8ea4, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1266,6 +1268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: default
+  previewSprite: {fileID: 21300000, guid: 16c2e85aa9cba0447827c528f42e8d13, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1316,6 +1319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: weiter_weg
+  previewSprite: {fileID: 21300000, guid: 18f65eac6bb318a4ab35c0df21dcfff1, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1786,6 +1790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AppV2.Runtime.Scripts.Environment.StageSpawnPoint
   spawnId: sitz_02
+  previewSprite: {fileID: 21300000, guid: 519bf7e11454d404a8c821fc207986b7, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8

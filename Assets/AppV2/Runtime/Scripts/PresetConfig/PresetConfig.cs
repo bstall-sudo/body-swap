@@ -126,6 +126,9 @@ namespace AppV2.Runtime.Scripts.Config
 
         public float SmoothAlignSeconds = 1f;
 
+        public const float DefaultStopRecordingDelaySeconds = 0.5f;
+        public float StopRecordingDelaySeconds = DefaultStopRecordingDelaySeconds;
+
         public bool SelectableNext = true;
 
         public float ProceduralStepLength = 0.4f;

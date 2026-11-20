@@ -101,6 +101,8 @@ namespace AppV2.Runtime.Scripts.Config
                     // an explicitly saved false, regardless of JsonUtility defaults.
                     if (!Regex.IsMatch(json, "\"AutomatedPlayerHeightRecognition\"\\s*:"))
                         config.Controls.AutomatedPlayerHeightRecognition = true;
+                    if (!Regex.IsMatch(json, "\"StopRecordingDelaySeconds\"\\s*:"))
+                        config.Controls.StopRecordingDelaySeconds = ControlSettings.DefaultStopRecordingDelaySeconds;
                     config.PresetId = id;
                 }
                 return config;

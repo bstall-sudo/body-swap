@@ -170,6 +170,25 @@ namespace AppV2.Runtime.Scripts.Loader
             return result;
         }
 
+        public Sprite GetEnvironmentPreview(string environmentId)
+        {
+            var entry = environments.Find(e => e != null && e.environmentId == environmentId);
+            return entry != null && entry.prefab != null ? entry.previewSprite : null;
+        }
+
+        public Sprite GetSpawnPreview(string environmentId, string spawnId)
+        {
+            var entry = environments.Find(e => e.environmentId == environmentId);
+            if (entry == null || entry.prefab == null)
+                return null;
+
+            foreach (var point in entry.prefab.GetComponentsInChildren<StageSpawnPoint>(true))
+                if (point.spawnId == spawnId)
+                    return point.PreviewSprite;
+
+            return null;
+        }
+
         public Transform GetTransformFromSpawnId(string spawnId = "default")
         {
             StageSpawnPoint spawnPoint = GetSpawnPoint(spawnId);
@@ -185,6 +204,7 @@ namespace AppV2.Runtime.Scripts.Loader
     {
         public string environmentId;
         public GameObject prefab;
+        public Sprite previewSprite;
     }
     
 

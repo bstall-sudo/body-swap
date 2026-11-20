@@ -49,6 +49,16 @@ namespace AppV2.Runtime.Scripts.Loader
             }
         }
 
+        public Sprite GetAvatarPreview(string avatarId)
+        {
+            if (_avatarById == null)
+                RebuildIndex();
+
+            return !string.IsNullOrWhiteSpace(avatarId) && _avatarById.TryGetValue(avatarId, out var entry)
+                ? entry.previewSprite
+                : null;
+        }
+
         public AvatarEntry GetAvatarEntry(string avatarId)
         {
             if (_avatarById == null)
@@ -79,6 +89,7 @@ namespace AppV2.Runtime.Scripts.Loader
     {
         public string avatarId;
         public GameObject prefab;
+        public Sprite previewSprite;
 
         // später nützlich:
         public string sourcePath;

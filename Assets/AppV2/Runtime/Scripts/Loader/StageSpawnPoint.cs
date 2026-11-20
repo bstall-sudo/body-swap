@@ -6,6 +6,9 @@ namespace AppV2.Runtime.Scripts.Loader
     public class StageSpawnPoint : MonoBehaviour
     {
         public string spawnId = "default";
+        [SerializeField] private Sprite previewSprite;
+
+        public Sprite PreviewSprite => previewSprite;
 
         [Header("Ground Snapping")]
         [SerializeField] private LayerMask groundLayer;

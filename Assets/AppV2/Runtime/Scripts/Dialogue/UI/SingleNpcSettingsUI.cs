@@ -63,7 +63,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                     {
                         if (source == null || string.IsNullOrWhiteSpace(source.RoleId)) continue;
                         var row = Instantiate(rowPrefab, rowsContainer);
-                        row.Initialize(group, source, avatars);
+                        row.Initialize(group, source, avatars, availableCatalog);
                         row.gameObject.SetActive(true);
                         _rows.Add(row);
                         estimated |= source.HeightOfSeatedRoleCm <= 0;

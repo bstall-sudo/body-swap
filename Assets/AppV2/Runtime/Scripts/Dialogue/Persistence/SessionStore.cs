@@ -53,39 +53,29 @@ namespace AppV2.Runtime.Scripts.Dialogue.Persistence
             );
         }
 
-        public string CreateNewSessionFolder(
-            string stageSpawnId,
-            string roleId,
-            out string sessionId)
+        public string GetNextSessionId(string stageSpawnId, string roleId)
         {
-            string baseId = $"{stageSpawnId}-{roleId}";
-
-            // Optionalen Session-Namen anhängen
-            if (!string.IsNullOrWhiteSpace(_sessionIdName))
-            {
-                baseId += $"-{_sessionIdName.Trim()}";
-            }
-
+            string baseId = string.IsNullOrWhiteSpace(_sessionIdName)
+                ? $"{stageSpawnId}-{roleId}"
+                : _sessionIdName.Trim();
             string root = RootPath();
-
-            Directory.CreateDirectory(root);
-
             string candidateId = baseId;
             int counter = 1;
-
-            // Prüfen, ob der Ordner bereits existiert
-            while (Directory.Exists(Path.Combine(root, candidateId)))
+            while (Directory.Exists(Path.Combine(root, candidateId)) ||
+                   File.Exists(Path.Combine(root, candidateId)))
             {
                 candidateId = $"{baseId}-{counter}";
                 counter++;
             }
+            return candidateId;
+        }
 
-            sessionId = candidateId;
-            _currentSessionId = sessionId;
-
-            string dir = Path.Combine(root, sessionId);
-
+        public string CreateNewSessionFolder(string stageSpawnId, string roleId, out string sessionId)
+        {
+            sessionId = GetNextSessionId(stageSpawnId, roleId);
+            string dir = Path.Combine(RootPath(), sessionId);
             Directory.CreateDirectory(dir);
+            _currentSessionId = sessionId;
 
             Debug.Log($"[SessionStore] Created Session: {sessionId}");
 

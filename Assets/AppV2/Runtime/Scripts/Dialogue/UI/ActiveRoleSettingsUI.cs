@@ -11,6 +11,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
     {
         [SerializeField] private AvatarCatalog avatarCatalog;
         public AvatarCatalog Catalog => avatarCatalog;
+        public event System.Action FirstAvatarChanged;
         [SerializeField] private TMP_Text activeRoleCountText;
         [SerializeField] private Button addRoleButton;
         [SerializeField] private Transform rowsContainer;
@@ -50,6 +51,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         {
             _config = config;
             _environmentLoader = environmentLoader ?? _environmentLoader;
+            if (_environmentLoader == null)
+                _environmentLoader = GetComponentInParent<WorkshopConfigurationUI>(true)?.EnvironmentLoader;
             BindButtons();
             if (_config == null) return;
             _config.StartRoles ??= new StartRolesSettings();
@@ -106,6 +109,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 Destroy(row.gameObject);
                 _rows.RemoveAt(_rows.Count - 1);
             }
+            string environmentId = _config.Environment.EnvironmentId;
+            var spawnIds = GetSpawnIds(environmentId);
             for (int i = 0; i < settings.Roles.Count; i++)
             {
                 var role = settings.Roles[i];
@@ -126,8 +131,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 row.Initialize(i, role.AvatarId,
                     role.HeightOfRoleCm > 0 ? role.HeightOfRoleCm.ToString() : "",
                     role.HeightOfSeatedRoleCm > 0 ? role.HeightOfSeatedRoleCm.ToString() : "",
-                    _availableAvatarIds);
-                row.ConfigurePlacement(GetSpawnIds(_config.Environment.EnvironmentId), _config.Environment.StageSpawnId, role);
+                    _availableAvatarIds, avatarCatalog);
+                row.ConfigurePlacement(spawnIds, _config.Environment.StageSpawnId, role, _environmentLoader, environmentId);
                 row.PlacementChanged += OnRolePlacementChanged;
                 row.SetRemoveAllowed(settings.RoleCount > 1);
                 row.Changed += OnRoleChanged;
@@ -137,14 +142,14 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 activeRoleCountText.text = $"Rollen: {settings.RoleCount}, davon aktiv: {settings.Roles.FindAll(r => r.StartsActive).Count}";
             if (addRoleButton != null) addRoleButton.interactable = settings.RoleCount < 20;
             RefreshFirstRoleAvatarDropdown();
+            FirstAvatarChanged?.Invoke();
         }
 
         private List<string> GetSpawnIds(string environmentId)
         {
-            if (_environmentLoader != null)
-                return _environmentLoader.GetSpawnIds(string.IsNullOrWhiteSpace(environmentId) ? "default" : environmentId);
-            var ui = GetComponentInParent<WorkshopConfigurationUI>(true);
-            return ui != null ? ui.GetRoleSpawnIds(environmentId) : new List<string>();
+            return _environmentLoader != null
+                ? _environmentLoader.GetSpawnIds(string.IsNullOrWhiteSpace(environmentId) ? "default" : environmentId)
+                : new List<string>();
         }
 
         public void RefreshSpawnOptions(string environmentId)
@@ -152,7 +157,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (_config?.StartRoles?.Roles == null) return;
             var ids = GetSpawnIds(environmentId);
             for (int i = 0; i < _rows.Count && i < _config.StartRoles.Roles.Count; i++)
-                _rows[i].ConfigurePlacement(ids, _config.Environment.StageSpawnId, _config.StartRoles.Roles[i]);
+                _rows[i].ConfigurePlacement(ids, _config.Environment.StageSpawnId, _config.StartRoles.Roles[i], _environmentLoader, environmentId);
         }
 
         private void OnRolePlacementChanged(int index, string spawnId, string lookAtId, bool active)
@@ -171,7 +176,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             role.AvatarId = avatarId;
             role.HeightOfRoleCm = int.TryParse(height, out int h) ? h : 0;
             role.HeightOfSeatedRoleCm = int.TryParse(seatedHeight, out int sh) ? sh : 0;
-            if (index == 0) RefreshFirstRoleAvatarDropdown();
+            if (index == 0)
+            {
+                RefreshFirstRoleAvatarDropdown();
+                FirstAvatarChanged?.Invoke();
+            }
         }
 
         private void FindFirstRoleAvatarDropdown()
@@ -217,6 +226,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             string avatarId = firstRoleAvatarDropdown.options[index].text;
             _config.StartRoles.Roles[0].AvatarId = avatarId;
             if (_rows.Count > 0) _rows[0].SetAvatarWithoutNotify(avatarId);
+            FirstAvatarChanged?.Invoke();
         }
     }
 }

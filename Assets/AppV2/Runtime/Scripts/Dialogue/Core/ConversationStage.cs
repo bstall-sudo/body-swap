@@ -7,6 +7,7 @@ using AppV2.Runtime.Scripts.Input;
 using AppV2.Runtime.Scripts.Loader;
 
 
+using AppV2.Runtime.Scripts.Config;
 using AppV2.Runtime.Scripts.DataStructures;
 using AppV2.Runtime.Scripts.Dialogue.Persistence;
 using AppV2.Runtime.Scripts.Dialogue.Services;
@@ -812,6 +813,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         [Header("Settings")]
         public bool UseXR = false;
         public float SmoothAlignSeconds = 0.6f;
+
+        [Min(0f)]
+        public float StopRecordingDelaySeconds = ControlSettings.DefaultStopRecordingDelaySeconds;
         public bool FullBodyTrackers = false;
         public bool SeatedMode = false;
 
@@ -1597,7 +1601,8 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                 source,
                                 _stageRoot,
                                 spawn.transform,
-                                XrHead
+                                XrHead,
+                                out Frame importedEndFrame
                             );
 
                             if (imported)
@@ -1628,8 +1633,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
                                         _session.SessionId,
                                         heightOfPlayerCm
                                     );
-
-                                    
+                                    _recordingController.SetLastEndFrame(targetRoleIndex, importedEndFrame);
                                 }
                                 else
                                 {
@@ -2490,10 +2494,11 @@ namespace AppV2.Runtime.Scripts.Dialogue
                 targetBodyPosLocal + (bodyRotStageLocal * scaledHeadPosBodyLocal);
             
             // 4) HeadYaw aus bodyYaw + localHeadYaw rekonstruieren
-            float targetHeadYawStage = Mathf.Repeat(targetBodyYaw + targetHeadYawLocal, 360f);
+            Quaternion targetHeadRotStage = Quaternion.Euler(0f, targetBodyYaw + targetHeadYawLocal, 0f);
 
             // 5) Stage-local -> World
             Vector3 targetHeadPosWorld = _stageRoot.TransformPoint(targetHeadPosStageLocal);
+            float targetHeadYawWorld = YawOf(_stageRoot.rotation * targetHeadRotStage);
 
             _playerAlignTargetHeadPosWorld = targetHeadPosWorld;
 
@@ -2503,7 +2508,7 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
             // Ziel-Yaw berechnen
             float currentHeadYaw = YawOf(XrHead.rotation);
-            float deltaYaw = Mathf.DeltaAngle(currentHeadYaw, targetHeadYawStage);
+            float deltaYaw = Mathf.DeltaAngle(currentHeadYaw, targetHeadYawWorld);
             _playerAlignToYaw = _playerAlignFromYaw + deltaYaw;
 
             // Lokalen Head-Offset innerhalb des XR-Rigs holen

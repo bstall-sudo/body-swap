@@ -4,6 +4,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using AppV2.Runtime.Scripts.Config;
+using AppV2.Runtime.Scripts.Dialogue.Persistence;
 
 namespace AppV2.Runtime.Scripts.Dialogue.UI
 {
@@ -17,6 +18,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         [SerializeField] private TMP_InputField storageSessionInput;
         [SerializeField] private TMP_InputField personalFolderNameInput;
         private TMP_InputField _recordingSessionNameInput;
+        private TMP_Text _recordingSessionNamePreview;
         private readonly List<string> _workshopFolders = new();
         private readonly List<string> _sessionFolders = new();
         private bool _newWorkshop;
@@ -29,8 +31,26 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         private void InitializeStorageUI()
         {
             foreach (var input in GetComponentsInChildren<TMP_InputField>(true))
+            {
                 if (input.name == "SessionFolder_InputField (TMP)" && input.transform.parent != null && input.transform.parent.name == "SessionId_Text")
                     _recordingSessionNameInput = input;
+                if (input.name == "SessionIdDisplay_InputField (TMP)")
+                {
+                    _recordingSessionNamePreview = input.textComponent;
+                    input.interactable = false;
+                    input.enabled = false;
+                    if (input.targetGraphic != null) input.targetGraphic.enabled = false;
+                    if (input.placeholder != null) input.placeholder.enabled = false;
+                    if (_recordingSessionNamePreview != null)
+                    {
+                        _recordingSessionNamePreview.raycastTarget = false;
+                        _recordingSessionNamePreview.richText = false;
+                        var label = input.transform.parent?.GetComponent<TMP_Text>();
+                        if (label != null) _recordingSessionNamePreview.color = label.color;
+                    }
+                }
+            }
+            if (activeRolesSettingsUI != null) activeRolesSettingsUI.FirstAvatarChanged += RefreshRecordingSessionNamePreview;
             if (_recordingSessionNameInput != null) _recordingSessionNameInput.onValueChanged.AddListener(OnRecordingSessionNameEdited);
             if (storageWorkshopDropdown != null) storageWorkshopDropdown.onValueChanged.AddListener(OnStorageWorkshopSelected);
             if (storageSessionDropdown != null) storageSessionDropdown.onValueChanged.AddListener(OnStorageSessionSelected);
@@ -41,6 +61,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void CleanupStorageUI()
         {
+            if (activeRolesSettingsUI != null) activeRolesSettingsUI.FirstAvatarChanged -= RefreshRecordingSessionNamePreview;
             if (_recordingSessionNameInput != null) _recordingSessionNameInput.onValueChanged.RemoveListener(OnRecordingSessionNameEdited);
             if (storageWorkshopDropdown != null) storageWorkshopDropdown.onValueChanged.RemoveListener(OnStorageWorkshopSelected);
             if (storageSessionDropdown != null) storageSessionDropdown.onValueChanged.RemoveListener(OnStorageSessionSelected);
@@ -110,6 +131,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
                 SetFolderInputState(storageSessionInput, _newSession);
             }
             if (personalFolderNameInput != null) personalFolderNameInput.SetTextWithoutNotify(_storageSettings.SessionFolderName);
+            RefreshRecordingSessionNamePreview();
         }
 
         private void SetStorageOptions(TMP_Dropdown dropdown, List<string> folders, string selected, bool createNew)
@@ -168,6 +190,7 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
             if (_storageSettings == null) return;
             _storageSettings.SessionFolderName = value;
             if (personalFolderNameInput != null) personalFolderNameInput.SetTextWithoutNotify(value);
+            RefreshRecordingSessionNamePreview();
         }
 
         private void OnPersonalFolderEdited(string value)
@@ -180,7 +203,40 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
 
         private void OnRecordingSessionNameEdited(string value)
         {
-            if (_storageSettings != null) _storageSettings.SessionIdName = value;
+            if (_storageSettings == null) return;
+            _storageSettings.SessionIdName = value;
+            RefreshRecordingSessionNamePreview();
+        }
+
+        private void RefreshRecordingSessionNamePreview()
+        {
+            if (_recordingSessionNamePreview == null || _storageSettings == null) return;
+            if (!ValidateStorageSettings(_storageSettings, out string error))
+            {
+                _recordingSessionNamePreview.text = error;
+                return;
+            }
+
+            string spawnId = _displayedConfig?.Environment != null
+                ? _displayedConfig.Environment.StageSpawnId
+                : storageStage != null ? storageStage.StageSpawnId : "";
+            string roleName = "";
+            if (string.IsNullOrWhiteSpace(_storageSettings.SessionIdName))
+            {
+                var roles = _displayedConfig?.StartRoles?.Roles;
+                if (roles != null && roles.Count > 0 && activeRolesSettingsUI != null &&
+                    activeRolesSettingsUI.Catalog != null)
+                {
+                    var entry = activeRolesSettingsUI.Catalog.GetAvatarEntry(roles[0].AvatarId);
+                    var animator = entry?.prefab.GetComponentInChildren<Animator>(true);
+                    if (animator != null)
+                        roleName = animator.gameObject == entry.prefab ? entry.avatarId : animator.gameObject.name;
+                }
+            }
+
+            var store = new SessionStore(_storageSettings.StorageFolderName, _storageSettings.WorkshopFolderName,
+                _storageSettings.SessionFolderName, _storageSettings.SessionIdName);
+            _recordingSessionNamePreview.text = store.GetNextSessionId(spawnId, roleName);
         }
 
         private void WriteStorageSettings(PresetConfig config)
@@ -199,6 +255,11 @@ namespace AppV2.Runtime.Scripts.Dialogue.UI
         public static bool ValidateStorageSettings(StorageSettings settings, out string error)
         {
             error = null;
+            if (!string.IsNullOrWhiteSpace(settings?.SessionIdName) && !IsFolderName(settings.SessionIdName.Trim()))
+            {
+                error = "Bitte einen gültigen Session-Namen eingeben.";
+                return false;
+            }
             if (settings == null || (settings.WorkshopFolderName == null && settings.SessionFolderName == null)) return true;
             if (!IsFolderName(settings.WorkshopFolderName) || !IsFolderName(settings.SessionFolderName))
             {
