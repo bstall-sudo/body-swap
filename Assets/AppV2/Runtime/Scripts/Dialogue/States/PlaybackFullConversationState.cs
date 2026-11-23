@@ -55,8 +55,8 @@ namespace AppV2.Runtime.Scripts.Dialogue.States
                 //_flow.StatusUI.ShowPlaybackFullConversationState();
                 _flow.StatusUI.ShowCustomCue(
                     "AUFNAHME GESTOPPT\n \n PlaybackMode ON",
-                    new Vector2(0f, 180f),
-                    new Vector2(500f, 0f),
+                    new Vector2(0f, 240f),
+                    new Vector2(600f, 0f),
                     Color.red
                 );
             }

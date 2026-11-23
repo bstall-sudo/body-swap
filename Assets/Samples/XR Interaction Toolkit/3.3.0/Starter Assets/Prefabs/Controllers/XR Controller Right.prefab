@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4871301772669071546}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: XRController_Thumbstick_Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 2121719750533061242}
   - component: {fileID: 4314555765524351075}
   - component: {fileID: 9061724193437782981}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Button_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 3826415840535314323}
   - component: {fileID: 2890725886003467535}
   - component: {fileID: 7967948701137510829}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Button_Home
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -210,7 +210,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4312999587465610534}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: UniversalController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,7 +249,7 @@ GameObject:
   - component: {fileID: 8133223008797737046}
   - component: {fileID: 6972219698470072734}
   - component: {fileID: 4643603977460086454}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ThumbStick_Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ GameObject:
   - component: {fileID: 476418562824415352}
   - component: {fileID: 2902600039765555297}
   - component: {fileID: 7052120983454352814}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Controller_Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,9 +414,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3475118261464492563}
   - component: {fileID: 2983433689305697426}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: XR Controller Right
-  m_TagString: Untagged
+  m_TagString: excludeFromVideoRendering
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 4431590825886359359}
   - component: {fileID: 2467634753240625225}
   - component: {fileID: 174741061115499315}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Bumper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -591,7 +591,7 @@ GameObject:
   - component: {fileID: 5534257073571976082}
   - component: {fileID: 8967149194210545788}
   - component: {fileID: 797108429923947933}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ThumbStick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -674,7 +674,7 @@ GameObject:
   - component: {fileID: 1912516935883159265}
   - component: {fileID: 2643900140894839440}
   - component: {fileID: 4876378503311385300}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Button_B
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -757,7 +757,7 @@ GameObject:
   - component: {fileID: 2467139442371389260}
   - component: {fileID: 9211829831748775768}
   - component: {fileID: 1317338165740228483}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TouchPad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -840,7 +840,7 @@ GameObject:
   - component: {fileID: 2548892874240362547}
   - component: {fileID: 8881652531632955877}
   - component: {fileID: 4546197970950160856}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

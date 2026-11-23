@@ -253,6 +253,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: f5ccd52dc494e054fbe7d7161dcabe25, type: 2}
     - target: {fileID: 919132149155446097, guid: e053b8fbc416ba349b4a58a26410bba2, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e053b8fbc416ba349b4a58a26410bba2, type: 3}
+      propertyPath: m_TagString
+      value: excludeFromVideoRendering
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e053b8fbc416ba349b4a58a26410bba2, type: 3}
       propertyPath: m_Name
       value: Pinch_Pointer_LOD0
       objectReference: {fileID: 0}

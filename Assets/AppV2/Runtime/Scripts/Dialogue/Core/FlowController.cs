@@ -14,6 +14,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
     {
         private IState _state;
 
+#if UNITY_EDITOR
+        public static event System.Action<FlowController, bool> FullPlaybackVideoAvailabilityChanged;
+#endif
         //das kommt von der ConversationStage Inspector und bedeutet "kann man den nächsten 
         // nächsten Sprecher / Zuhörer auswählen oder nicht.
         private bool selectableNext;
@@ -92,6 +95,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
         {
             if (!CanReturnToMenu || _returnToMenuRequested) return;
             _returnToMenuRequested = true;
+#if UNITY_EDITOR
+            FullPlaybackVideoAvailabilityChanged?.Invoke(this, false);
+#endif
             _primaryAction = _secondaryAction = _reset = false;
             statusUI?.SetDesktopExitButtonVisible(false);
             statusUI?.SetStatusText("Aufnahme / Wiedergabe wird beendet …");
@@ -126,7 +132,9 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         private void OnDestroy()
         {
-
+#if UNITY_EDITOR
+            FullPlaybackVideoAvailabilityChanged?.Invoke(this, false);
+#endif
         }
 
  
@@ -201,6 +209,12 @@ namespace AppV2.Runtime.Scripts.Dialogue
 
         public void SetState(IState next)
         {
+#if UNITY_EDITOR
+            bool wasFullPlayback = _state is PlaybackFullConversationState;
+            bool isFullPlayback = next is PlaybackFullConversationState;
+            if (wasFullPlayback && !isFullPlayback)
+                FullPlaybackVideoAvailabilityChanged?.Invoke(this, false);
+#endif
             // Both the configuration menu and direct startup converge here.
             // Do this before Exit/Enter can access recording session services.
             if (next is CalibrationState || next is ChooseSpeakerState || next is RecordSpeakerState)
@@ -234,6 +248,10 @@ namespace AppV2.Runtime.Scripts.Dialogue
             //PrintRoleLists("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);
             //PrintRoleListsAndFlowStateDataWithStateInfo("FlowController PreRecorded Debug | SetState BEFORE ENTER|", oldStateName, newStateName);
             _state?.Enter();
+#if UNITY_EDITOR
+            if (!wasFullPlayback && isFullPlayback)
+                FullPlaybackVideoAvailabilityChanged?.Invoke(this, true);
+#endif
             // statusUI?.SetExitButtonVisible(Stage.UseXR && CanReturnToMenu);
             statusUI?.SetDesktopExitButtonVisible(CanReturnToMenu);
             //PrintRoleLists("FlowController PreRecorded Debug | SetState AFTER ENTER|", oldStateName, newStateName, _data.Playbacks,_data.ReactiveIdles,_data.SceneCount,_data.ToBeRecorded);

@@ -1908,6 +1908,15 @@ namespace AppV2.Runtime.Scripts.Dialogue
             
         }
 
+#if UNITY_EDITOR
+        public string GetFullPlaybackVideoDirectory()
+        {
+            if (_store == null || string.IsNullOrEmpty(_session?.SessionId))
+                return null;
+
+            return Path.GetDirectoryName(_store.GetSessionJsonPath(_session.SessionId));
+        }
+#endif
 
         public void InitializePlaybackFromSession(string sessionId)
         {

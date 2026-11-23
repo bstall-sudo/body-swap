@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3755238779732181253}
   - component: {fileID: 3053154067257784704}
   - component: {fileID: 6278253758758756215}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: LineVisual
-  m_TagString: Untagged
+  m_TagString: excludeFromVideoRendering
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
