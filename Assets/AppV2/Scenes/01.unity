@@ -17629,6 +17629,11 @@ MonoBehaviour:
     previewSprite: {fileID: 21300000, guid: 84c22297f1c728c43b2981997b45f901, type: 3}
     sourcePath: 
     isExternal: 0
+  - avatarId: EinBein_001
+    prefab: {fileID: 2139186443689266634, guid: 6515ebc844f9486419f92d960b5182a3, type: 3}
+    previewSprite: {fileID: 21300000, guid: 83a39e8a9293e804b9f7884c9bdcad8b, type: 3}
+    sourcePath: 
+    isExternal: 0
 --- !u!1 &236542514
 GameObject:
   m_ObjectHideFlags: 0
@@ -61572,7 +61577,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1191703870}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.29360795
+  m_Size: 0.293051
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -121071,6 +121076,9 @@ MonoBehaviour:
   - environmentId: BeschwerdeStelle_01
     prefab: {fileID: 888953961253849248, guid: bfb29fb1050efd24caefc6d8f9199c98, type: 3}
     previewSprite: {fileID: 21300000, guid: e352bc22fd0ffc547a3b386a9895fa38, type: 3}
+  - environmentId: roterHimmelRezeption
+    prefab: {fileID: 5675472318541006916, guid: 72ac33e9b26c37e4988f5069b8bff496, type: 3}
+    previewSprite: {fileID: 21300000, guid: 301bf7dc353df9849b86fa4c08628f74, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0
