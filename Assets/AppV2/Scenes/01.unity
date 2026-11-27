@@ -61577,7 +61577,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1191703870}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2642007
+  m_Size: 0.26142266
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -121079,6 +121079,9 @@ MonoBehaviour:
   - environmentId: roterHimmelRezeption
     prefab: {fileID: 5675472318541006916, guid: 72ac33e9b26c37e4988f5069b8bff496, type: 3}
     previewSprite: {fileID: 21300000, guid: 301bf7dc353df9849b86fa4c08628f74, type: 3}
+  - environmentId: Wohung_01
+    prefab: {fileID: 6099700693124364740, guid: 9e80105aaba1e84479ca5ad4a089a5c0, type: 3}
+    previewSprite: {fileID: 21300000, guid: 1ca5380f7ce9fde49aef9a73e0e129de, type: 3}
 --- !u!1 &1729954102
 GameObject:
   m_ObjectHideFlags: 0
